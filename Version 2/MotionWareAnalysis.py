@@ -11,41 +11,27 @@ __docformat__ = 'reStructuredText'
 import warnings; warnings.simplefilter("ignore");
 
 #Import extenstion libraries
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import datetime
 
+# If cells are not formatted as spcified in readMe the 
+# toSLeepIndex values and finish Sleep indedx values must be changed
+# NOTE: The index values seem off by 1 because we remove the first row in
+# the sleep diary upon storing it as pandas dataframe
 toSleepIndex = 0
 finishSleepIndex = 2
 sleepDiarySkipRows = 1
 sleepDiaryError = 1; #hours
 
-#TODO: Add Raises clause so that we don't allow improperly formatted CSV file 
-def getSleepData():
-    """ Reads the sleep data and stores it in pandas DataFrame
-
-    Reads the raw sleep data extracted from MotionWare software into CSV file 
-    and stores the data in a pandas DataFrame datatype. Raw sleep data MUST be 
-    formatted as specified in the read me document)
-
-    :param: none
-    :return: dataframe with datetime, activity (int), lux (int) as cols
-    :rtype: (pandas DataFrame)
-    """
-    sleepData = pd.read_excel('SampleRawData.xlsx')
-    sleepData = sleepData.set_index("Date")
-    
-    return sleepData
-
-#TODO:  Add sleep diary format to readme
 def getSleepDiary():
     """Reads the sleep diary and stores it in pandas DataFrame 
 
     Reads the Sleep diaries of study participants and stores the data in a 
     pandas DataFrame datatype. Raw Sleep data MUST be formatted correctly. 
     No exception will be thrown for incorrectly formatted sleep diary. (see 
-    read me for sleep diary formattingg)
+    read me for sleep diary formatting). The dataframe does not store the data
+    contained in the first row with the USER ID Code.
 
     :param: none
     :return: sleep diary converted to pandas DataFrame
@@ -56,21 +42,13 @@ def getSleepDiary():
     
     return sleepDiary
 
-"""
-@Function: getSleepDates()
-@Parameters: None
-@Returns: Returns the dates participant wore MotionWare watch as list
-"""
+
 def getSleepDates():
-    """ Reads the sleep diary 
+    """ Gets the dates the participant wore the MotionWatch 8
 
-    Extended description of function.
-
-    :param int arg1: Description of arg1.
-    :param str arg2: Description of arg2.
-    :raises ValueError if arg1 is equal to arg2
-    :return: Description of return value
-    :rtype: bool
+    :param: None
+    :return: Returns the dates the particpant wore watch in chronological order
+    :rtype: (list)
     """
     sleepDiary = getSleepDiary()
     dates = list(sleepDiary)
@@ -80,13 +58,17 @@ def getSleepDates():
     return dates;
     
 
-"""
-@Function: SleepDateTimes()
-@Parameter: None
-@Returns: Returns a list of the to sleep times of participant from most recent day
-to oldest day
-"""
 def getToSleepDateTimes():
+    """ Gets the sleep times of the participant during study period
+
+    This function gets the times the participant marked in their sleep diary
+    that they started to try and fall alseep. It gets these times for the
+    days where MotionWatch data was specified to be recorded.
+    
+    :param: None
+    :return: Returns the time the particpant inidicated they were going to sleep
+    :rtype: (list)
+    """
     dates = getSleepDates()
     sleepDiary = getSleepDiary()
     toSleepList = list()
@@ -106,13 +88,13 @@ def getToSleepDateTimes():
     return toSleepList
 
 
-"""
-@Function: SleepDateTimes()
-@Parameter: None
-@Returns: Returns a list of the to sleep times of participant from most recent day
-to oldest day
-"""
 def getFinishSleepDateTimes():
+    """Gets the times the participant specified they woke up in sleep diary
+    
+    :param: none
+    :return: Returns the times the participant inidicated the woke up in diary
+    :rtype: (list)
+    """
     dates = getSleepDates()
     sleepDiary = getSleepDiary()
     finishSleepList = list()
@@ -125,12 +107,19 @@ def getFinishSleepDateTimes():
     
     return finishSleepList
                
-"""
-@Function: sleepDataDateTime()
-@Parameters: None
-@Returns: Sleep data edited with date and time combined as indices 
-"""
+
 def sleepDataDateTime():
+    """ Reads the sleep data and stores it in pandas DataFrame
+
+    Reads the raw sleep data extracted from MotionWare software into CSV file 
+    and stores the data in a pandas DataFrame datatype. The datetime 
+    column becomes the indicies for the dataframe. Raw sleep data MUST be 
+    formatted as specified in the read me document). 
+
+    :param: none
+    :return: dataframe with datetime as index, activity(int), lux(int) as cols
+    :rtype: (pandas DataFrame)
+    """
     sleepDataRaw = pd.read_excel('SampleRawData.xlsx')
     dateTimeList = list()
     for index, row in sleepDataRaw.iterrows():
@@ -148,73 +137,84 @@ def sleepDataDateTime():
 @Parameters: Takes the sleep range and the sleepTime list
 @Returns: The time the participant went to sleep
 """
+#TODO make this function more modular
 def findSleepTime(sleepRange, actualSleepTime):
+    """ Commputes the sleep times 
+
+    Reads the raw sleep data extracted from MotionWare software into CSV file 
+    and stores the data in a pandas DataFrame datatype. Raw sleep data MUST be 
+    formatted as specified in the read me document)
+
+    :param: none
+    :return: dataframe with datetime, activity (int), lux (int) as cols
+    :rtype: (pandas DataFrame)
+    """    
     
-          meanActivity = sleepData['Activity (MW counts)'].mean()
+    meanActivity = sleepData['Activity (MW counts)'].mean()
           #Set too sleep variables
-          zeroMovementCount = 0;
-          zeroLightCount = 0;
-          zeroLightActiveCount = 0;
-          darkMotion = 0;
-          sleepActiveCheck = False
-          sleepLightCheck = False
-          foundSleepTime = False
-          sleepTime = datetime.datetime.now()
-          sleepLightTime = datetime.datetime.now()
+    zeroMovementCount = 0;
+    zeroLightCount = 0;
+    zeroLightActiveCount = 0;
+    darkMotion = 0;
+    sleepActiveCheck = False
+    sleepLightCheck = False
+    foundSleepTime = False
+    sleepTime = datetime.datetime.now()
+    sleepLightTime = datetime.datetime.now()
           
             
-          for index, row in sleepRange.iterrows():       
+    for index, row in sleepRange.iterrows():       
              
-             if foundSleepTime == False:        # Find the time the participant went to sleep
-                  if int(row['Activity (MW counts)']) == 0:
-                      zeroMovementCount = zeroMovementCount + 1 
+        if foundSleepTime == False:        # Find the time the participant went to sleep
+            if int(row['Activity (MW counts)']) == 0:
+                zeroMovementCount = zeroMovementCount + 1 
                       
-                      if int(row['Light (lux)']) == 0:
-                          zeroLightActiveCount = zeroLightActiveCount + 1     
+                if int(row['Light (lux)']) == 0:
+                    zeroLightActiveCount = zeroLightActiveCount + 1     
                       
-                      if sleepActiveCheck == False:
-                          sleepActiveCheck = True
-                          sleepTime = row.name  
-                  else:
-                    zeroMovementCount = 0
-                    sleepActiveCheck = False
-                    zeroLightActiveCount = 0
+                if sleepActiveCheck == False:
+                    sleepActiveCheck = True
+                    sleepTime = row.name  
+            else:
+                zeroMovementCount = 0
+                sleepActiveCheck = False
+                zeroLightActiveCount = 0
              
-                  if int(row['Light (lux)']) == 0:
-                      zeroLightCount = zeroLightCount + 1
+            if int(row['Light (lux)']) == 0:
+                zeroLightCount = zeroLightCount + 1
                       
-                      if int(row['Activity (MW counts)']) <= meanActivity:
-                          darkMotion = darkMotion + 1;
+                if int(row['Activity (MW counts)']) <= meanActivity:
+                    darkMotion = darkMotion + 1;
                       
-                      if sleepLightCheck == False:
-                          sleepLightCheck = True
-                          sleepLightTime = row.name  
-                  else:
-                    zeroMovementCount = 0
-                    sleepLightCheck = False
-                    darkMotion = 0
+                if sleepLightCheck == False:
+                    sleepLightCheck = True
+                    sleepLightTime = row.name  
+            else:
+                zeroMovementCount = 0
+                sleepLightCheck = False
+                darkMotion = 0
                   
-                  if darkMotion >= 5 and foundSleepTime == False: # Look here to switch threshold values for light, activity and both 
-                      #print('dark motion')
-                      actualSleepTime.append(sleepLightTime)
-                      foundSleepTime = True
+            if darkMotion >= 5 and foundSleepTime == False: # Look here to switch threshold values for light, activity and both 
+                #print('dark motion')
+                actualSleepTime.append(sleepLightTime)
+                foundSleepTime = True
                   
-                  if zeroLightActiveCount >= 5 and foundSleepTime == False:
-                      #print('zero activity and then no Light')
-                      actualSleepTime.append(sleepTime)
-                      foundSleepTime = True
+            if zeroLightActiveCount >= 5 and foundSleepTime == False:
+                #print('zero activity and then no Light')
+                actualSleepTime.append(sleepTime)
+                foundSleepTime = True
                     
-                  if zeroMovementCount >= 20 and foundSleepTime == False:
-                     #print('no movement')
-                     actualSleepTime.append(sleepTime)
-                     foundSleepTime = True
+            if zeroMovementCount >= 20 and foundSleepTime == False:
+                #print('no movement')
+                actualSleepTime.append(sleepTime)
+                foundSleepTime = True
                   
-                  if zeroLightCount >= 15 and foundSleepTime == False:
-                      #print('no light')
-                      actualSleepTime.append(sleepLightTime)
-                      foundSleepTime = True
+            if zeroLightCount >= 15 and foundSleepTime == False:
+                #print('no light')
+                actualSleepTime.append(sleepLightTime)
+                foundSleepTime = True
                       
-          return actualSleepTime
+    return actualSleepTime
  
     
 """

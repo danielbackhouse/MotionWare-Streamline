@@ -134,7 +134,7 @@ def sleepDataDateTime():
 def findSleepTime(sleepRange, actualSleepTime):
     
           meanActivity = sleepData['Activity (MW counts)'].mean()
-          #Set too sleep variables
+         #Set too sleep variables
           zeroMovementCount = 0;
           zeroLightCount = 0;
           zeroLightActiveCount = 0;
@@ -258,7 +258,7 @@ def findAwakeTime(awakeRange, actualAwakeTime, diaryTime, darkRangeMean):
 def findSleepPoint():
       sleepData = sleepDataDateTime()
       toSleepTimes = getToSleepDateTimes() # Sleep Diary Sleep times
-      finishSleepTimes = getFinishSleepDateTimes() # Sleep Diary Awaken Times
+      finishSleepTimes = getFinishSleepDateTimes() # Sleep Diary Awake times
       
       meanActivity = sleepData['Activity (MW counts)'].mean()
       meanLux = sleepData['Light (lux)'].mean()
@@ -269,7 +269,7 @@ def findSleepPoint():
       activityVariance = list()
       luxVariance = list()
       
-      for i in range(len(toSleepTimes)):        # iterare through sleep times
+      for i in range(len(toSleepTimes)):
           # Find too sleep times of the participant
           toSleepError = toSleepTimes[i] - datetime.timedelta(hours = 1)
           finishSleepError = finishSleepTimes[i] + datetime.timedelta(hours = 1)
