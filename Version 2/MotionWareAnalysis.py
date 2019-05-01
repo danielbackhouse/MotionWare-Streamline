@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on: 2018-08-20 
-Last Edit: 2018-11-02 
-
-@ Title: MotionWare Sleep Analysis VGH
-@ Purpose: To determine the sleep points and awake times from raw data and sleep diaries for given participants
-@author: Daniel Backhouse
-
+""" Title: MotionWare Sleep Analysis VGH
+    Purpose: To determine the sleep points and awake times from raw data and sleep diaries for given participants
+    uthor: Daniel Backhouse
 """
 
 __license__ = "Daniel Backhouse"
@@ -27,23 +21,42 @@ finishSleepIndex = 2
 sleepDiarySkipRows = 1
 sleepDiaryError = 1; #hours
 
-"""
-@Function: getSleepData()
-@Parameters: None
-@Returns: Reads sleep data file as pandas DataFrame from excel file
-"""      
+#TODO: Add Raises clause so that we don't allow improperly formatted CSV file 
 def getSleepData():
+    """ Reads the sleep data and stores it in pandas DataFrame
+
+    Reads the raw sleep data extracted from MotionWare software into CSV file 
+    and stores the data in a pandas DataFrame datatype. Raw sleep data MUST be 
+    formatted as follows:
+        - 3 columns of data (date and time, activity count and then lux count)
+        - first row holds strings specifying which column corresponds to which
+        - all subsequent rows should only include relevant data
+        - dates must be in chronological order
+    else an exception an exception will be thrown
+    
+    :param: none
+    :raises ValueError if CSV formatted incorrectly
+    :return: dataframe with datetime, activity (int), lux (int) as cols
+    :rtype: (pandas DataFrame)
+    """
     sleepData = pd.read_excel('SampleRawData.xlsx')
     sleepData = sleepData.set_index("Date")
     
     return sleepData
 
-"""
-@Function: getSleepDiary()
-@Paramters: None
-@Returns: Returns particpant sleepDiary as pandas DataFrame
-"""
+#TODO:  Add sleep diary format to readme
 def getSleepDiary():
+    """Reads the sleep diary and stores it in pandas DataFrame 
+
+    Reads the Sleep diaries of study participants and stores the data in a 
+    pandas DataFrame datatype. Raw Sleep data MUST be formatted correctly. 
+    No exception will be thrown for incorrectly formatted sleep diary. (see 
+    read me for sleep diary formattingg)
+
+    :param: none
+    :return: sleep diary converted to pandas DataFrame
+    :rtype: (pandas DataFrame)
+    """
     #skipping row 1 for now based on current format
     sleepDiary = pd.read_excel('SampleSleepDiaries.xlsx', skiprows = sleepDiarySkipRows);
     
@@ -55,6 +68,16 @@ def getSleepDiary():
 @Returns: Returns the dates participant wore MotionWare watch as list
 """
 def getSleepDates():
+    """ Reads the sleep diary 
+
+    Extended description of function.
+
+    :param int arg1: Description of arg1.
+    :param str arg2: Description of arg2.
+    :raises ValueError if arg1 is equal to arg2
+    :return: Description of return value
+    :rtype: bool
+    """
     sleepDiary = getSleepDiary()
     dates = list(sleepDiary)
     dates.reverse()
@@ -299,4 +322,3 @@ sleepData = sleepDataDateTime()
 
 # Sleep times and awkaening times of participants
 sleepTimes, awakeTimes = findSleepPoint()
-
