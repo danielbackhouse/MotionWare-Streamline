@@ -141,9 +141,18 @@ def sleepDataDateTime():
 def findSleepTime(sleepRange, actualSleepTime):
     """ Commputes the sleep times 
 
-    Reads the raw sleep data extracted from MotionWare software into CSV file 
-    and stores the data in a pandas DataFrame datatype. Raw sleep data MUST be 
-    formatted as specified in the read me document)
+    This function computes the sleep times of the participant given the 
+    sleeprange (sleep range is the range of time in which is was determined
+    it is most likely for the participant to have fell asleep). The sleepRange
+    value is computed by taking the sleep time specified in the sleep diary and
+    the generating a time range based on the sleep diary error specified in the
+    global variables of this class. The actualSleepTime is an empty list that 
+    we will store the computed sleep times in. 
+    
+    Sleep point are determined be checking the zeroMovementCount, 
+    zeroLightCount, zeroLightActiveCount and darkMotion variables. For me on
+    these and what they are see the readME. 
+    
 
     :param: none
     :return: dataframe with datetime, activity (int), lux (int) as cols
