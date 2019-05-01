@@ -27,15 +27,9 @@ def getSleepData():
 
     Reads the raw sleep data extracted from MotionWare software into CSV file 
     and stores the data in a pandas DataFrame datatype. Raw sleep data MUST be 
-    formatted as follows:
-        - 3 columns of data (date and time, activity count and then lux count)
-        - first row holds strings specifying which column corresponds to which
-        - all subsequent rows should only include relevant data
-        - dates must be in chronological order
-    else an exception an exception will be thrown
-    
+    formatted as specified in the read me document)
+
     :param: none
-    :raises ValueError if CSV formatted incorrectly
     :return: dataframe with datetime, activity (int), lux (int) as cols
     :rtype: (pandas DataFrame)
     """
