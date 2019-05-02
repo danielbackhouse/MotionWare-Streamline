@@ -134,12 +134,12 @@ def sleepDataDateTime():
 
 
 #TODO make this function more modular
-def findSleepTime(sleepRange, actualSleepTime):
+def findSleepTime(sleepPointRange, actualSleepTime):
     """ Commputes the sleep times 
 
     This function computes the sleep times of the participant given the 
-    sleeprange (sleep range is the range of time in which is was determined
-    it is most likely for the participant to have fell asleep). The sleepRange
+    sleepPointRange (sleep range is the range of time in which is was determined
+    it is most likely for the participant to have fell asleep). The sleepPointRange
     value is computed by taking the sleep time specified in the sleep diary and
     the generating a time range based on the sleep diary error specified in the
     global variables of this class. The actualSleepTime is an empty list that 
@@ -152,14 +152,13 @@ def findSleepTime(sleepRange, actualSleepTime):
     Note that if a sleep point cannot be found give the thresholds the sleep
     diary value marked down by the participant will be used as the sleep time
     
-    :param (pandas DataFrame) sleepRange: Range of times participant fell asleep
+    :param (pandas DataFrame) sleepPointRange: Range of times participant fell asleep
     :param (list) actualSleepTime: empty list where sleep times will be stored
     :return: actualSleepTimes list with the times participant went to sleep
     :rtype: (list)
     """    
     
     meanActivity = sleepData['Activity (MW counts)'].mean()
-          #Set too sleep variables
     zeroMovementCount = 0;
     zeroLightCount = 0;
     zeroLightActiveCount = 0;
@@ -171,7 +170,7 @@ def findSleepTime(sleepRange, actualSleepTime):
     sleepLightTime = datetime.datetime.now()
           
             
-    for index, row in sleepRange.iterrows():       
+    for index, row in sleepPointRange.iterrows():       
              
         if foundSleepTime == False:        # Find the time the participant went to sleep
             if int(row['Activity (MW counts)']) == 0:
@@ -232,16 +231,16 @@ def findSleepTime(sleepRange, actualSleepTime):
 @Parameters: Takes the awake range (pandas dataframe) and the awake time list
 @ Returns: A list of times the participant woke up
 """
-def findAwakeTime(awakeRange, actualAwakeTime, diaryTime, darkRangeMean):
+def findAwakeTime(awakePointRange, actualAwakeTime, diaryTime, sleepRangeMean):
     
     zeroStirringCount = 0;
     awakeFound = False
     awakeTime = datetime.datetime.now()
     
-    for index, row in awakeRange.iterrows():
+    for index, row in awakePointRange.iterrows():
         
         if awakeFound == False:
-            if int(row['Light (lux)']) != 0 and int(row['Activity (MW counts)']) >= darkRangeMean:
+            if int(row['Light (lux)']) != 0 and int(row['Activity (MW counts)']) >= sleepRangeMean:
                 zeroStirringCount = zeroStirringCount + 1
                 if zeroStirringCount == 1:
                     awakeTime = row.name
@@ -267,29 +266,26 @@ def findAwakeTime(awakeRange, actualAwakeTime, diaryTime, darkRangeMean):
 """
 def findSleepPoint():
       sleepData = sleepDataDateTime()   # Get sleep diary from excel sheet
-      toSleepTimes = getToSleepDateTimes()      # Get sleep diary lights out times
-      finishSleepTimes = getFinishSleepDateTimes()      # Get sleep diary got up times
-        
+      lightsOutDiaryTimes = getToSleepDateTimes()      # Get sleep diary lights out times
+      gotUpDiaryTimes = getFinishSleepDateTimes()      # Get sleep diary got up times
+      
       actualSleepTime = list() 
       actualAwakeTime = list()
       
-      for i in range(len(toSleepTimes)):        # iterare through sleep times
-          # Find too sleep times of the participant
-          toSleepError = toSleepTimes[i] - datetime.timedelta(hours = 1)
-          finishSleepError = finishSleepTimes[i] + datetime.timedelta(hours = 1)
-          sleepRange = sleepData.loc[toSleepError:finishSleepError]
-          sleepTimes = findSleepTime(sleepRange, actualSleepTime)
+      for i in range(len(lightsOutDiaryTimes)):
           
-          # Analyze the sleep period of the participant to look for strange activty or lux
-          hourBeforeWakeUp = finishSleepTimes[i] - datetime.timedelta(hours = 1)
-          darkRange = sleepData.loc[sleepTimes[i]: hourBeforeWakeUp]
-          #sleepTimeCheck(darkRange, meanActivity, meanLux, luxVariance, activityVariance)
-          
-          # Find the awakening times of the participant
-          twohourBeforeWakeUp = finishSleepTimes[i] - datetime.timedelta(hours = 1)
-          finishSleepGuess  = finishSleepTimes[i] + datetime.timedelta(hours = 2)
-          awakeRange = sleepData.loc[twohourBeforeWakeUp:finishSleepGuess]
-          awakeTimes = findAwakeTime(awakeRange, actualAwakeTime, finishSleepTimes[i], darkRange['Activity (MW counts)'].mean())      
+          beforeLightsOutError = lightsOutDiaryTimes[i] - datetime.timedelta(hours = 1) # One hour before lights out
+          afterLightsOutError = gotUpDiaryTimes[i] + datetime.timedelta(hours = 1) # One hour after got up
+          sleepPointRange = sleepData.loc[beforeLightsOutError:afterLightsOutError] # range to check for actual lights out
+          sleepTimes = findSleepTime(sleepPointRange, actualSleepTime)   # get the times the particiapnt went to sleep
+            
+          hourBeforeWakeUp = gotUpDiaryTimes[i] - datetime.timedelta(hours = 1)
+          sleepRange = sleepData.loc[sleepTimes[i]: hourBeforeWakeUp] # estimated sleep range of participant (awake point estimated)
+
+          beforeGotUpError = gotUpDiaryTimes[i] - datetime.timedelta(hours = 1) # One hour before got up
+          afterGotUpError  = gotUpDiaryTimes[i] + datetime.timedelta(hours = 2) # Two hour after got up
+          awakePointRange = sleepData.loc[beforeGotUpError:afterGotUpError]
+          awakeTimes = findAwakeTime(awakePointRange, actualAwakeTime, gotUpDiaryTimes[i], sleepRange['Activity (MW counts)'].mean())      
         
       return sleepTimes, awakeTimes
 
