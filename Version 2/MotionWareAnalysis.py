@@ -1,6 +1,7 @@
 """ Title: MotionWare Sleep Analysis VGH
-    Purpose: To determine the sleep points and awake times from raw data and sleep diaries for given participants
-    uthor: Daniel Backhouse
+    Purpose: To determine the sleep points and awake times from raw data and 
+            sleep diaries for given .
+    Author: Daniel Backhouse
 """
 
 __license__ = "Daniel Backhouse"
@@ -191,8 +192,8 @@ def findSleepTime(sleepPointRange, actualSleepTime):
                 zeroLightCount = zeroLightCount + 1
                       
                 if int(row['Activity (MW counts)']) <= meanActivity:
-                    darkMotion = darkMotion + 1;
-                      
+                    darkMotion = darkMotion + 1;            
+                
                 if sleepLightCheck == False:
                     sleepLightCheck = True
                     sleepLightTime = row.name  
@@ -200,39 +201,42 @@ def findSleepTime(sleepPointRange, actualSleepTime):
                 zeroMovementCount = 0
                 sleepLightCheck = False
                 darkMotion = 0
-                  
+            
+            # Check all counters to see if they have exceeded the threshold values
             if darkMotion >= 5 and foundSleepTime == False: # Look here to switch threshold values for light, activity and both 
-                #print('dark motion')
                 actualSleepTime.append(sleepLightTime)
                 foundSleepTime = True
                   
             if zeroLightActiveCount >= 5 and foundSleepTime == False:
-                #print('zero activity and then no Light')
                 actualSleepTime.append(sleepTime)
                 foundSleepTime = True
                     
             if zeroMovementCount >= 20 and foundSleepTime == False:
-                #print('no movement')
                 actualSleepTime.append(sleepTime)
                 foundSleepTime = True
                   
             if zeroLightCount >= 15 and foundSleepTime == False:
-                #print('no light')
                 actualSleepTime.append(sleepLightTime)
                 foundSleepTime = True
                       
     return actualSleepTime
  
-    
 
-
-"""
-@Function: findAwakeTime
-@Parameters: Takes the awake range (pandas dataframe) and the awake time list
-@ Returns: A list of times the participant woke up
-"""
 def findAwakeTime(awakePointRange, actualAwakeTime, diaryTime, sleepRangeMean):
+    """ Finds the times the participant woke up and returns it as a list
+
+    This function determines the points at which the participant went to sleep
+    on each day of the study are returns all the times they woke up as a list.
     
+    :param (pandas DataFrame) awakePointRange: Estimated range during which
+                participant woke up.
+    :param (list) actualAwakeTime: Empty list where awake times are stored
+    :param (datetime) diaryTime: Time participant marked to have gone to sleep
+                in sleep diary.
+    :param (double) sleepRangeMean: mean activity count over estimated sleep range
+    :return: Returns a list containing the times the participant went to sleep
+    :rtype: (list) 
+    """
     zeroStirringCount = 0;
     awakeFound = False
     awakeTime = datetime.datetime.now()
@@ -243,8 +247,7 @@ def findAwakeTime(awakePointRange, actualAwakeTime, diaryTime, sleepRangeMean):
             if int(row['Light (lux)']) != 0 and int(row['Activity (MW counts)']) >= sleepRangeMean:
                 zeroStirringCount = zeroStirringCount + 1
                 if zeroStirringCount == 1:
-                    awakeTime = row.name
-                
+                    awakeTime = row.name                
             else:
                 zeroStirringCount = 0
             
@@ -253,26 +256,31 @@ def findAwakeTime(awakePointRange, actualAwakeTime, diaryTime, sleepRangeMean):
                 actualAwakeTime.append(awakeTime)
                 break
             
-    # If no time is found return diary time
-    if awakeFound == False:
+    if awakeFound == False:         # If no time is found return diary time
         actualAwakeTime.append(diaryTime)            
              
     return actualAwakeTime;
   
-""""
-@Function: findSleepPoint()
-@Parameters: sleepData (DataFrame), activityMean (float)
-@Returns: The point at which participant went to sleep on given day
-"""
+    
 def findSleepPoint():
-      sleepData = sleepDataDateTime()   # Get sleep diary from excel sheet
-      lightsOutDiaryTimes = getToSleepDateTimes()      # Get sleep diary lights out times
-      gotUpDiaryTimes = getFinishSleepDateTimes()      # Get sleep diary got up times
+    """ Finds the times the participant went to sleep and woke up
+
+    This function utilizes the sleep diary times and sleep data to determine 
+    the points at which a participant went to sleep and woke up. 
+    
+    :param: None
+    :return: Returns two lists, one of when the participant went to sleep and 
+             the other when they woke up
+    :rtype: (list) (list)
+    """
+    sleepData = sleepDataDateTime()   # Get sleep diary from excel sheet
+    lightsOutDiaryTimes = getToSleepDateTimes()      # Get sleep diary lights out times
+    gotUpDiaryTimes = getFinishSleepDateTimes()      # Get sleep diary got up times
       
-      actualSleepTime = list() 
-      actualAwakeTime = list()
+    actualSleepTime = list() 
+    actualAwakeTime = list()
       
-      for i in range(len(lightsOutDiaryTimes)):
+    for i in range(len(lightsOutDiaryTimes)):
           
           beforeLightsOutError = lightsOutDiaryTimes[i] - datetime.timedelta(hours = 1) # One hour before lights out
           afterLightsOutError = gotUpDiaryTimes[i] + datetime.timedelta(hours = 1) # One hour after got up
@@ -287,14 +295,14 @@ def findSleepPoint():
           awakePointRange = sleepData.loc[beforeGotUpError:afterGotUpError]
           awakeTimes = findAwakeTime(awakePointRange, actualAwakeTime, gotUpDiaryTimes[i], sleepRange['Activity (MW counts)'].mean())      
         
-      return sleepTimes, awakeTimes
+    return sleepTimes, awakeTimes
 
     
 """
-@Main: Runs the main 
-@Purpose: Runs each function to execute program
+Main Program is executed from this point
+@TODO: This will be changed to a public function within this python class
 """
-##Get the particpants sleepData from the excel sheet
+# Get the particpants sleepData from the excel sheet
 sleepData = sleepDataDateTime()
 
 # Sleep times and awkaening times of participants
