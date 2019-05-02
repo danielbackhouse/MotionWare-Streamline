@@ -305,7 +305,7 @@ def findSleepPoint():
           # Analyze the sleep period of the participant to look for strange activty or lux
           hourBeforeWakeUp = finishSleepTimes[i] - datetime.timedelta(hours = 1)
           darkRange = sleepData.loc[sleepTimes[i]: hourBeforeWakeUp]
-          sleepTimeCheck(darkRange, meanActivity, meanLux, luxVariance, activityVariance)
+          #sleepTimeCheck(darkRange, meanActivity, meanLux, luxVariance, activityVariance)
           
           # Find the awakening times of the participant
           twohourBeforeWakeUp = finishSleepTimes[i] - datetime.timedelta(hours = 1)
