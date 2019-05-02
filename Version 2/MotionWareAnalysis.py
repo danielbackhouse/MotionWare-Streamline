@@ -132,11 +132,7 @@ def sleepDataDateTime():
     
     return sleepData
 
-"""
-@Function: findSleepTime
-@Parameters: Takes the sleep range and the sleepTime list
-@Returns: The time the participant went to sleep
-"""
+
 #TODO make this function more modular
 def findSleepTime(sleepRange, actualSleepTime):
     """ Commputes the sleep times 
@@ -150,13 +146,16 @@ def findSleepTime(sleepRange, actualSleepTime):
     we will store the computed sleep times in. 
     
     Sleep point are determined be checking the zeroMovementCount, 
-    zeroLightCount, zeroLightActiveCount and darkMotion variables. For me on
+    zeroLightCount, zeroLightActiveCount and darkMotion variables. For more on
     these and what they are see the readME. 
     
-
-    :param: none
-    :return: dataframe with datetime, activity (int), lux (int) as cols
-    :rtype: (pandas DataFrame)
+    Note that if a sleep point cannot be found give the thresholds the sleep
+    diary value marked down by the participant will be used as the sleep time
+    
+    :param (pandas DataFrame) sleepRange: Range of times participant fell asleep
+    :param (list) actualSleepTime: empty list where sleep times will be stored
+    :return: actualSleepTimes list with the times participant went to sleep
+    :rtype: (list)
     """    
     
     meanActivity = sleepData['Activity (MW counts)'].mean()
@@ -250,6 +249,7 @@ def sleepTimeCheck(darkRange, meanActivity, meanLux, luxVariance, activityVarian
 @ Returns: A list of times the participant woke up
 """
 def findAwakeTime(awakeRange, actualAwakeTime, diaryTime, darkRangeMean):
+    
     zeroStirringCount = 0;
     awakeFound = False
     awakeTime = datetime.datetime.now()
