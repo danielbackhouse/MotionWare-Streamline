@@ -225,23 +225,7 @@ def findSleepTime(sleepRange, actualSleepTime):
     return actualSleepTime
  
     
-"""
-@Function: sleepTimeCheck
-@Parameters: darkRange -  pandas dataframe corrsponding to range participant was aslseep (dataframe)
-             meanActivity  - mean Activity of sleepdata (float)
-             meanLux - mean lux of sleepdata (float)
-             certaintyList - list of certainties for each day
-@Returns: A value from 1 - 10 corresponding to the activity present during sleep
-and the certainty of the sleepTime value
-"""    
-def sleepTimeCheck(darkRange, meanActivity, meanLux, luxVariance, activityVariance):
-    meanRangeActivity  = darkRange['Activity (MW counts)'].mean()
-    meanRangeLux = darkRange['Light (lux)'].mean()
-    
-    luxVariance.append(meanLux - meanRangeLux)
-    activityVariance.append(meanActivity - meanRangeActivity)
-    
-    return luxVariance, activityVariance
+
 
 """
 @Function: findAwakeTime
@@ -282,18 +266,12 @@ def findAwakeTime(awakeRange, actualAwakeTime, diaryTime, darkRangeMean):
 @Returns: The point at which participant went to sleep on given day
 """
 def findSleepPoint():
-      sleepData = sleepDataDateTime()
-      toSleepTimes = getToSleepDateTimes() # Sleep Diary Sleep times
-      finishSleepTimes = getFinishSleepDateTimes() # Sleep Diary Awaken Times
-      
-      meanActivity = sleepData['Activity (MW counts)'].mean()
-      meanLux = sleepData['Light (lux)'].mean()
-      
-      
-      actualSleepTime = list()
+      sleepData = sleepDataDateTime()   # Get sleep diary from excel sheet
+      toSleepTimes = getToSleepDateTimes()      # Get sleep diary lights out times
+      finishSleepTimes = getFinishSleepDateTimes()      # Get sleep diary got up times
+        
+      actualSleepTime = list() 
       actualAwakeTime = list()
-      activityVariance = list()
-      luxVariance = list()
       
       for i in range(len(toSleepTimes)):        # iterare through sleep times
           # Find too sleep times of the participant
