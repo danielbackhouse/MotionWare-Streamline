@@ -2,9 +2,11 @@
 
 Concerning Formatting of Sleep Diary and Raw Data Excel Files:
 
-It is of the utmost and paramount importance that the TWO SEPERATE excel
+It is very important that the TWO SEPERATE excel
 files containing the raw data and sleep diary be formatted correctly BEFORE
 using the MotionWare Analysis program. They must be formatted as follows:
+(note that changes are being made to allow for improperly formatted documents
+only the program will give an error).
 
 Formatting Sleep Diary:
 (example contained within Version 1 folder of this repository)
