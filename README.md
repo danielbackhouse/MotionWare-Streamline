@@ -48,7 +48,7 @@ Concerning the Sleep Point Determination Method:
 		The threshold values for each of the four variables is set within the program and can be checked there. 
 		Currently the threshold values work for members of the lab. Once one of the four variables exceeeds its
 		threshold count we mark that time as being the sleep time and store that value. Note that the counts 
-		represent the number of CONSECUTIVE occurences of each type and NOT an overall count with the given
+		represent the number of CONSECUTIVE occurences of each type and NOT an overall count within the given
 		time range.
 	
 			
