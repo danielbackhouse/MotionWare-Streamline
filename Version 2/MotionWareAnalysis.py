@@ -43,7 +43,7 @@ def getSleepDiary():
     #skipping row 1 for now based on current format
     
     xlsx = pd.ExcelFile('BT_Sleep_Diary.xlsx')
-    sleepDiary = pd.read_excel(xlsx, sheetname='BT_001', dtype = str)
+    sleepDiary = pd.read_excel(xlsx, sheetname='BT_022', dtype = str)
     
     #sleepDiary = pd.read_excel('BT_Sleep_Diary.xlsx', skiprows = sleepDiarySkipRows);
     
@@ -101,9 +101,7 @@ def getToSleepDateTimes():
             date = date - datetime.timedelta(days = 1)
             dateTime = datetime.datetime.combine(date, time)
             toSleepList.append(dateTime)
-            
-    print(toSleepList)
-    
+
     return toSleepList
 
 
@@ -125,8 +123,7 @@ def getFinishSleepDateTimes():
         time = datetime.datetime.strptime(timeString, '%H:%M:%S').time()
         dateTime = datetime.datetime.combine(date, time)
         finishSleepList.append(dateTime)
-    
-    print(finishSleepList)
+
     return finishSleepList
                
 
@@ -142,7 +139,7 @@ def sleepDataDateTime():
     :return: dataframe with datetime as index, activity(int), lux(int) as cols
     :rtype: (pandas DataFrame)
     """
-    sleepDataRaw = pd.read_excel('BT_001_Baseline.xlsx', skiprows = 12)
+    sleepDataRaw = pd.read_excel('BT-022_Baseline.xlsx', skiprows = 12)
     dateTimeList = list()
     for index, row in sleepDataRaw.iterrows():
         dateTime = datetime.datetime.combine(row['Date'], row['Time'])
