@@ -190,6 +190,7 @@ def findSleepTime(sleepPointRange, actualSleepTime, meanActivity):
             
             # Check all counters to see if they have exceeded the threshold values
             if darkMotion >= 5 and foundSleepTime == False: # Look here to switch threshold values for light, activity and both 
+                print("dark motion")
                 actualSleepTime.append(sleepLightTime)
                 foundSleepTime = True
                   
