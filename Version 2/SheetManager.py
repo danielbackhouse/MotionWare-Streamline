@@ -9,6 +9,7 @@ import os
 import pandas as pd
 
 #Directories for folder locations
+#TODO: changes the diretories to be in the RunMotionWareProcessing program
 rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
 sleepDiaryDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Diary.xlsx'
 diaryLightsOutIndex = 1;
@@ -83,10 +84,10 @@ def populateDiaryList():
 @Main: Runs the main
 @Purpose: Runs each function to execute the program
 """
-rawDataList = populateRawDataList()
-diaryList = populateDiaryList()
-diaryDataPairList = [rawDataList,diaryList]
-print(len(rawDataList),len(diaryList))
+#rawDataList = populateRawDataList()
+#diaryList = populateDiaryList()
+#diaryDataPairList = [rawDataList,diaryList]
+#print(len(rawDataList),len(diaryList))
 
 #Testing, patient one would be diaryDataPairList[0][0] and diaryDataPairList[1][0]. etc
 #print(diaryDataPairList[0][0])

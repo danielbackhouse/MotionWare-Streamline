@@ -8,11 +8,29 @@ __revision__ = " $Id: RunMotionWareProcessing.py $ "
 __docformat__ = 'reStructuredText'
 
 
-#supress warnings message
+# Supress warnings message
 import warnings; warnings.simplefilter("ignore");
 
-#Import extenstion libraries
+# Import extenstion libraries
 import pandas as pd
+#TODO: Change title of this at some point
 import MotionWareAnalysis
+import SheetManager
+import time
 
+start = time.time()
+rawDataList = SheetManager.populateRawDataList()
+diaryList = SheetManager.populateDiaryList()
+diaryDataPairList = [rawDataList,diaryList]
+midway = time.time()
+print("\n Found the data... \n")
+print("\n Calculting sleep points for first participant... \n")
+
+      
+sleepTimes, awakeTimes = MotionWareAnalysis.findSleepPoint(diaryList[0], 
+                                                           rawDataList[0])
+
+end = time.time()
+print("\n Completed. \n")
+      
 
