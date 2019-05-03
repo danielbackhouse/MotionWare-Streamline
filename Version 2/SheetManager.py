@@ -11,7 +11,7 @@ import pandas as pd
 #Directories for folder locations
 #TODO: changes the diretories to be in the RunMotionWareProcessing program
 rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
-sleepDiaryDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Diary.xlsx'
+sleepDiaryDirectory  = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\Edited Sleep Diary\BT Sleep Diary Edited.xlsx'
 diaryLightsOutIndex = 1;
 diaryGotUpIndex = 5;
 
