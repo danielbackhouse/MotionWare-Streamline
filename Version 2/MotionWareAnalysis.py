@@ -58,10 +58,7 @@ def getToSleepDateTimes(sleepDiary):
     for index in dates:
       
         date = index
-        timeString = sleepDiary.get_value(toSleepIndex, date)
-        
-        #conerting time given as string in dataframe to datetime.time object
-        time = datetime.datetime.strptime(timeString, '%H:%M:%S').time()
+        time = sleepDiary.get_value(toSleepIndex, date)
         
         # If the the participant goes to sleep in the morning
         # then the day given in the index correspoinds to the day they
@@ -90,9 +87,7 @@ def getFinishSleepDateTimes(sleepDiary):
      
     for index in dates:
         date = index
-        timeString = sleepDiary.get_value(finishSleepIndex, date)
-        #convert time given as string in dataframe to datetime.time object
-        time = datetime.datetime.strptime(timeString, '%H:%M:%S').time()
+        time = sleepDiary.get_value(finishSleepIndex, date)
         dateTime = datetime.datetime.combine(date, time)
         finishSleepList.append(dateTime)
 

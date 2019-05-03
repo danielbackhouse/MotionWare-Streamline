@@ -12,7 +12,6 @@ __docformat__ = 'reStructuredText'
 import warnings; warnings.simplefilter("ignore");
 
 # Import extenstion libraries
-import pandas as pd
 #TODO: Change title of this at some point
 import MotionWareAnalysis
 import SheetManager
