@@ -17,7 +17,7 @@ import pandas as pd
 import datetime
 
 # If cells are not formatted as spcified in readMe the 
-# toSLeepIndex values and finish Sleep indedx values must be changed
+# toSLeepIndex values and finish Sleep index values must be changed
 # NOTE: The index values seem off by 1 because we remove the first row in
 # the sleep diary upon storing it as pandas dataframe
 toSleepIndex = 1

@@ -23,11 +23,20 @@ diaryList = SheetManager.populateDiaryList()
 diaryDataPairList = [rawDataList,diaryList]
 midway = time.time()
 print("\n Found the data... \n")
-print("\n Calculting sleep points for first participant... \n")
+print(midway-start)
+print("\n Calculting sleep points for participants... \n")
 
-      
-sleepTimes, awakeTimes = MotionWareAnalysis.findSleepPoint(diaryList[0], 
-                                                           rawDataList[0])
+lightsOutTimes = list()
+gotUpTimes = list()
+
+for i in range(0,len(diaryList)):
+    check1 = time.time()
+    lightsOut, gotUp = MotionWareAnalysis.findSleepPoint(diaryList[i], rawDataList[i])
+    lightsOutTimes.append(lightsOut)
+    gotUpTimes.append(gotUp)
+    check2 = time.time()
+    print(check2-check1)
+
 
 end = time.time()
 print("\n Completed. \n")
