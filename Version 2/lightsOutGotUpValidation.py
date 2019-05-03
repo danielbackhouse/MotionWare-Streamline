@@ -48,10 +48,22 @@ def get_sleep_analysis_times():
     return lightsOutAnalysis, gotUpAnalysis
 
 
+def get_program_times():
+    """Gets the lights out and got up times of the participant as determined by 
+    the program
+    
+    :param: none
+    :return: Returns the lights out and got up tims of the participant as 
+        specified by the program
+    :rtype: (list)
+    """
+    
+    rawDataList = SheetManager.populateRawDataList()
+    diaryList = SheetManager.populateDiaryList()
+    
+    lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(diaryList[0], rawDataList[0])
+    
+    return lightsOutTimes, gotUpTimes
 
-rawDataList = SheetManager.populateRawDataList()
-diaryList = SheetManager.populateDiaryList()
-diaryDataPairList = [rawDataList,diaryList]
 
-lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(diaryList[0], rawDataList[0])
 
