@@ -31,8 +31,7 @@ def findMatching(fileName):
     numbers = fileName[3:6]
     
     if fileName.endswith('.xlsx'):
-        xlsx = pd.ExcelFile(sleepDiaryDirectory)
-        rawSleepDiary = pd.ExcelFile(xlsx)
+        rawSleepDiary = pd.ExcelFile(sleepDiaryDirectory)
         for sheetName in rawSleepDiary.sheet_names:         
             if sheetName.find(numbers) == 3:
                 return True
@@ -57,7 +56,8 @@ def populateRawDataList():
     
     for file in rawDataAll:
         if file.endswith('.xlsx') and findMatching(file):
-            rawDataList.append(pd.read_excel(rawDataDirectory + '\Baseline\\' + file))  
+            rawDataList.append(pd.read_excel(rawDataDirectory + '\Baseline\\' 
+                                             + file, skiprows = 12))  
         
     return rawDataList
 
@@ -70,7 +70,8 @@ def populateDiaryList():
     :rtype(list)
     """
     diaryList = []
-    rawSleepDiary = pd.ExcelFile(sleepDiaryDirectory)
+    xlsx = pd.ExcelFile(sleepDiaryDirectory)
+    rawSleepDiary = pd.ExcelFile(xlsx)
     
     for sheetName in rawSleepDiary.sheet_names:
         if findMatching(sheetName):
