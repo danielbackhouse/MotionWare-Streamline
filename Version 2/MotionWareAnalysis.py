@@ -283,15 +283,3 @@ def findSleepPoint(sleepDiary, rawData):
           awakeTimes = findAwakeTime(awakePointRange, actualAwakeTime, gotUpDiaryTimes[i], sleepRange['Activity (MW counts)'].mean())      
         
     return sleepTimes, awakeTimes
-
-    
-"""
-Main Program is executed from this point
-@TODO: This will be changed to a public function within this python class
-"""
-# Get the particpants sleepData from the excel sheet
-#sleepData = sleepDataDateTime()
-#sleepDiary = getSleepDiary()
-
-# Sleep times and awkaening times of participants
-#sleepTimes, awakeTimes = findSleepPoint()

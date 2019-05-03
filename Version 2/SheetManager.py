@@ -78,24 +78,4 @@ def populateDiaryList():
         if findMatching(sheetName):
             diaryList.append(pd.read_excel(sleepDiaryDirectory, sheet_name = sheetName))
         
-    return diaryList
-            
-"""
-@Main: Runs the main
-@Purpose: Runs each function to execute the program
-"""
-#rawDataList = populateRawDataList()
-#diaryList = populateDiaryList()
-#diaryDataPairList = [rawDataList,diaryList]
-#print(len(rawDataList),len(diaryList))
-
-#Testing, patient one would be diaryDataPairList[0][0] and diaryDataPairList[1][0]. etc
-#print(diaryDataPairList[0][0])
-#print(diaryDataPairList[1][0])
-#print(diaryDataPairList[0][7])
-#print(diaryDataPairList[1][7])
-#print(diaryDataPairList[0][25])
-#print(diaryDataPairList[1][25])
-#print(diaryDataPairList[0][93])
-#print(diaryDataPairList[1][93])
-        
+    return diaryList        
