@@ -1,6 +1,6 @@
 """ Title: MotionWare Sleep Analysis VGH
     Purpose: To determine the sleep points and awake times from raw data and 
-            sleep diaries for given .
+            sleep diaries for given.
     Author: Daniel Backhouse
 """
 
@@ -20,10 +20,10 @@ import datetime
 # toSLeepIndex values and finish Sleep indedx values must be changed
 # NOTE: The index values seem off by 1 because we remove the first row in
 # the sleep diary upon storing it as pandas dataframe
-toSleepIndex = 0
-finishSleepIndex = 2
-sleepDiarySkipRows = 1
-sleepDiaryError = 1; #hours
+toSleepIndex = 1
+finishSleepIndex = 5
+sleepDiarySkipRows = 0
+sleepDiaryError = 1;    #hours
 
 def getSleepDiary():
     """Reads the sleep diary and stores it in pandas DataFrame 
@@ -33,13 +33,19 @@ def getSleepDiary():
     No exception will be thrown for incorrectly formatted sleep diary. (see 
     read me for sleep diary formatting). The dataframe does not store the data
     contained in the first row with the USER ID Code.
+    
+    Sleep diary times must be entered on 24 hour clock
 
     :param: none
     :return: sleep diary converted to pandas DataFrame
     :rtype: (pandas DataFrame)
     """
     #skipping row 1 for now based on current format
-    sleepDiary = pd.read_excel('SampleSleepDiaries.xlsx', skiprows = sleepDiarySkipRows);
+    
+    xlsx = pd.ExcelFile('BT_Sleep_Diary.xlsx')
+    sleepDiary = pd.read_excel(xlsx, sheetname='BT_001', dtype = str)
+    
+    #sleepDiary = pd.read_excel('BT_Sleep_Diary.xlsx', skiprows = sleepDiarySkipRows);
     
     return sleepDiary
 
@@ -53,8 +59,10 @@ def getSleepDates():
     """
     sleepDiary = getSleepDiary()
     dates = list(sleepDiary)
+    dates.pop()  #remove baseline string from first col in dataframe
     dates.reverse()
-    dates.pop()
+    dates.pop()     #remove avg tring from last col in dataframe
+    dates.reverse()     #flip back to chronoligcal order 
     
     return dates;
     
@@ -73,19 +81,29 @@ def getToSleepDateTimes():
     dates = getSleepDates()
     sleepDiary = getSleepDiary()
     toSleepList = list()
-     
+    
     for index in dates:
-       
+      
         date = index
-        time = sleepDiary.get_value(toSleepIndex, date)
+        timeString = sleepDiary.get_value(toSleepIndex, date)
+        
+        #conerting time given as string in dataframe to datetime.time object
+        time = datetime.datetime.strptime(timeString, '%H:%M:%S').time()
+        
+        # If the the participant goes to sleep in the morning
+        # then the day given in the index correspoinds to the day they
+        # went to sleep otherwise it is the day prior to that given in the
+        # sleep diary
         if time <= datetime.time(hour = 12) and time >= datetime.time(hour=0):
             dateTime = datetime.datetime.combine(date, time)
             toSleepList.append(dateTime)
-        else:
+        else:       
             date = date - datetime.timedelta(days = 1)
             dateTime = datetime.datetime.combine(date, time)
             toSleepList.append(dateTime)
-        
+            
+    print(toSleepList)
+    
     return toSleepList
 
 
@@ -102,10 +120,13 @@ def getFinishSleepDateTimes():
      
     for index in dates:
         date = index
-        time = sleepDiary.get_value(finishSleepIndex, date)
+        timeString = sleepDiary.get_value(finishSleepIndex, date)
+        #conert time given as string in dataframe to datetime.time object
+        time = datetime.datetime.strptime(timeString, '%H:%M:%S').time()
         dateTime = datetime.datetime.combine(date, time)
         finishSleepList.append(dateTime)
     
+    print(finishSleepList)
     return finishSleepList
                
 
@@ -121,7 +142,7 @@ def sleepDataDateTime():
     :return: dataframe with datetime as index, activity(int), lux(int) as cols
     :rtype: (pandas DataFrame)
     """
-    sleepDataRaw = pd.read_excel('SampleRawData.xlsx')
+    sleepDataRaw = pd.read_excel('BT_001_Baseline.xlsx', skiprows = 12)
     dateTimeList = list()
     for index, row in sleepDataRaw.iterrows():
         dateTime = datetime.datetime.combine(row['Date'], row['Time'])
@@ -304,6 +325,7 @@ Main Program is executed from this point
 """
 # Get the particpants sleepData from the excel sheet
 sleepData = sleepDataDateTime()
+sleepDiary = getSleepDiary()
 
 # Sleep times and awkaening times of participants
 sleepTimes, awakeTimes = findSleepPoint()
