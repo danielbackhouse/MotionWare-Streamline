@@ -1,5 +1,8 @@
-""" Title:
-    Purpose:
+""" Title: SheetManager
+    Purpose: To get sleep diaries and raw data of each participant for
+    baseline, midline and final assesments and store both the sleep diary
+    and raw data into pandas dataframe objects
+    Author: Alan Yan and Daniel Backhouse
 """
 #Import extension libraries
 import os
@@ -8,7 +11,8 @@ import pandas as pd
 #Directories for folder locations
 rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
 sleepDiaryDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Diary.xlsx'
-
+diaryLightsOutIndex = 1;
+diaryGotUpIndex = 5;
 
 
 def findMatching(fileName):
@@ -27,7 +31,8 @@ def findMatching(fileName):
     numbers = fileName[3:6]
     
     if fileName.endswith('.xlsx'):
-        rawSleepDiary = pd.ExcelFile(sleepDiaryDirectory)
+        xlsx = pd.ExcelFile(sleepDiaryDirectory)
+        rawSleepDiary = pd.ExcelFile(xlsx)
         for sheetName in rawSleepDiary.sheet_names:         
             if sheetName.find(numbers) == 3:
                 return True

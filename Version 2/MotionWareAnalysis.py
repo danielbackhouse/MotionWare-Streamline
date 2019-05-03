@@ -1,7 +1,7 @@
 """ Title: MotionWare Sleep Analysis VGH
     Purpose: To determine the sleep points and awake times from raw data and 
             sleep diaries for given.
-    Author: Daniel Backhouse
+    Author: Daniel Backhouse and Alan Yan
 """
 
 __license__ = "Daniel Backhouse"
