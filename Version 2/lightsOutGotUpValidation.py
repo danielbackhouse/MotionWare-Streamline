@@ -8,11 +8,9 @@
 import MotionWareAnalysis
 import SheetManager
 import pandas as pd
-
+import datetime
 # Define global variables
 sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
-lightsOutIndex  = 2;
-getUpIndex  = 5;
 
 def get_sleep_analysis_times():
     """Gets the lights out and got up times of the participant as determined in
@@ -23,6 +21,9 @@ def get_sleep_analysis_times():
         specified within the sleep analysis spreadsheet
     :rtype: (list)
     """
+    lightsOutIndex  = 2;
+    getUpIndex  = 5;
+    
     sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, 
                                   sheet_name = 'BT-001 Baseline', skiprows = 16)
     
@@ -42,6 +43,8 @@ def get_sleep_analysis_times():
         lightsOutTime = sleepAnalysis.get_value(lightsOutIndex, day)
         getUpTime = sleepAnalysis.get_value(getUpIndex, day)
         
+        # Note here that we are assuming that the lightsOutTime dates and 
+        # getUpTime dates are the same as those given by the program
         lightsOutAnalysis.append(lightsOutTime)
         gotUpAnalysis.append(getUpTime)
     
@@ -65,5 +68,17 @@ def get_program_times():
     
     return lightsOutTimes, gotUpTimes
 
+# Main execution for the time being will till testing function
+lights_out_analysis_times, got_up_analysis_times = get_sleep_analysis_times()
+lights_out_program_datetimes, got_up_program_datetimes = get_program_times()
 
+lights_out_program_times  = list()
+for times in lights_out_program_datetimes:
+    lights_out_program_times.append(times.time())
+
+got_up_program_times = list()    
+for times in got_up_program_datetimes:
+    got_up_program_times.append(times.time())
+
+ 
 
