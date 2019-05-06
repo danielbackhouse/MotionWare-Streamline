@@ -18,6 +18,9 @@ assesment = 'Baseline'
 lights_out_index  = 2;
 get_up_index  = 5;
 skiprows_analysis = 16;
+#TODO: Create a function that gets the dates for a specified participant
+#did the study over
+dates = "Will be the dates the study goes over"
 
 def get_study_analysis_sleep_times(participant_list):
     """Gets the lights and and got up times for the protocol method of 
@@ -38,9 +41,9 @@ def get_study_analysis_sleep_times(participant_list):
     for participant_id in participant_list:
         lightsOutTimes, gotUpTimes = get_participant_sleep_analysis_times(
                 sleepAnalysisDirectory, participant_id)
-        
+        print(gotUpTimes)
         lights_out_analysis_study_times.append(lightsOutTimes)
-        got_up_analysis_study_times.aappend(got_up_analysis_study_times)
+        got_up_analysis_study_times.append(got_up_analysis_study_times)
         
     return lights_out_analysis_study_times, got_up_analysis_study_times
 
@@ -62,10 +65,11 @@ def get_participant_sleep_analysis_times(sleepAnalysisDirectory, participant_id)
     dates = get_dates(sleepAnalysis)     #get the dates the study was done over
     lightsOutAnalysisTimes = list()
     gotUpAnalysisTimes = list()
-
+    print('about to print get up times')
     for day in dates:
         lightsOutTime = sleepAnalysis.get_value(lights_out_index, day)
         getUpTime = sleepAnalysis.get_value(get_up_index, day)
+        print(getUpTime)
         lightsOutAnalysisTimes.append(lightsOutTime)         # Note here that we are assuming that the lightsOutTime dates and 
         gotUpAnalysisTimes.append(getUpTime)                # getUpTime dates are the same as those given by the program
     
@@ -120,7 +124,7 @@ def get_participant_program_times(rawData,sleepDiary):
         specified by the program
     :rtype: (list)
     """
-    lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(rawData, sleepDiary)
+    lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(sleepDiary, rawData)
 
 #TODO
 def get_raw_data_list(rawDataDirectory):
