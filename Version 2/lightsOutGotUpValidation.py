@@ -182,7 +182,7 @@ def get_participant_error_list(program_times, protocol_times):
     """   
     errorList = list()
     for i in range(0,len(protocol_times)):
-        error = protocol_times.minute - program_times.minute
+        error = protocol_times[i].minute - program_times[i].minute
         errorList.append(error)
         
     return errorList
