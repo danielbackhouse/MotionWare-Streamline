@@ -11,12 +11,37 @@ import pandas as pd
 import datetime
 import numpy as np
 import matplotlib.pyplot as plt
-# Define global variables
-sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
-study_name = 'BT'
-assesment = 'Baseline'
 
-def get_participant_sleep_analysis_times():
+def get_study_analysis_sleep_times(participant_list):
+    """Gets the lights and and got up times for the protocol method of 
+    determining sleep points for the entire study
+    
+    Returns the lights out and got up times for the human protocol 
+    in two lists of lists, one containing all the lights out time for each
+    participant and the other the got up times for each participant.
+    
+    :param (list<string>) participant_list: A list of participant ID's
+    :return: Returns the lights out and got up tims of all the participants
+        within the study
+    :rtype: (list<list>) (list<list>)
+    """
+    lights_out_analysis_study_times = list()
+    got_up_analysis_study_times = list()
+    
+    for participant_id in participant_list:
+        lightsOutTimes, gotUpTimes = get_participant_sleep_analysis_times(
+                sleepAnalysisDirectory, study_name, assesment, participant_id)
+        
+        lights_out_analysis_study_times.append(lightsOutTimes)
+        got_up_analysis_study_times.aappend(got_up_analysis_study_times)
+        
+    return lights_out_analysis_study_times, got_up_analysis_study_times
+
+
+def get_participant_sleep_analysis_times(sleepAnalysisDirectory, study_name, 
+                                         assesment, participant_id, 
+                                         lights_out_index, get_up_index,
+                                         skiprows_analysis):
     """Gets the lights out and got up times of the participant as determined in
     in the sleep analysis
     
@@ -26,60 +51,39 @@ def get_participant_sleep_analysis_times():
         specified within the sleep analysis spreadsheet
     :rtype: (list) (list)
     """
-    lightsOutIndex  = 2;
-    getUpIndex  = 5;
-    
+    sheetName = study_name + '-' + participant_id + ' ' + assesment
     sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, 
-                                  sheet_name = 'BT-001 Baseline', skiprows = 16)
-    
-    dates = list(sleepAnalysis)     #get the dates the study was done over
-    dates.pop()
-    dates.pop()
-    dates.reverse()
-    dates.pop()
-    dates.reverse()
-    
-    lightsOutAnalysis = list()
-    gotUpAnalysis = list()
-    
-    # iterate over study dates within excel sheet at specified indices
-    # to get the lights out and got up values for each specific date
+                                  sheet_name = sheetName,
+                                  skiprows = skiprows_analysis )
+    dates = get_dates(sleepAnalysis)     #get the dates the study was done over
+    lightsOutAnalysisTimes = list()
+    gotUpAnalysisTimes = list()
+
     for day in dates:
-        lightsOutTime = sleepAnalysis.get_value(lightsOutIndex, day)
-        getUpTime = sleepAnalysis.get_value(getUpIndex, day)
-        
-        # Note here that we are assuming that the lightsOutTime dates and 
-        # getUpTime dates are the same as those given by the program
-        lightsOutAnalysis.append(lightsOutTime)
-        gotUpAnalysis.append(getUpTime)
+        lightsOutTime = sleepAnalysis.get_value(lights_out_index, day)
+        getUpTime = sleepAnalysis.get_value(get_up_index, day)
+        lightsOutAnalysisTimes.append(lightsOutTime)         # Note here that we are assuming that the lightsOutTime dates and 
+        gotUpAnalysisTimes.append(getUpTime)                # getUpTime dates are the same as those given by the program
     
-    return lightsOutAnalysis, gotUpAnalysis, dates
+    return lightsOutAnalysisTimes, gotUpAnalysisTimes
 
-def get_study_analysis_sleep_times():
-    """Gets the lights and and got up times for the protocol method of 
-    determining sleep points for the entire study
+
+def get_dates(sleepAnalysis):
+    """Gets the dates the study was done over give the analysis dataframe
     
-    Returns the lights out and got up times for the human protocol 
-    in two lists of lists, one containing all the lights out time for each
-    participant and the other the got up times for each participant.
-    
-    :param: none
-    :return: Returns the lights out and got up tims of all the participants
-        within the study
-    :rtype: (list<list>) (list<list>)
+    :param (pandas dataframe) sleepAnalysis: sleep analysis excel scan
+    :return: Returns the dates the study was done over as a list
+    :rtype: (list<datetime.datetime>)
     """
-    #lights_out_analysis_study_times = list()
-    #got_up_analysis_study_times = list()
-    
-    #for participant_id in participant_numbers:
-        
-        
-    
+    dates = list(sleepAnalysis)
+    dates.pop()
+    dates.pop()
+    dates.reverse()
+    dates.pop()
+    dates.reverse()
 
 
-
-
-def get_program_times():
+def get_study_program_times(rawDataList, diaryList):
     """Gets the lights out and got up times of the participant as determined by 
     the program
     
@@ -88,41 +92,34 @@ def get_program_times():
         specified by the program
     :rtype: (list)
     """
+    lights_out_program_study_times = list()
+    got_up_program_study_times = list()
+    for i in range(0, len(diaryList)):
+       lightsOutTimes, gotUpTimes = get_participant_program_times(
+               rawDataList[i], diaryList[i])
+       lights_out_program_study_times.append(lightsOutTimes)
+       got_up_program_study_times.append(gotUpTimes)
+       
+       
     
-    rawDataList = SheetManager.populateRawDataList()
-    diaryList = SheetManager.populateDiaryList()
+    return lights_out_program_study_times, got_up_program_study_times
+
+def get_participant_program_times(rawData,sleepDiary):
+    """Gets the lights out and got up times of the participant as determined by 
+    the program for the participant specified
     
-    lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(diaryList[0], rawDataList[0])
-    
-    return lightsOutTimes, gotUpTimes
-
-# Main execution for the time being will till testing function
-lights_out_analysis_times, got_up_analysis_times,  dates = get_participant_sleep_analysis_times()
-lights_out_program_datetimes, got_up_program_datetimes = get_program_times()
-
-lights_out_program_times  = list()
-for times in lights_out_program_datetimes:
-    lights_out_program_times.append(times.time())
-
-got_up_program_times = list()    
-for times in got_up_program_datetimes:
-    got_up_program_times.append(times.time())
+    :param 
+    :return: Returns the lights out and got up tims of the participant as 
+        specified by the program
+    :rtype: (list)
+    """
+    lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(rawData, sleepDiary)
 
 
-lights_out_relative_error = list()
-#Error comparison
-#TODO: what if the two lists aren't the same size
-for i in range(0,len(lights_out_program_times)):
-    error = lights_out_program_times[i].minute - lights_out_analysis_times[i].minute
-    lights_out_relative_error.append(error)
-
-
-#TODO: Making function to create square sum of errors
-plt.figure(0)
-plt.plot(got_up_analysis_times)
-plt.plot(got_up_program_times)
-plt.show()
-
-plt.figure(1)
-plt.plot(lights_out_relative_error)
-plt.show()
+lights_out_Index  = 2;
+get_up_index  = 5;
+rawDataList = SheetManager.populateRawDataList()
+diaryList = SheetManager.populateDiaryList()
+sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
+study_name = 'BT'
+assesment = 'Baseline'
