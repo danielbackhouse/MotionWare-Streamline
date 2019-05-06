@@ -15,9 +15,9 @@ import pandas as pd
 sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
 study_name = 'BT'
 assesment = 'Baseline'
-lights_out_Index  = 2;
+lights_out_index  = 2;
 get_up_index  = 5;
-
+skiprows_analysis = 16;
 
 def get_study_analysis_sleep_times(participant_list):
     """Gets the lights and and got up times for the protocol method of 
@@ -37,7 +37,7 @@ def get_study_analysis_sleep_times(participant_list):
     
     for participant_id in participant_list:
         lightsOutTimes, gotUpTimes = get_participant_sleep_analysis_times(
-                sleepAnalysisDirectory, study_name, assesment, participant_id)
+                sleepAnalysisDirectory, participant_id)
         
         lights_out_analysis_study_times.append(lightsOutTimes)
         got_up_analysis_study_times.aappend(got_up_analysis_study_times)
@@ -45,10 +45,7 @@ def get_study_analysis_sleep_times(participant_list):
     return lights_out_analysis_study_times, got_up_analysis_study_times
 
 
-def get_participant_sleep_analysis_times(sleepAnalysisDirectory, study_name, 
-                                         assesment, participant_id, 
-                                         lights_out_index, get_up_index,
-                                         skiprows_analysis):
+def get_participant_sleep_analysis_times(sleepAnalysisDirectory, participant_id):
     """Gets the lights out and got up times of the participant as determined in
     in the sleep analysis
     
@@ -89,6 +86,8 @@ def get_dates(sleepAnalysis):
     dates.reverse()
     dates.pop()
     dates.reverse()
+    
+    return dates
 
 
 def get_study_program_times(rawDataList, diaryList):
@@ -134,9 +133,17 @@ def get_sleep_diary_list(sleepDiaryDirectory):
 #TODO
 def get_participant_list(sleepDiaryDirectory):
     return False
-    
+
+print('\n Getting ' + assesment + ' raw data for ' + study_name + ' study... \n')  
 participant_list = list()
 participant_list.append('001')
 rawDataList = SheetManager.populateRawDataList()
+print('\n Found raw data... Getting sleep diary data...')
 diaryList = SheetManager.populateDiaryList()
-get_study_analysis_sleep_times(participant_list)
+print('\n Found sleep diary data... Getting existing protocol sleep times... \n')
+
+LO_analysis, GU_analysis = get_study_analysis_sleep_times(participant_list)
+print('\n Found exisiting protocol sleep times... Calculating sleep times...\n')
+LO_program, GU_program = get_participant_program_times(rawDataList[0], diaryList[0])
+print('\n Sleep points calculated... Program completed! \n')
+
