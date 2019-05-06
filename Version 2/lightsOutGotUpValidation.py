@@ -68,6 +68,12 @@ def get_study_analysis_sleep_times():
         within the study
     :rtype: (list<list>) (list<list>)
     """
+    #lights_out_analysis_study_times = list()
+    #got_up_analysis_study_times = list()
+    
+    #for participant_id in participant_numbers:
+        
+        
     
 
 
