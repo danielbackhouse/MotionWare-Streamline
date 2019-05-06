@@ -9,6 +9,8 @@ import MotionWareAnalysis
 import SheetManager
 import pandas as pd
 import datetime
+import numpy as np
+import matplotlib.pyplot as plt
 # Define global variables
 sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
 
@@ -19,7 +21,7 @@ def get_sleep_analysis_times():
     :param: none
     :return: Returns the lights out and got up tims of the participant as 
         specified within the sleep analysis spreadsheet
-    :rtype: (list)
+    :rtype: (list) (list)
     """
     lightsOutIndex  = 2;
     getUpIndex  = 5;
@@ -48,7 +50,7 @@ def get_sleep_analysis_times():
         lightsOutAnalysis.append(lightsOutTime)
         gotUpAnalysis.append(getUpTime)
     
-    return lightsOutAnalysis, gotUpAnalysis
+    return lightsOutAnalysis, gotUpAnalysis, dates
 
 
 def get_program_times():
@@ -69,7 +71,7 @@ def get_program_times():
     return lightsOutTimes, gotUpTimes
 
 # Main execution for the time being will till testing function
-lights_out_analysis_times, got_up_analysis_times = get_sleep_analysis_times()
+lights_out_analysis_times, got_up_analysis_times,  dates = get_sleep_analysis_times()
 lights_out_program_datetimes, got_up_program_datetimes = get_program_times()
 
 lights_out_program_times  = list()
@@ -80,5 +82,21 @@ got_up_program_times = list()
 for times in got_up_program_datetimes:
     got_up_program_times.append(times.time())
 
- 
 
+lights_out_relative_error = list()
+#Error comparison
+#TODO: what if the two lists aren't the same size
+for i in range(0,len(lights_out_program_times)):
+    error = lights_out_program_times[i].minute - lights_out_analysis_times[i].minute
+    lights_out_relative_error.append(error)
+
+
+#TODO: Making function to create square sum of errors
+plt.figure(0)
+plt.plot(got_up_analysis_times)
+plt.plot(got_up_program_times)
+plt.show()
+
+plt.figure(1)
+plt.plot(error)
+plt.show()
