@@ -13,12 +13,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 # Define global variables
 sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
+study_name = 'BT'
+assesment = 'Baseline'
 
-def get_sleep_analysis_times():
+def get_participant_sleep_analysis_times():
     """Gets the lights out and got up times of the participant as determined in
     in the sleep analysis
     
-    :param: none
+    :param (string) participant_id: The participant ID to identify correct 
+                    sheet
     :return: Returns the lights out and got up tims of the participant as 
         specified within the sleep analysis spreadsheet
     :rtype: (list) (list)
@@ -52,6 +55,23 @@ def get_sleep_analysis_times():
     
     return lightsOutAnalysis, gotUpAnalysis, dates
 
+def get_study_analysis_sleep_times():
+    """Gets the lights and and got up times for the protocol method of 
+    determining sleep points for the entire study
+    
+    Returns the lights out and got up times for the human protocol 
+    in two lists of lists, one containing all the lights out time for each
+    participant and the other the got up times for each participant.
+    
+    :param: none
+    :return: Returns the lights out and got up tims of all the participants
+        within the study
+    :rtype: (list<list>) (list<list>)
+    """
+    
+
+
+
 
 def get_program_times():
     """Gets the lights out and got up times of the participant as determined by 
@@ -71,7 +91,7 @@ def get_program_times():
     return lightsOutTimes, gotUpTimes
 
 # Main execution for the time being will till testing function
-lights_out_analysis_times, got_up_analysis_times,  dates = get_sleep_analysis_times()
+lights_out_analysis_times, got_up_analysis_times,  dates = get_participant_sleep_analysis_times()
 lights_out_program_datetimes, got_up_program_datetimes = get_program_times()
 
 lights_out_program_times  = list()
