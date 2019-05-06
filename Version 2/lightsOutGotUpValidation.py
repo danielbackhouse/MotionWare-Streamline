@@ -9,8 +9,8 @@ import MotionWareAnalysis
 import SheetManager
 import pandas as pd
 #import datetime
-#import numpy as np
-#import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
 
 sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
 study_name = 'BT'
@@ -41,9 +41,8 @@ def get_study_analysis_sleep_times(participant_list):
     for participant_id in participant_list:
         lightsOutTimes, gotUpTimes = get_participant_sleep_analysis_times(
                 sleepAnalysisDirectory, participant_id)
-        print(gotUpTimes)
         lights_out_analysis_study_times.append(lightsOutTimes)
-        got_up_analysis_study_times.append(got_up_analysis_study_times)
+        got_up_analysis_study_times.append(gotUpTimes)
         
     return lights_out_analysis_study_times, got_up_analysis_study_times
 
@@ -65,11 +64,9 @@ def get_participant_sleep_analysis_times(sleepAnalysisDirectory, participant_id)
     dates = get_dates(sleepAnalysis)     #get the dates the study was done over
     lightsOutAnalysisTimes = list()
     gotUpAnalysisTimes = list()
-    print('about to print get up times')
     for day in dates:
         lightsOutTime = sleepAnalysis.get_value(lights_out_index, day)
         getUpTime = sleepAnalysis.get_value(get_up_index, day)
-        print(getUpTime)
         lightsOutAnalysisTimes.append(lightsOutTime)         # Note here that we are assuming that the lightsOutTime dates and 
         gotUpAnalysisTimes.append(getUpTime)                # getUpTime dates are the same as those given by the program
     
@@ -119,12 +116,77 @@ def get_participant_program_times(rawData,sleepDiary):
     """Gets the lights out and got up times of the participant as determined by 
     the program for the participant specified
     
+    This program takes about two seconds per raw data and sleep diary file
+    
     :param 
     :return: Returns the lights out and got up tims of the participant as 
         specified by the program
-    :rtype: (list)
+    :rtype: (list) (list)
     """
-    lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(sleepDiary, rawData)
+    lightsOutDateTimes, gotUpDateTimes = MotionWareAnalysis.findSleepPoint(
+            sleepDiary, rawData)
+    lightsOutTimes = list()
+    gotUpTimes = list()
+    for time in lightsOutDateTimes:
+        lightsOutTimes.append(time.time())
+    
+    for time in gotUpDateTimes:
+        gotUpTimes.append(time.time())
+    
+    return lightsOutTimes, gotUpTimes
+
+def plot_participant_GotUp_error(GU_program, GU_analysis):
+    """Plots the relative errors of the got up times, comparing those generated
+    by the program and those found following the protocol
+    
+    :param (list) GU_program: The Got up times found by the program
+    :param (list) GU_analysis: The got up times found using the protocol
+    :return: None
+    """
+    plt.figure()
+    plt.plot(GU_program)
+    plt.plot(GU_analysis)
+    plt.show()
+
+    errorList = get_participant_error_list(GU_program, GU_analysis)
+    plt.figure()
+    plt.plot(errorList)
+    
+    
+def plot_participant_LightsOut_error(LO_program, LO_analysis):
+    """Plots the relative errors of the lights out times, comparing those generated
+    by the program and those found following the protocol
+    
+    :param (list) LO_program: The lights out times found by the program
+    :param (list) LO_analysis: The lights out times found using the protocol
+    :return: None
+    """
+    plt.figure()
+    plt.plot(LO_program)
+    plt.plot(LO_analysis)
+    plt.show()
+
+    errorList = get_participant_error_list(LO_program, LO_analysis)
+    plt.figure()
+    plt.plot(errorList)    
+    
+def get_participant_error_list(program_times, protocol_times):
+    """Gets a list containing the errors (in units of minutes) between
+    the times determined by the protocol method and by the program and
+    places them in a list in the order of the dates
+    
+    :param (list) program_times: The Got up times found by the program
+    :param (list) protocol_times: The got up times found using the protocol
+    :return: errorList which is a list of the relative errors (absolute value)
+    :rtype: (list)
+    """   
+    errorList = list()
+    for i in range(0,len(protocol_times)):
+        error = protocol_times.minute - program_times.minute
+        errorList.append(error)
+        
+    return errorList
+    
 
 #TODO
 def get_raw_data_list(rawDataDirectory):
@@ -150,4 +212,7 @@ LO_analysis, GU_analysis = get_study_analysis_sleep_times(participant_list)
 print('\n Found exisiting protocol sleep times... Calculating sleep times...\n')
 LO_program, GU_program = get_participant_program_times(rawDataList[0], diaryList[0])
 print('\n Sleep points calculated... Program completed! \n')
+
+plot_participant_LightsOut_error(LO_program, LO_analysis[0])
+plot_participant_GotUp_error(GU_program, GU_analysis[0])
 
