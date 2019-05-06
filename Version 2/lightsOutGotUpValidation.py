@@ -8,9 +8,16 @@
 import MotionWareAnalysis
 import SheetManager
 import pandas as pd
-import datetime
-import numpy as np
-import matplotlib.pyplot as plt
+#import datetime
+#import numpy as np
+#import matplotlib.pyplot as plt
+
+sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
+study_name = 'BT'
+assesment = 'Baseline'
+lights_out_Index  = 2;
+get_up_index  = 5;
+
 
 def get_study_analysis_sleep_times(participant_list):
     """Gets the lights and and got up times for the protocol method of 
@@ -68,6 +75,7 @@ def get_participant_sleep_analysis_times(sleepAnalysisDirectory, study_name,
     return lightsOutAnalysisTimes, gotUpAnalysisTimes
 
 
+
 def get_dates(sleepAnalysis):
     """Gets the dates the study was done over give the analysis dataframe
     
@@ -115,11 +123,20 @@ def get_participant_program_times(rawData,sleepDiary):
     """
     lightsOutTimes, gotUpTimes = MotionWareAnalysis.findSleepPoint(rawData, sleepDiary)
 
+#TODO
+def get_raw_data_list(rawDataDirectory):
+    return False
 
-lights_out_Index  = 2;
-get_up_index  = 5;
+#TODO
+def get_sleep_diary_list(sleepDiaryDirectory):
+    return False
+
+#TODO
+def get_participant_list(sleepDiaryDirectory):
+    return False
+    
+participant_list = list()
+participant_list.append('001')
 rawDataList = SheetManager.populateRawDataList()
 diaryList = SheetManager.populateDiaryList()
-sleepAnalysisDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
-study_name = 'BT'
-assesment = 'Baseline'
+get_study_analysis_sleep_times(participant_list)
