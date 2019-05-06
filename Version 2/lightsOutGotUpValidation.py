@@ -98,5 +98,5 @@ plt.plot(got_up_program_times)
 plt.show()
 
 plt.figure(1)
-plt.plot(error)
+plt.plot(lights_out_relative_error)
 plt.show()
