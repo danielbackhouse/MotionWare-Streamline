@@ -6,7 +6,7 @@
 import MotionWareAnalysis
 import SheetManager
 import pandas as pd
-#import datetime
+import datetime
 #import numpy as np
 import matplotlib.pyplot as plt
 
@@ -153,6 +153,51 @@ class Study:
         
         return lightsOutTimes, gotUpTimes
     
+    #TODO
+    def get_sum_of_squares_error_GU(GU_program, GU_protocol):
+        """Compares the got up and lights out times found by the program and
+        those found by the protocol and computes the sum of the squares of the 
+        errors between each participant
+        
+        :param (list<lists>) GU_program: list of lists containing each
+            participant and the times each participant went to sleep over the
+            study period as determined by the GU_program
+        :param (list<lists>) GU_protocol: list of lists containing each
+            participant and the times each participant went to sleep over the 
+            study period as determined by the GU_protocl method
+        :return: A list containing the sum of the squares of the error over 
+            each day for each participant in the study
+        :rtype: (list<int>)
+        """
+        sum_of_squares_participants = list()
+        for i in range(0, len(GU_program)):
+            print("TODO")
+    
+    #TODO: fix error where not comparing hours
+    def get_participant_error_list(program_times, protocol_times):
+        """Gets a list containing the errors (in units of minutes) between
+        the times determined by the protocol method and by the program and
+        places them in a list in the order of the dates
+        
+        :param (list) program_times: The Got up times found by the program
+        :param (list) protocol_times: The got up times found using the protocol
+        :return: errorList which is a list of the relative errors (absolute value)
+        :rtype: (list)
+        """   
+        errorList = list()
+        
+        for i in range(0, len(program_times)):
+            if(program_times[i].hour == datetime.time(hour = 23) and 
+               protocol_times[i].hour == datetime.time(hour = 0)):
+                    date_program = 
+                    
+                    dateTime_program = datetime.datetime.combine(
+                            datetime.date.today()+, )
+                    dateTime_protocol = datetime.datetime.combine(
+                            datetime.date.today(), b)
+                
+            
+        return 
     
     # All functions form here onward are only called within the class init   
     # *******************************************************************
