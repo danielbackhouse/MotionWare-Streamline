@@ -8,7 +8,7 @@ import SheetManager
 import pandas as pd
 #import datetime
 #import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 class Study:
     
@@ -152,7 +152,6 @@ class Study:
             gotUpTimes.append(time.time())
         
         return lightsOutTimes, gotUpTimes
-
     
     
     # All functions form here onward are only called within the class init   
