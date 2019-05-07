@@ -73,9 +73,11 @@ def populateDiaryList():
     diaryList = []
     xlsx = pd.ExcelFile(sleepDiaryDirectory)
     rawSleepDiary = pd.ExcelFile(xlsx)
+    # Added sheet name list
+    sheetNameList = list()
     
     for sheetName in rawSleepDiary.sheet_names:
         if findMatching(sheetName):
             diaryList.append(pd.read_excel(sleepDiaryDirectory, sheet_name = sheetName))
-        
-    return diaryList        
+            sheetNameList.append(sheetName)
+    return diaryList, sheetNameList        

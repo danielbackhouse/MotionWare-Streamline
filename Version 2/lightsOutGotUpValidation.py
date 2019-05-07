@@ -186,8 +186,26 @@ def get_participant_error_list(program_times, protocol_times):
         errorList.append(error)
         
     return errorList
-    
 
+def modify_participant_list(participant_list):
+    """Function that modifies the participant list for a given study and removes
+    the study code from the string so that just the numbers are left
+    
+    :param (list) participant_list: a list of string with participant id's 
+        with the study abbreviation preceding the number (ex: BT_001)
+    :return: Modifies list with the abbreviation gone and only numbers (ex: 001)
+    :rtype: (list)
+    """
+    index = len(study_name)
+    final_index = index + 4     #This is since we assume the numbers will never exceed 
+    # three digits
+    modified_participant_list = list()
+    for i in range(0, len(participant_list)):
+        participant_id = participant_list[i]
+        modified_participant_list.append(participant_id[index+1: final_index])
+    
+    return modified_participant_list
+    
 #TODO
 def get_raw_data_list(rawDataDirectory):
     return False
@@ -201,13 +219,14 @@ def get_participant_list(sleepDiaryDirectory):
     return False
 
 print('\n Getting ' + assesment + ' raw data for ' + study_name + ' study... \n')  
-participant_list = list()
-participant_list.append('001')
+#participant_list = list()
+#participant_list.append('001')
+#participant_list.append('002')
 rawDataList = SheetManager.populateRawDataList()
 print('\n Found raw data... Getting sleep diary data...')
-diaryList = SheetManager.populateDiaryList()
+diaryList, participant_list = SheetManager.populateDiaryList()
 print('\n Found sleep diary data... Getting existing protocol sleep times... \n')
-
+participant_list = modify_participant_list(participant_list)
 LO_analysis, GU_analysis = get_study_analysis_sleep_times(participant_list)
 print('\n Found exisiting protocol sleep times... Calculating sleep times...\n')
 LO_program, GU_program = get_participant_program_times(rawDataList[0], diaryList[0])
