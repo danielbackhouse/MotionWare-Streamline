@@ -7,7 +7,6 @@ import MotionWareAnalysis
 import SheetManager
 import pandas as pd
 import datetime
-#import numpy as np
 import matplotlib.pyplot as plt
 
 class Study:
@@ -44,7 +43,8 @@ class Study:
         self.sleep_diaries = sleep_diaries
         self.raw_data = raw_data
         
-    
+    #TODO: makes this function return two dictionaries where the indices 
+    # are given by the partici[ant list]. See how this changes the time of execution
     def get_study_analysis_sleep_times(self):
         """Gets the lights and and got up times for the protocol method of 
         determining sleep points for the entire study
@@ -57,6 +57,7 @@ class Study:
             within the study
         :rtype: (list<list>) (list<list>)
         """
+        print('\n Getting study analysis sleep times...')
         lights_out_analysis_study_times = list()
         got_up_analysis_study_times = list()
         
@@ -127,7 +128,8 @@ class Study:
         dates.reverse()
         
         return dates
-    
+    #TODO: make this function return two dictionaries where the indices are 
+    # given as the participant list
     def get_study_program_times(self):
         """Gets the lights out and got up times of the participant as determined by 
         the program
@@ -167,16 +169,47 @@ class Study:
         
         return lightsOutDateTimes, gotUpDateTimes
 
-    def error_in_date_time_lists(GU_program, GU_protocl):
+    def error_in_date_time_lists(self, program, protocol):
         """Computes the errors between two list of lists
         
         :param (list<list>) GU_program: errors between two times 
-        :return: Returns the lights out and got up tims of the participant as 
-            specified by the program
-        :rtype: (list) (list)
+        :return: Returns error between the two lists of lists
+        :rtype: (list) 
+        
         """
-        lightsOutDat
+        sum_of_squares_error_study = list()
+        for i in range(0, len(program)):
+            errorList = self.get_error_list_participant(program[i], protocol[i])
+            error =  sum(errorList)
+            sum_of_squares_error_study.append(error)
+        
+        plt.figure()
+        plt.plot(self.participant_list, sum_of_squares_error_study)
+        plt.rc('xtick', labelsize = 8)
+        return sum_of_squares_error_study
     
+    def get_error_list_participant(self,participant_times_program, participant_times_protocol):
+        """Computes the errors between two datetime lists
+        
+        :param (list<datetime>): The datetims participant went to sleep over study
+            according to analysis
+        :param (list<datetime>): The datetimes participant went to sleep over
+            study according to program
+        :return: The difference of the errors in minutes between the two squared
+        :rtype: (list)
+        """
+        errorList = list()
+        #TODO:Note here that currently some of the lists are empty
+        # for the program times so we are still returning null on some values
+        # Will need to add some conditional statement to check that both are the same length
+        for i in range(0, len(participant_times_program)):
+            timeDifference = participant_times_program[i] - participant_times_protocol[i]
+            error = abs(timeDifference.total_seconds()/(60*len(participant_times_program)))
+            error = error**2
+            errorList.append(error)
+        
+        return errorList
+            
     # All functions form here onward are only called within the class init   
     # *******************************************************************
     def modify_participant_list(self, participants):

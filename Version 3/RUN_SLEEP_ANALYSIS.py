@@ -66,6 +66,7 @@ LO_Analysis, GU_Analysis = sleep_study.get_study_analysis_sleep_times()
 
 LO_Program, GU_Program = sleep_study.get_study_program_times()
 
+error = sleep_study.error_in_date_time_lists(LO_Program,LO_Analysis)
 
 
 
