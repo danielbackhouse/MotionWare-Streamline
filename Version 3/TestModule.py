@@ -8,9 +8,9 @@ import pandas as pd
 import MotionWareAnalysis
 
 sleepDiaryDirectory  = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\Edited Sleep Diary\BT Sleep Diary Edited.xlsx'
-rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data\Baseline\BT-014_Baseline.xlsx'
+rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data\Baseline\BT-074_Baseline.xlsx'
 
-sleepDiary  = pd.read_excel(sleepDiaryDirectory, sheet_name = 'BT_014')
+sleepDiary  = pd.read_excel(sleepDiaryDirectory, sheet_name = 'BT_074')
 rawData = pd.read_excel(rawDataDirectory, skiprows = 12)
 
 LO_times, GU_times = MotionWareAnalysis.findSleepPoint(sleepDiary, rawData)

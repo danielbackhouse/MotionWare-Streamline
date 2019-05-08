@@ -92,7 +92,7 @@ class Study:
             lightsOutTime = sleepAnalysis.get_value(
                     self.lights_out_index_analysis, day)
             
-            getUpTime = sleepAnalysis.get_value(self.get_up_index_analysis, day)
+            getUpTime = sleepAnalysis.get_value(self.got_up_index_analysis, day)
             lightsOutAnalysisTimes.append(lightsOutTime)         # Note here that we are assuming that the lightsOutTime dates and 
             gotUpAnalysisTimes.append(getUpTime)                # getUpTime dates are the same as those given by the program
         

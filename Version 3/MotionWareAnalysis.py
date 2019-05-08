@@ -315,7 +315,7 @@ def findSleepPoint(sleepDiary, rawData):
         awake = list()
         return sleep, awake
     if(diaryLength == rawDataLength):
-        print('\n Diary date legnth matches that of the raw data...')
+        print('\n Diary date length matches that of the raw data...')
         if(studyDates_by_rawdata[0] != studyDates_by_diary[0]):
             print('\n The dates do not align which means this data was analyzed first')
             sleep = list()
@@ -324,6 +324,13 @@ def findSleepPoint(sleepDiary, rawData):
     if(diaryLength < rawDataLength):
         print('\n This is probably an un-analyzed participant so in this instance we probably use diary dates')
         print('\n Or anaylsis was done incorrectly')
+        
+        print(rawDataLength)
+        
+        sleep = list()
+        awake = list()
+        
+        return awake, sleep
         
     actualSleepTime = list() 
     actualAwakeTime = list()
@@ -334,7 +341,9 @@ def findSleepPoint(sleepDiary, rawData):
           afterLightsOutError = gotUpDiaryTimes[i] + datetime.timedelta(hours = 1) # One hour after got up
           sleepPointRange = sleepData.loc[beforeLightsOutError:afterLightsOutError] # range to check for actual lights out
           sleepTimes = findSleepTime(sleepPointRange, actualSleepTime, meanActivity)   # get the times the particiapnt went to sleep
-          
+
+          #TODO: add exception for if the sleep range is checking outside
+          # the data we have available.
           hourBeforeWakeUp = gotUpDiaryTimes[i] - datetime.timedelta(hours = 1)
           sleepRange = sleepData.loc[sleepTimes[i]: hourBeforeWakeUp] # estimated sleep range of participant (awake point estimated)
 
