@@ -81,6 +81,7 @@ class Study:
             specified within the sleep analysis spreadsheet
         :rtype: (list) (list)
         """
+        print(participant_id)
         sheetName = self.study_name + '-' + participant_id + ' ' + self.assesment
         sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, 
                                       sheet_name = sheetName,
@@ -93,8 +94,19 @@ class Study:
                     self.lights_out_index_analysis, day)
             
             getUpTime = sleepAnalysis.get_value(self.got_up_index_analysis, day)
-            lightsOutAnalysisTimes.append(lightsOutTime)         # Note here that we are assuming that the lightsOutTime dates and 
-            gotUpAnalysisTimes.append(getUpTime)                # getUpTime dates are the same as those given by the program
+            if(isinstance(day, str)):
+                try:
+                    strDate = datetime.datetime.strptime(day[0:10], '%Y-%m-%d')
+                except:
+                    break
+                getUpDateTime = datetime.datetime.combine(strDate, getUpTime)
+                lightsOutDateTime = datetime.datetime.combine(strDate, lightsOutTime)
+            else:
+                getUpDateTime = datetime.datetime.combine(day, getUpTime)
+                lightsOutDateTime = datetime.datetime.combine(day, lightsOutTime)
+                
+            lightsOutAnalysisTimes.append(lightsOutDateTime)         # Note here that we are assuming that the lightsOutTime dates and 
+            gotUpAnalysisTimes.append(getUpDateTime)                # getUpTime dates are the same as those given by the program
         
         return lightsOutAnalysisTimes, gotUpAnalysisTimes
 
@@ -152,16 +164,18 @@ class Study:
         """
         lightsOutDateTimes, gotUpDateTimes = MotionWareAnalysis.findSleepPoint(
                 sleepDiary, rawData)
-        lightsOutTimes = list()
-        gotUpTimes = list()
-        for time in lightsOutDateTimes:
-            lightsOutTimes.append(time.time())
         
-        for time in gotUpDateTimes:
-            gotUpTimes.append(time.time())
-        
-        return lightsOutTimes, gotUpTimes
+        return lightsOutDateTimes, gotUpDateTimes
 
+    def error_in_date_time_lists(GU_program, GU_protocl):
+        """Computes the errors between two list of lists
+        
+        :param (list<list>) GU_program: errors between two times 
+        :return: Returns the lights out and got up tims of the participant as 
+            specified by the program
+        :rtype: (list) (list)
+        """
+        lightsOutDat
     
     # All functions form here onward are only called within the class init   
     # *******************************************************************
