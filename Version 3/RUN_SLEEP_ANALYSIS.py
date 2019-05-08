@@ -14,7 +14,7 @@ import Study
 # quotations. NOTE THAT THIS FIELD IS NOT REQUIRED AND IS ONLY NEEDED IF COMPARING
 # PROGGRAM VALUES TO PROTOCOL VALUES. So then if there is no sleep analysis directory
 # just leave enter r"" after the equals sign.
-sleep_analysis_directory = r""
+sleep_analysis_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
 
 # Indicies and SkipRows Analysis: THESE ARE NOT REQUIRED IF NO SLEEP ANALYSIS DIRECTORY
 # IS SPECIFIED. These indices should not be changed unless the format of the 
@@ -26,19 +26,19 @@ skiprows_analysis = 16
 
 # Sleep Diary Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # sleep diary excel files is located.
-sleep_diary_directory = r""
+sleep_diary_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\Edited Sleep Diary\BT Sleep Diary Edited.xlsx'
 
 # Indices and SkipRows Sleep Diary: THESE FIELDS ARE REQUIRED. These should not
 # be changed unless the file format for the sleep diaries is changed
 lights_out_index_diary = 1;
 got_up_index_diary = 5;
-skip_rows_diary = 0;
+skiprows_diary = 0;
 
 
 # Raw Data Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # raw data files are located. The raw data files should be in folders Baseline
 # Midpoint and Final
-raw_data_directory = r""
+raw_data_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
 
 # SkipRows Raw Data: THIS IS A REQUIRED FIELD. This field should not be changed 
 # unless the format of the raw data files has changed. This field is the most
@@ -58,12 +58,15 @@ assesment = "Baseline"
 sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory, 
                           sleep_diary_directory, lights_out_index_diary, 
                           got_up_index_diary, lights_out_index_analysis, 
-                          got_up_index_analysis, skiprows_analysis, 
-                          skiprows_rawdata, study_name, assesment)
+                          got_up_index_analysis, skiprows_diary, 
+                          skiprows_analysis, skiprows_rawdata, 
+                          study_name, assesment)
+
+LO_Program, GU_Program = sleep_study.get_study_program_times()
 
 LO_Analysis, GU_Analysis = sleep_study.get_study_analysis_sleep_times()
 
-LO_Program, GU_Program = sleep_study.get_study_program_times()
+
 
 
 

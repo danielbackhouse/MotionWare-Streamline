@@ -41,7 +41,7 @@ def getSleepDatesDiary(sleepDiary):
     
     return dates;
 
-def getSleepDatesRawData(sleepData):
+def getSleepDatesRawData(rawData):
     """ Gets the dates the participant's activity was recorded.
     
     NOTE: It is important to note here that for any old study where the analysis
@@ -55,19 +55,14 @@ def getSleepDatesRawData(sleepData):
     :return: Returns the dates the particpant wore watch in chronological order
     :rtype: (list)
     """
-    allDatesandTimes = list(sleepData.index)
+    allDatesandTimes = list(rawData.index)
     dates = list()
-    dates.append(allDatesandTimes[0])   #Add the first date
+    dates.append(allDatesandTimes[0].date)   #Add the first date
     counter = 0
-
     for dateTime in allDatesandTimes:
-        if(dates[counter].day != dateTime.day ):
-            dates.append(dateTime)
+        if(dates[counter].date != dateTime.date ):
+            dates.append(dateTime.date)
             counter = counter + 1
-    # We remove the first entry to match how the dairy keeps track of dates
-    dates.reverse()
-    dates.pop()
-    dates.reverse()
     
     return dates;    
 
@@ -296,35 +291,14 @@ def findSleepPoint(sleepDiary, rawData):
     
     #TODO: newly added piece of code to handle date mismatching
     studyDates_by_diary = getSleepDatesDiary(sleepDiary)
-    studyDates_by_rawdata = getSleepDatesRawData(sleepData)
+    studyDates_by_rawdata = getSleepDatesRawData(rawData)
     #TODO
-    diaryLength = len(studyDates_by_diary)
-    rawDataLength = len(studyDates_by_rawdata)
-    if(diaryLength > rawDataLength):
-        print('\n The raw data file spans a shorter time frame...')
-        if(studyDates_by_rawdata[0] == studyDates_by_diary[0]):
-            print('\n Start dates match...')
-        elif(studyDates_by_rawdata[rawDataLength-1] == studyDates_by_diary[diaryLength-1]):
-            print('\n End dates match...')
-        else:
-            print('\n Neither start date or finald date match so find matching date...')
+    for i in studyDates_by_rawdata:
+        print(i)
         
-        print('\n For now returning empty list on above participant...\n')
-        
-        sleep = list()
-        awake = list()
-        return sleep, awake
-    if(diaryLength == rawDataLength):
-        print('\n Diary date legnth matches that of the raw data...')
-        if(studyDates_by_rawdata[0] != studyDates_by_diary[0]):
-            print('\n The dates do not align which means this data was analyzed first')
-            sleep = list()
-            awake = list()
-            return sleep, awake
-    if(diaryLength < rawDataLength):
-        print('\n This is probably an un-analyzed participant so in this instance we probably use diary dates')
-        print('\n Or anaylsis was done incorrectly')
-        
+    for i in studyDates_by_diary:
+        print(i)
+    
     actualSleepTime = list() 
     actualAwakeTime = list()
     meanActivity = sleepData['Activity (MW counts)'].mean(); 

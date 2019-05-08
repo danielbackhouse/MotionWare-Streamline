@@ -30,13 +30,17 @@ class Study:
         self.skiprows_rawdata = skiprows_rawdata
         self.study_name = study_name
         self.assesment = assesment
-        
+        print('\n Getting ' + assesment + ' sleep diary data for ' + study_name + ' study... \n')  
         sleep_diaries, unmod_participant_list = self.get_sleep_diary_list_and_participants(
                 self.sleep_analysis_directory)
+        print('\n Found sleep diary data... Getting raw activity and lux data...')
         raw_data = self.get_raw_data_list(
                 self.raw_data_directory)
+        print('\n Found raw activity and lux data...\n')
         
         self.participant_list = self.modify_participant_list(unmod_participant_list)
+        
+        print(' Participant list succesfully modified')
         self.sleep_diaries = sleep_diaries
         self.raw_data = raw_data
         
@@ -121,15 +125,20 @@ class Study:
             specified by the program
         :rtype: (list)
         """
+        print('\n Calculating lights out and got up times... \n')
         lights_out_program_study_times = list()
         got_up_program_study_times = list()
         for i in range(0, len(self.sleep_diaries)):
+           print('\n' + self.participant_list[i])
            lightsOutTimes, gotUpTimes = self.get_participant_program_times(
                    self.raw_data[i], self.sleep_diaries[i])
            lights_out_program_study_times.append(lightsOutTimes)
            got_up_program_study_times.append(gotUpTimes)
+           
+         
+        print('\n Done calculating...\n')
+        return lights_out_program_study_times, got_up_program_study_times
         
- 
     def get_participant_program_times(self, rawData,sleepDiary):
         """Gets the lights out and got up times of the participant as determined by 
         the program for the participant specified
@@ -152,52 +161,7 @@ class Study:
             gotUpTimes.append(time.time())
         
         return lightsOutTimes, gotUpTimes
-    
-    #TODO
-    def get_sum_of_squares_error_GU(GU_program, GU_protocol):
-        """Compares the got up and lights out times found by the program and
-        those found by the protocol and computes the sum of the squares of the 
-        errors between each participant
-        
-        :param (list<lists>) GU_program: list of lists containing each
-            participant and the times each participant went to sleep over the
-            study period as determined by the GU_program
-        :param (list<lists>) GU_protocol: list of lists containing each
-            participant and the times each participant went to sleep over the 
-            study period as determined by the GU_protocl method
-        :return: A list containing the sum of the squares of the error over 
-            each day for each participant in the study
-        :rtype: (list<int>)
-        """
-        sum_of_squares_participants = list()
-        for i in range(0, len(GU_program)):
-            print("TODO")
-    
-    #TODO: fix error where not comparing hours
-    def get_participant_error_list(program_times, protocol_times):
-        """Gets a list containing the errors (in units of minutes) between
-        the times determined by the protocol method and by the program and
-        places them in a list in the order of the dates
-        
-        :param (list) program_times: The Got up times found by the program
-        :param (list) protocol_times: The got up times found using the protocol
-        :return: errorList which is a list of the relative errors (absolute value)
-        :rtype: (list)
-        """   
-        errorList = list()
-        
-        for i in range(0, len(program_times)):
-            if(program_times[i].hour == datetime.time(hour = 23) and 
-               protocol_times[i].hour == datetime.time(hour = 0)):
-                    date_program = 
-                    
-                    dateTime_program = datetime.datetime.combine(
-                            datetime.date.today()+, )
-                    dateTime_protocol = datetime.datetime.combine(
-                            datetime.date.today(), b)
-                
-            
-        return 
+
     
     # All functions form here onward are only called within the class init   
     # *******************************************************************
