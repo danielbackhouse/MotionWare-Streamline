@@ -6,7 +6,6 @@
     Author: Alan Yan and Daniel Backhouse
 """
 #Import extension libraries
-import SheetManager
 import MotionWareAnalysis
 import datetime
 import pandas as pd
