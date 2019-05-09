@@ -1,5 +1,5 @@
 """ Title: SleepDataAnalysis
-    Purpose: 
+    Purpose:
     Author: Alan Yan and Daniel Backhouse
 """
 #Import extension libraries
@@ -29,7 +29,7 @@ def findSleepPoint(inBedPoint, rawDataFile, threshold = requiredEpochsConsecutiv
     sheetData = MotionWareAnalysis.sleepDataFormatter(rawDataFile)
     passedThreshold = False
     fellAsleepTime = inBedPoint
-    while passedThreshold == False:    
+    while passedThreshold == False:
         higherThanThresholdCount = 0
         for minutes in range(threshold):
             time = fellAsleepTime + datetime.timedelta(minutes = minutes)
@@ -45,7 +45,7 @@ def findWakePoint(outOfBedPoint, rawDataFile, threshold = requiredEpochsConsecut
     sheetData = MotionWareAnalysis.sleepDataFormatter(rawDataFile)
     passedThreshold = False
     wokeUpTime = outOfBedPoint
-    while passedThreshold == False:    
+    while passedThreshold == False:
         higherThanThresholdCount = 0
         for minutes in range(threshold):
             time = wokeUpTime - datetime.timedelta(minutes = minutes)
@@ -55,7 +55,7 @@ def findWakePoint(outOfBedPoint, rawDataFile, threshold = requiredEpochsConsecut
             passedThreshold = True
             return wokeUpTime
         wokeUpTime -= datetime.timedelta(minutes = epochLength)
-        
+
 def findActualSleepTime(inBedPoint, outOfBedPoint, rawDataFile):
     sheetData = MotionWareAnalysis.sleepDataFormatter(rawDataFile)
     fellAsleepTime = findSleepPoint(inBedPoint,rawDataFile)
@@ -76,11 +76,11 @@ def findActualSleepTime(inBedPoint, outOfBedPoint, rawDataFile):
             sleepWakeList.append(1)
         fellAsleepTime += datetime.timedelta(minutes = 1)
         sleepMinutes += 1
-    percentSleep = actualSleepMinutes/sleepMinutes * 100 
+    percentSleep = actualSleepMinutes/sleepMinutes * 100
     awakeMinutes = sleepMinutes-actualSleepMinutes
     percentAwake = 100-percentSleep
-    return actualSleepMinutes, sleepMinutes, percentSleep, awakeMinutes, percentAwake        
-        
+    return actualSleepMinutes, sleepMinutes, percentSleep, awakeMinutes, percentAwake
+
 def findSleepPercentage(inBedPoint, outOfBedPoint, actualSleepMinutes):
     timeInBed = findTimeDifferenceInMinutes(inBedPoint, outOfBedPoint)
     return actualSleepMinutes/timeInBed
@@ -93,6 +93,18 @@ def findBouts(inBedPoint, outOfBedPoint, rawDataFile):
     wokeUpTime = findWakePoint(outOfBedPoint, rawDataFile)
     sleepMinutes = 0
     actualSleepMinutes = 0
+
+def activityToList(fellAsleepTime, wokeUpTime, sheetData):
+    activityInNight = list()
+    while fellAsleepTime != (wokeUpTime+ datetime.timedelta(minutes = 1)):
+        activityInNight.append(sheetData.loc[fellAsleepTime, 'Activity (MW counts)'])
+        fellASleepTime += datetime.timedelta(minutes = 1)
+    return activityToList
+
+def findSleepAnalysisData(inBedPoint, outOfBedPoint, rawData):
+    formattedData = MotionWareAnalysis.sleepDataFormatter(rawData)
+    
+
 path = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data\Baseline\BT-001_Baseline.xlsx'
 rawData = pd.read_excel(path, skiprows = 12)
 #rawDataList = SheetManager.populateRawDataList()
