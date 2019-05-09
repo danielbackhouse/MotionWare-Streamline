@@ -290,7 +290,11 @@ def findSleepPoint(sleepDiary, rawData):
              the other when they woke up
     :rtype: (list) (list)
     """
-    sleepData = sleepDataFormatter(rawData)   # Set the indices of raw sleep data to date and time
+    try:
+        sleepData = sleepDataFormatter(rawData)   # Set the indices of raw sleep data to date and time
+    except:
+        print (rawData)
+        
     lightsOutDiaryTimes = getToSleepDateTimes(sleepDiary)      # Get sleep diary lights out times
     gotUpDiaryTimes = getFinishSleepDateTimes(sleepDiary)      # Get sleep diary got up times
     

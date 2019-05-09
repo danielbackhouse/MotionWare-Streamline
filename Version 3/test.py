@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May  8 09:48:12 2019
-Test Function
-@author: dbackhou
+Created on Thu May  9 13:04:08 2019
+Testing the no sleep diary  program
+@author: danie
 """
+
 import pandas as pd
 import MotionWareAnalysis
 
