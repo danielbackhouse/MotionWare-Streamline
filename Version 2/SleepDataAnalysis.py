@@ -1,5 +1,8 @@
 """ Title: SleepDataAnalysis
-    Purpose:
+    Purpose: To take the in bed point, the got out of bed point found from 
+    motionWareAnalysis.py along with the raw data in order to calculate
+    sleep and wake points, along with all the statistics found with the 
+    MotionWare software.
     Author: Alan Yan and Daniel Backhouse
 """
 #Import extension libraries
@@ -8,6 +11,7 @@ import MotionWareAnalysis
 import datetime
 import pandas as pd
 
+#Threshold values used
 activityThreshold = 6
 requiredEpochsConsecutiveSleep = 10
 requiredEpochsConsecutiveWake = 5
@@ -16,7 +20,13 @@ numberAboveThresholdAllowedWake = 2
 epochLength = 1
 
 def findTimeDifferenceInMinutes(timeOne, timeTwo):
-    #time one must be before time two
+    """Finds the difference in minutes between two date times. Time one MUST 
+    be before Time two.
+    
+    :param: timeOne and timeTwo
+    :return: Returns the number of minutes between two times
+    :rtype(int)
+    """
     minutes = 0
     while timeOne != timeTwo:
         timeOne += datetime.timedelta(minutes = 1)
@@ -24,6 +34,19 @@ def findTimeDifferenceInMinutes(timeOne, timeTwo):
     return minutes
 
 def findSleepPoint(inBedPoint, formattedData, threshold = requiredEpochsConsecutiveSleep):
+    """Finds the sleep point based on the inBedPoint, the formatted data and the
+    threshold
+    
+    the inBedPoint is used as the basepoint to find the fellAsleepTime, 10 minutes
+    after the fellAsleepTime are looked at and if the activity in that minute
+    is greater than the threshold, then higherThanThresholdCount gains one.
+    If there is more epochs above the number allowed in the 10 minutes,
+    a minute is added to the fellAsleepTime, continues until a time is found.
+    
+    :param: inBedPoint, formattedData, threshold
+    :return: Returns the time when the person fell asleep
+    :rtype(datetime)
+    """
     passedThreshold = False
     fellAsleepTime = inBedPoint
     while passedThreshold == False:
@@ -39,6 +62,16 @@ def findSleepPoint(inBedPoint, formattedData, threshold = requiredEpochsConsecut
 
 
 def findWakePoint(outOfBedPoint, formattedData, threshold = requiredEpochsConsecutiveWake):
+    """Finds the wake point based on the outOfBedPoint, the formatted data and the
+    threshold
+    
+    Same idea as findSleepPoint, except different thresholds and working backwards
+    from the out of bed point, only looking at 5 minute windows.
+    
+    :param: outOfBedPoint, formattedData, threshold
+    :return: Returns the time when the person woke 
+    :rtype(datetime)
+    """
     passedThreshold = False
     wokeUpTime = outOfBedPoint
     while passedThreshold == False:
@@ -53,6 +86,19 @@ def findWakePoint(outOfBedPoint, formattedData, threshold = requiredEpochsConsec
         wokeUpTime -= datetime.timedelta(minutes = epochLength)
 
 def findActualSleepTime(fellAsleepTime, wokeUpTime, activityArray):
+    """Finds the actual sleep minutes, percent asleep, awake minutes, percent awake,
+    and a sleepWakeList used for later analysis
+    
+    parses through the activityArray, which is an array with activity counts
+    per epoch, uses the MotionWare guidelines to calculate a total activity for 
+    each epoch in the sleep window. If the total is below the threshold, the
+    minute is considered a sleep minute, if not, then it is an awake minute.
+    
+    :param: fellAsleepTime, wokeUpTime, activityArray
+    :return: Returns the actual sleep minutes, awake minutes, assume sleep minutes,
+    and percentages for awake and asleep.
+    :rtype(int, int, float, int, float, list)
+    """
     sleepMinutes = 0
     actualSleepMinutes = 0
     sleepWakeList = []
@@ -73,13 +119,40 @@ def findActualSleepTime(fellAsleepTime, wokeUpTime, activityArray):
     return actualSleepMinutes, sleepMinutes, percentSleep, awakeMinutes, percentAwake, sleepWakeList
 
 def findSleepEfficiency(inBedPoint, outOfBedPoint, actualSleepMinutes):
+    """Finds the sleep efficiency of the person, which is actual asleep over
+    time in bed
+    
+    :param: inBedPoint, outOfBedPoint, actualSleepMinutes
+    :return: Returns the sleep efficiency
+    :rtype(float)
+    """
     timeInBed = findTimeDifferenceInMinutes(inBedPoint, outOfBedPoint)
     return actualSleepMinutes/timeInBed*100
 
 def findSleepLatency(inBedPoint, fellAsleepTime):
+    """Finds the sleep latency of the person, which is how long it took
+    for the person to fall asleep
+    
+    :param: inBedPoint, fellAsleepTime
+    :return: Returns the minute difference between the two parameters
+    :rtype(int)
+    """
     return findTimeDifferenceInMinutes(inBedPoint, fellAsleepTime)
 
 def findBouts(sleepWakeList):
+    """Finds the number of sleep and awake bouts, along with the
+    mean length for both
+    
+    Uses the sleep wake list, which is an array of 1s and 0s, to find 
+    continuous sections of sleeping and awake periods, which is what a bout is.
+    After the for loop, checks the last element of the list, which is the
+    waking time to add the last bout.
+    
+    :param: sleepWakeList
+    :return: returns the number of sleeping and awake bouts, along with
+    their mean lengths
+    :rtype(int, int, float, float)
+    """
     sleepBout = 0
     wakeBout = 0
     wakeOrSleep = -1
@@ -114,6 +187,20 @@ def findBouts(sleepWakeList):
     return sleepBout, wakeBout, meanSleepBoutLength, meanWakeBoutLength
             
 def findMobileImmobileMinutes(activityList):
+    """Finds the mobile and immmobile minutes, along with their percentages
+    and returns a mobile immobile list, similar to the sleep wake list
+    
+    The activity list is shortened to take two elements off the front and 
+    three from the back, since there is no more activity total per epoch calculations.
+    The activity list is now from the start of sleep to the minute before waking up
+    The mobile minutes are then counted based on a threshold, same with immobile
+    and then percentages are easily calculated.
+    
+    :param: activityList
+    :return: Returns mobile and immobile minutes, along with their percentages,
+    and a mobile immobile list
+    :rtype(int, int, float, float, list)
+    """
     activityList.pop(0)
     activityList.pop(0)
     activityList.reverse()
@@ -137,6 +224,18 @@ def findMobileImmobileMinutes(activityList):
     return mobileMinutes, immobileMinutes, mobilePercent, immobilePercent, mobileImmobileList
 
 def findImmobileBout(mobileImmobileList):
+    """Finds more statistics on the immobile bout information.
+    
+    Runs through the mobile immobile list to count immobile bouts and calculate
+    mean immobile bout length and immobile bout less than or equal to one
+    minute, and the percentage of those over all immobile bouts.
+    
+    :param: mobileImmobileList
+    :return: Returns number of immobile bouts, the mean length of immobile bouts,
+    the immobile bouts less than one minute and the percentage of those versus the
+    total immobile bout count
+    :rtype(int, float, int, float)
+    """
     immobileBout = 0
     immobileBoutLengths = []
     boutCount = 0
@@ -169,6 +268,14 @@ def findImmobileBout(mobileImmobileList):
     return immobileBout,  meanImmobileBoutLength, boutsLessThanOne, boutsLessThanOnePercent
         
 def findTotalActivity(activityList):
+    """Finds the total activity over the assumes sleep period, as well as the 
+    mean avtivity per epoch and mean activity per non zero epoch
+    
+    :param: activityList
+    :return: Returns the total activity, the mean activity per epoch and the
+    mean activity per non zero epoch
+    :rtype(float)
+    """
     nonZeroEpoch = 0
     totalActivity = sum(activityList)
     meanActivityPerEpoch = totalActivity/len(activityList)
@@ -179,6 +286,13 @@ def findTotalActivity(activityList):
     return totalActivity, meanActivityPerEpoch, meanActivityPerNonZeroEpoch
 
 def activityToList(fellAsleepTime, wokeUpTime, formattedData):
+    """Reads the formatted data and puts the activity data into a list to spee
+    d up program.
+    
+    :param: fellAsleepTime, wokeUpTime, formattedData
+    :return: Returns an array of activity data for that sleep period
+    :rtype(list)
+    """
     activityInNight = list()
     fellAsleepTime -= datetime.timedelta(minutes=2)
     wokeUpTime += datetime.timedelta(minutes = 2)
@@ -188,9 +302,29 @@ def activityToList(fellAsleepTime, wokeUpTime, formattedData):
     return activityInNight
 
 def findFragmentationIndex(mobilePercent, boutsLessThanOnePercent):
+    """Finds the fragmentation index, which is mobile % added to the immobile
+    bouts less than one epoch %
+    
+    :param: mobilePercent and boutLessThanOnePercent
+    :return: Returns the fragmentation index
+    :rtype(float)
+    """
     return mobilePercent + boutsLessThanOnePercent 
 
 def findSleepAnalysisData(inBedPoint, outOfBedPoint, rawData):
+    """This method finds all the sleep analysis data by calling the other 
+    methods
+    
+    The method takes in the inBedPoint and outOfBedPoint found by 
+    MotionWareAnalysis.py, along with the raw data to find all the sleep analysis
+    data for one night. This is method to be called to find the sleep statistics,
+    these are returned in a dictionary for ease of printing to an excel doc or
+    onto console.
+    
+    :param: inBedPoint, outOfBedPoint, rawData
+    :return: Returns a dictionary of all the sleep analysis stats
+    :rtype(dictionary)
+    """
     
     formattedData = MotionWareAnalysis.sleepDataFormatter(rawData)
     fellAsleepTime = findSleepPoint(inBedPoint, formattedData)
