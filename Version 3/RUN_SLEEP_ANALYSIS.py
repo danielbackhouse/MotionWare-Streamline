@@ -62,9 +62,10 @@ sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory,
                           skiprows_analysis, skiprows_rawdata, 
                           study_name, assesment)
 
-LO_Analysis, GU_Analysis = sleep_study.get_study_analysis_sleep_times()
 
 LO_Program, GU_Program = sleep_study.get_study_program_times()
+LO_Analysis, GU_Analysis = sleep_study.get_study_analysis_sleep_times()
+
 
 error = sleep_study.error_in_date_time_lists(LO_Program,LO_Analysis)
 

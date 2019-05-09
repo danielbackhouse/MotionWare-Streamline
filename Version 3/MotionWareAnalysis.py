@@ -344,9 +344,14 @@ def findSleepPoint(sleepDiary, rawData):
 
           #TODO: add exception for if the sleep range is checking outside
           # the data we have available.
-          hourBeforeWakeUp = gotUpDiaryTimes[i] - datetime.timedelta(hours = 1)
-          sleepRange = sleepData.loc[sleepTimes[i]: hourBeforeWakeUp] # estimated sleep range of participant (awake point estimated)
-
+          try:
+              hourBeforeWakeUp = gotUpDiaryTimes[i] - datetime.timedelta(hours = 1)
+              sleepRange = sleepData.loc[sleepTimes[i]: hourBeforeWakeUp] # estimated sleep range of participant (awake point estimated)
+          except:
+              awake = list()
+              sleep = list()
+              print('\n ***Found some unknown error... most likey timestamp issue ')
+              return awake,sleep
           beforeGotUpError = gotUpDiaryTimes[i] - datetime.timedelta(hours = 1) # One hour before got up
           afterGotUpError  = gotUpDiaryTimes[i] + datetime.timedelta(hours = 2) # Two hour after got up
           awakePointRange = sleepData.loc[beforeGotUpError:afterGotUpError]

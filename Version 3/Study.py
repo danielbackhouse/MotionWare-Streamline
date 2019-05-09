@@ -31,8 +31,8 @@ class Study:
         self.assesment = assesment
         print('\n Getting ' + assesment + ' sleep diary data for ' + study_name + ' study... \n')  
         sleep_diaries, unmod_participant_list = self.get_sleep_diary_list_and_participants(
-                self.sleep_analysis_directory)
-        print('\n Found sleep diary data... Getting raw activity and lux data...')
+                self.sleep_diary_directory)
+        print('\n Found sleep diary data... Getting raw activity and lux data for participants with complete sleep diary...')
         raw_data = self.get_raw_data_list(
                 self.raw_data_directory)
         print('\n Found raw activity and lux data...\n')
@@ -260,7 +260,7 @@ class Study:
         :return: Returns a list of participant id's
         :rtype: (list<pandas dataFrame>) (list<string>)
         """
-        diaryList, participant_list = SheetManager.populateDiaryList()
+        diaryList, noDiaryList, participant_list, noDiary_part_list = SheetManager.populateSplitDiaryLists()
         return diaryList, participant_list
 
     
