@@ -420,7 +420,7 @@ rawData = pd.read_excel(path, skiprows = 12)
 #rawDataList = SheetManager.populateRawDataList()
 
 sampleSleep = datetime.datetime(2017, 4, 27, 23, 23)
-samepleWake = datetime.datetime(2017, 4, 28, 6, 10)
+sampleWake = datetime.datetime(2017, 4, 28, 6, 10)
 dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
 
 sampleSleep = datetime.datetime(2017, 4, 28, 23, 16)
