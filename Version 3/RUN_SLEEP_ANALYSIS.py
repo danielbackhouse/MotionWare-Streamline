@@ -10,6 +10,7 @@
     Author: Alan Yan and Daniel Backhouse
 """
 import Study
+import SleepDataAnalysis
 # Sleep Analysis Directory: enter the sleep analysis directory within the double
 # quotations. NOTE THAT THIS FIELD IS NOT REQUIRED AND IS ONLY NEEDED IF COMPARING
 # PROGGRAM VALUES TO PROTOCOL VALUES. So then if there is no sleep analysis directory
@@ -63,12 +64,21 @@ sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory,
                           study_name, assesment)
 
 rawData, sleepDiary = sleep_study.return_raw_data_and_diary()
-LO_Program, GU_Program = sleep_study.get_study_program_times()
-LO_Analysis, GU_Analysis = sleep_study.get_study_analysis_sleep_times()
+LO_program, GU_program = sleep_study.get_study_program_times()
+LO_analysis, GU_analysis = sleep_study.get_study_analysis_sleep_times()
 
 
-error = sleep_study.error_in_date_time_lists(LO_Program,LO_Analysis)
+error = sleep_study.error_in_date_time_lists(LO_program,LO_analysis)
 
+sleepAnalysis = list()
+for i in range(0,len(GU_program)):
+    print(i)
+    for j in range(0,len(GU_program[i])):
+        participant_awake = GU_program[i]
+        participant_sleep = LO_program[i]
+        dictionary = SleepDataAnalysis.findSleepAnalysisData(
+                participant_sleep[j], participant_awake[j], rawData[i])
+        sleepAnalysis.append(dictionary)
 
 
 
