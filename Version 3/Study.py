@@ -33,15 +33,20 @@ class Study:
         sleep_diaries, unmod_participant_list = self.get_sleep_diary_list_and_participants(
                 self.sleep_diary_directory)
         print('\n Found sleep diary data... Getting raw activity and lux data for participants with complete sleep diary...')
-        raw_data = self.get_raw_data_list(
+        raw_data_all, raw_data_id = self.get_raw_data_list(
                 self.raw_data_directory)
         print('\n Found raw activity and lux data...\n')
-        
+        self.raw_data_id = raw_data_id
         self.participant_list = self.modify_participant_list(unmod_participant_list)
-        
+        self.raw_data_all = raw_data_all
         print(' Participant list succesfully modified')
+        raw_data = self.get_raw_data_with_sleep_diaries()
         self.sleep_diaries = sleep_diaries
         self.raw_data = raw_data
+    
+    # Function used for testign    
+    def return_raw_data_and_diary(self):
+        return self.raw_data, self.sleep_diaries
         
     #TODO: makes this function return two dictionaries where the indices 
     # are given by the partici[ant list]. See how this changes the time of execution
@@ -110,9 +115,7 @@ class Study:
             gotUpAnalysisTimes.append(getUpDateTime)                # getUpTime dates are the same as those given by the program
         
         return lightsOutAnalysisTimes, gotUpAnalysisTimes
-
-
-    
+        
     def get_dates(self,sleepAnalysis):
         """Gets the dates the study was done over give the analysis dataframe
         
@@ -142,6 +145,7 @@ class Study:
         print('\n Calculating lights out and got up times... \n')
         lights_out_program_study_times = list()
         got_up_program_study_times = list()
+        
         for i in range(0, len(self.sleep_diaries)):
            print('\n' + self.participant_list[i])
            lightsOutTimes, gotUpTimes = self.get_participant_program_times(
@@ -243,8 +247,8 @@ class Study:
         :return: Returns a list of raw data files stored in dataframes
         :rtype: (list<pandas dataFrame>)
         """
-        rawDataList = SheetManager.populateRawDataList()
-        return rawDataList
+        rawDataList, participants = SheetManager.populateRawDataList()
+        return rawDataList, participants
     
     #TODO: modify this function so that populateDiaryList takes a directory as
     # input
@@ -262,5 +266,14 @@ class Study:
         """
         diaryList, noDiaryList, participant_list, noDiary_part_list = SheetManager.populateSplitDiaryLists()
         return diaryList, participant_list
-
+    
+    #TODO: Docstring
+    def get_raw_data_with_sleep_diaries(self):
+        rawDataSleepDiary = list()
+        counter = 0    
+        for i in range(0, len(self.raw_data_all)):
+            if(self.raw_data_id[i] == self.participant_list[counter]):
+                rawDataSleepDiary.append(self.raw_data_all[i])
+                counter = counter + 1
+        return rawDataSleepDiary       
     

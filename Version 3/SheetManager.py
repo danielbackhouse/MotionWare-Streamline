@@ -7,7 +7,7 @@
 #Import extension libraries
 import os
 import pandas as pd
-
+import time
 #Directories for folder locations
 #TODO: changes the diretories to be in the RunMotionWareProcessing program
 rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
@@ -33,7 +33,7 @@ def findMatching(fileName):
     numbers = fileName[3:6]
     
     if fileName.endswith('.xlsx'):
-        rawSleepDiary = pd.ExcelFile(sleepDiaryDirectory)
+        rawSleepDiary = pd.ExcelFile(origSleepDiaryDirectory)
         for sheetName in rawSleepDiary.sheet_names:         
             if sheetName.find(numbers) == 3:
                 return True
@@ -54,14 +54,15 @@ def populateRawDataList():
     :rtype(list)
     """
     rawDataList = []
+    participant_id = []
     rawDataAll = os.listdir(rawDataDirectory+ '\Baseline')
-    
     for file in rawDataAll:
         if file.endswith('.xlsx') and findMatching(file):
             rawDataList.append(pd.read_excel(rawDataDirectory + '\Baseline\\' 
-                                             + file, skiprows = 12))  
-        
-    return rawDataList
+                                           + file, skiprows = 12))  
+            participant_id.append(file[3:6])
+
+    return rawDataList, participant_id
 
 def populateDiaryList():
     """Creates and populates a list of all sleep diaries, in numerical order
