@@ -7,7 +7,6 @@
 #Import extension libraries
 import os
 import pandas as pd
-import time
 #Directories for folder locations
 #TODO: changes the diretories to be in the RunMotionWareProcessing program
 rawDataDirectory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
