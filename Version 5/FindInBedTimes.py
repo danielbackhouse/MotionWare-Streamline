@@ -60,7 +60,6 @@ def get_sleep_window_indices(activity, lux, time, window_size):
     """ Gets the sleep window indices
     """
     days_of_recorded_activity = int(len(activity)/1440)
-    print(days_of_recorded_activity)
     start_index = find_start_index(time)
     days_indices = get_day_indices(start_index, days_of_recorded_activity)
     
@@ -73,7 +72,6 @@ def get_sleep_window_indices(activity, lux, time, window_size):
         sleep_window_indices.append(sleep_index)
     
     # Get from last index to end of raw data file
-    print(len(sleep_window_indices))
     return sleep_window_indices
     
 def find_sleep_window(activity, lux, size):

@@ -3,11 +3,11 @@
     Author: Daniel Backhouse and Alan Yan
 """
 # Import extension libraries
-import SheetManager
 import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
 import FindInBedTimes
+import os
 ############### Note participant list changes to just the diaries that are 
 ## properly filled once use_sleep_diaries has been called 
 class Study:
@@ -25,10 +25,10 @@ class Study:
         self.study_name = study_name
         self.assesment = assesment
         print('Getting raw activity and lux data for participants...')
-        raw_data_all, raw_data_id = self.get_raw_data_list()
+        raw_data, participant_list = self.get_raw_data_list()
         print('\n Found raw activity and lux data...\n')
-        self.raw_data = raw_data_all
-        self.participant_list = raw_data_id
+        self.raw_data = raw_data
+        self.participant_list = participant_list
 
     def get_in_bed_times_noDiary(self):
         """Gets the in bed times for when not using sleep diaries
@@ -68,16 +68,23 @@ class Study:
         excel files pandas data frame an stores each as a seperate entry in     
         a list
         
-        :param (string) rawDataDirectory: the directory where the raw data is
-        found
+        :param: none
         :return: Returns a list of raw data files stored in dataframes
         :rtype: (list<pandas dataFrame>)
         """
-        #TODO Populating raw data list without sleep Diaries for now
-        rawDataList, participants = SheetManager.populateRawDataNoDiary(self.raw_data_directory)
-        return rawDataList, participants
+        rawDataList = []
+        participant_id = []
+        rawDataAll = os.listdir(self.raw_data_directory + '\\' + self.assesment)
+        for file in rawDataAll:
+            if file.endswith('.xlsx'):
+                rawDataList.append(pd.read_excel(self.raw_data_directory + '\Baseline\\' 
+                                               + file, skiprows = self.skiprows_rawdata))  
+                participant_id.append(file[len(self.study_name)+1:6])
+                print(file[len(self.study_name)+1:6])
     
-        #TODO: makes this function return two dictionaries where the indices 
+        return rawDataList, participant_id 
+    
+    #TODO: makes this function return two dictionaries where the indices 
     # are given by the partici[ant list]. See how this changes the time of execution
     def get_study_analysis_sleep_times(self):
         """Gets the lights and and got up times for the protocol method of 

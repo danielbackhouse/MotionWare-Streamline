@@ -10,7 +10,6 @@
     Author: Alan Yan and Daniel Backhouse
 """
 import Study
-import SleepDataAnalysis
 # Sleep Analysis Directory: enter the sleep analysis directory within the double
 # quotations. NOTE THAT THIS FIELD IS NOT REQUIRED AND IS ONLY NEEDED IF COMPARING
 # PROGGRAM VALUES TO PROTOCOL VALUES. So then if there is no sleep analysis directory
@@ -57,9 +56,7 @@ assesment = "Baseline"
 # *************DO NOT MAKE CHANGES TO THE PROGRAM BEYOND THIS POINT**********
 
 sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory, 
-                          sleep_diary_directory, lights_out_index_diary, 
-                          got_up_index_diary, lights_out_index_analysis, 
-                          got_up_index_analysis, skiprows_diary, 
+                          lights_out_index_analysis, got_up_index_analysis,  
                           skiprows_analysis, skiprows_rawdata, 
                           study_name, assesment)
 
