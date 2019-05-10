@@ -72,6 +72,8 @@ def get_sleep_window_indices(activity, lux, time, window_size):
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
     
+    # Get from last index to end of raw data file
+    print(len(sleep_window_indices))
     return sleep_window_indices
     
 def find_sleep_window(activity, lux, size):
@@ -96,7 +98,7 @@ def find_sleep_window(activity, lux, size):
         index_list.append(index)
         index = index + one_hour_epoch
         
-    sortedIndex = sort_lists(light_list, activity_list, index_list)   
+    sortedIndex = sort_lists(light_list, activity_list, index_list)
     sleep_index  = sortedIndex[len(sortedIndex)-1]   
     return  sleep_index
      
@@ -119,14 +121,14 @@ def get_day_indices(start_index, worn_days):
     duration of the study
     
     :param (int) start_index: the first 12pm time index
-    :param (int) worn_days: the number of proper data worn days
+    :param (double) worn_days: the number of proper data worn days
     return: A list of the indices which correspond to a time of 12pm
     :rtype: list<int>
     """
     day = 1440
     start_day_indices = list()
     index = start_index
-    while index < worn_days*day:
+    while index <= worn_days*day:
         start_day_indices.append(index)
         index = index + day
     

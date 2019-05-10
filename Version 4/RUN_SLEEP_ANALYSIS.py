@@ -72,12 +72,12 @@ LOdates, LOtimes ,GUdates , GUtimes = sleep_study.get_in_bed_times_noDiary()
 
 
 #************** Test for with Diaries****************************************#
-sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory, 
-                          sleep_diary_directory, lights_out_index_diary, 
-                          got_up_index_diary, lights_out_index_analysis, 
-                          got_up_index_analysis, skiprows_diary, 
-                          skiprows_analysis, skiprows_rawdata, 
-                          study_name, assesment)
+#sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory, 
+#                          sleep_diary_directory, lights_out_index_diary, 
+#                          got_up_index_diary, lights_out_index_analysis, 
+#                          got_up_index_analysis, skiprows_diary, 
+#                          skiprows_analysis, skiprows_rawdata, 
+#                          study_name, assesment)
 
 #rawData = sleep_study.raw_data
 #LO_program, GU_program = sleep_study.get_study_program_times()
