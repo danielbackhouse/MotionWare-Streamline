@@ -9,7 +9,8 @@ import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
 import FindInBedTimes
-
+############### Note participant list changes to just the diaries that are 
+## properly filled once use_sleep_diaries has been called 
 class Study:
     
     def __init__(self, sleep_analysis_directory, raw_data_directory, 
@@ -33,19 +34,20 @@ class Study:
         print('Getting raw activity and lux data for participants...')
         raw_data_all, raw_data_id = self.get_raw_data_list()
         print('\n Found raw activity and lux data...\n')
-        self.participant_list = raw_data_id
         self.raw_data_id = raw_data_id
-        self.raw_data = raw_data_all
+        self.raw_data_all = raw_data_all
+        self.participant_list = raw_data_id
     
     # TODO: Add docstring
     def use_sleep_diaries(self):
         print('\n Getting ' + self.assesment + ' sleep diary data for ' + self.study_name + ' study... \n')  
         sleep_diaries, unmod_participant_list = self.get_sleep_diary_list_and_participants(
                 self.sleep_diary_directory)
-        
+        self.participant_list = self.modify_participant_list(unmod_participant_list)
         self.sleep_diaries = sleep_diaries
+        print('\n getting the raw data files with sleep diaries...')
         raw_data = self.get_raw_data_with_sleep_diaries()
-        self.raw_data = raw_data
+        self.raw_data_withDiary = raw_data
     
     #TODO: makes this function return two dictionaries where the indices 
     # are given by the partici[ant list]. See how this changes the time of execution
@@ -148,7 +150,7 @@ class Study:
         for i in range(0, len(self.sleep_diaries)):
            print('\n' + self.participant_list[i])
            lightsOutTimes, gotUpTimes = self.get_participant_program_times(
-                   self.raw_data[i], self.sleep_diaries[i])
+                   self.raw_data_withDiary[i], self.sleep_diaries[i])
            lights_out_program_study_times.append(lightsOutTimes)
            got_up_program_study_times.append(gotUpTimes)
            
@@ -229,8 +231,8 @@ class Study:
         GUdateList = list()
         LOtimeList = list()
         GUtimeList = list()
-        for file in self.raw_data:
-            print(self.participant_list[index])
+        for file in self.raw_data_all:
+            print(self.raw_data_id[index])
             dates = file.iloc[:,0].values
             time = file.iloc[:,1].values
             activity = file.iloc[:,2].values
@@ -248,7 +250,6 @@ class Study:
            
     # All functions form here onward are only called within the class init   
     # *******************************************************************
-    #TODO: not using this guy anymore
     def modify_participant_list(self, participants):
         """Function that modifies the participant list for a given study and removes
         the study code from the string so that just the numbers are left
