@@ -7,14 +7,14 @@ Testing the no sleep diary  program
 
 
 import pandas as pd
-import noSleepDiarySleepWindow
+import FindInBedTimes
 
 study_period = 14
 start_threshold = 20    # starts if less than twenty zeros
 activity_sleep_window_threshold = 60 # if there are 60 zeros in a 3 hour period then its a sleep window
 light_sleep_window_threshold = 0 # not set yet
 
-rawDataDirectory = r'RAW_DATA_NEW.xlsx'
+rawDataDirectory = r'SampleRawData.xlsx'
 rawData = pd.read_excel(rawDataDirectory, skiprows = 15)
 
 dates = rawData.iloc[:,0].values
@@ -37,8 +37,13 @@ lux = rawData.iloc[:,3].values
 #for index in sleep_indices:
 #    print(time[index])
 
-lightsOutTimes, lightsOutIndices = noSleepDiarySleepWindow.find_in_bed_time(dates, time, activity, lux, 8)
+lightsOutIndices, gotUpIndices = FindInBedTimes.find_in_bed_time(dates, time, activity, lux, 8)
 
-#for index in lightsOutIndices:
-#    print(dates[index])
-#    print(time[index])
+for index in lightsOutIndices:
+    print(dates[index])
+    print(time[index])
+
+print('\n')  
+for index in gotUpIndices:
+    print(dates[index])
+    print(time[index])

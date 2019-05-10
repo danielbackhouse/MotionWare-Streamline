@@ -3,6 +3,8 @@
             sleep diaries for given.
     Author: Daniel Backhouse and Alan Yan
 """
+import numpy as np
+
 def find_in_bed_time(dates, time, activity, lux, window_size):
     """ Finds the got up and lights out times using only the activity, light
     and date arrays
@@ -24,16 +26,25 @@ def find_in_bed_time(dates, time, activity, lux, window_size):
     :rtype: (list) (list)
     """
     sleep_window_indices = get_sleep_window_indices(activity,lux,time,window_size)
-   
     lights_out_indices = list()
+    got_up_indices = list()
     for index in sleep_window_indices:
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
-        lights_out_index  = find_lights_out_index(sleep_range_backward, activity, lux, sleep_range_forward )    
+        lights_out_index = find_lights_out_index(sleep_range_backward, activity,
+                                                 lux, sleep_range_forward )    
         lights_out_indices.append(lights_out_index)
-
+        
+        start = index
+        end = index + window_size*60
+        sleepRangeMean = np.mean(activity[start:end])
+        awake_range_backward = index + 3*60
+        awake_range_forward = index + 9*60
+        got_up_index = find_got_up_index(awake_range_backward, activity, lux, 
+                                         awake_range_forward, sleepRangeMean )
+        got_up_indices.append(got_up_index)
     
-    return lights_out_indices
+    return lights_out_indices, got_up_indices
 
 #TODO: Write docstring
 def get_sleep_window_indices(activity, lux, time, window_size):
@@ -244,4 +255,34 @@ def find_lights_out_index(index, activity, lux, sleepRange):
             index = index + 1
                       
     return lights_out_index
-      
+    
+def find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
+    """ Finds the got up time of the participant
+    
+    :param (array) activity: the activity data of the participant over a sleep range
+    :param (array) lux: the lux data of the participant over the sleep range
+    :param (int) sleep_range: the index corresponding to the end of the passed
+        sleep range
+    :param (double) sleepRangeMean: mean activity count over estimated sleep range
+    :return: the index corresponding to the moment the participant went to sleep
+    :rtype: (int)
+    """
+    zeroStirringCount = 0;
+    got_up_index = index
+    
+    while index < sleep_range:
+
+        if lux[index] != 0 and activity[index] >= sleepRangeMean:
+            zeroStirringCount = zeroStirringCount + 1
+            if zeroStirringCount == 1:
+                got_up_index = index               
+        else:
+            zeroStirringCount = 0
+            
+        if zeroStirringCount >= 10:
+            return got_up_index
+            
+        index = index + 1
+                 
+             
+    return got_up_index
