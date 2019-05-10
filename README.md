@@ -30,7 +30,7 @@ containing lux and activity counts.
 4. Open the MotionWare software and click on 'Browse for MotionFile.'
 
 5. Go to where your .mtn files are located and open them using the MotionWare software. An actigraph should
-not appear graphically displaying the activity and lux counts recorded by the watch while it was active.
+now appear graphically displaying the activity and lux counts recorded by the watch while it was active.
 
 6. To make it easier to visualize, increase the activity scale reading to 1000 and the lux scale reading to 78.
 
