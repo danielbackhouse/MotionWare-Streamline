@@ -3,11 +3,7 @@
             sleep diaries for given.
     Author: Daniel Backhouse and Alan Yan
 """
-
-import numpy as np
-
-def find_in_bed_time(dates, time, activity, lux, study_period, start_threshold, 
-                     activity_sleep_window_threshold, light_sleep_window_threshold):
+def find_in_bed_time(dates, time, activity, lux, window_size):
     """ Finds the got up and lights out times using only the activity, light
     and date arrays
     
@@ -19,124 +15,112 @@ def find_in_bed_time(dates, time, activity, lux, study_period, start_threshold,
     
     :param (array) date: the dates over which activity and light were recorded
     :param (array) time: the times at which the activity and light were recorded
-    :param (array) activity: the activity for the specified epoch
+    :param (array) activity: the activity for the specified epochtime
     :param (array) lux: the lux for the specified epoch
-    :param (int) study_period: the number of days the sleep study was
-        conducted over
+    :param (int) window_size: the size in hours of the window to check for sleep
+    windows
     :return: Two lists containing the got up and lights out times of the 
         participant
     :rtype: (list) (list)
     """
-    # Each epoch is 1 minute. There are 14440 minutes in a day.
-    days_of_recorded_activity = len(activity)/1440
-    
-    if(len(dates) != len(activity)):
-        print('Error length of dates does not match length of activity')
-    
-    # The raw data should be taken over a period of 14 days selected by the 
-    # person ding the analysis. This checks to see of the total number of epochs is 
-    # 20160 (14 days) or just length of the study period
-    if(study_period == days_of_recorded_activity):
-        LO, GU = get_in_bed_time_complete_activity(dates,time,activity,lux, study_period)
-    
-    if(study_period < days_of_recorded_activity):
-        print('Raw actiivty data exceeds study time' )
-        GU_dates, GU_times, LO_times, LO_dates = get_in_bed_time_large_activity(dates,time,activity,lux, 
-                                                study_period, start_threshold, 
-                                                activity_sleep_window_threshold, 
-                                                light_sleep_window_threshold)
-        
-    if(study_period > days_of_recorded_activity):
-        LO, GU = get_in_bed_time_small_activity(dates, time, activity, lux, study_period)
-         
-    return GU_dates, GU_times, LO_times, LO_dates
+    sleep_window_indices = get_sleep_window_indices(activity,lux,time,window_size)
+   
+    lights_out_indices = list()
+    for index in sleep_window_indices:
+        sleep_range_backward = index - 2*60
+        sleep_range_forward = index + 3*60 
+        lights_out_index  = find_lights_out_index(sleep_range_backward, activity, lux, sleep_range_forward )    
+        lights_out_indices.append(lights_out_index)
 
+    
+    return lights_out_indices
 
-def get_in_bed_time_complete_activity(date, time, activity, lux, study_period):
-    """ Finds the lights out and got up times of a participant where 
-    the days for which acitivity was recorded is equal to the number
-    of days the study was done over
-    
-    :param (array) time: the times at which the activity and light were recorded
-    :param (array) activity: the activity for the specified epoch
-    :param (array) lux: the lux for the specified epoch
-    :return: Two lists containing the got up and lights out times of the 
-        participant
-    :rtype: (list) (list)  
-    """  
-
-def get_in_bed_time_large_activity(date, time, activity, lux, study_period, 
-                                   start_threshold, activity_sleep_window_threshold,
-                                   light_sleep_window_threshold):
-    """ Finds the lights out and got up times of a participant where 
-    the days for which acitivity was recorded exceeds  the number
-    of days the study was done over
-    
-    :param (array) time: the times at which the activity and light were recorded
-    :param (array) activity: the activity for the specified epoch
-    :param (array) lux: the lux for the specified epoch
-    :return: Two lists containing the got up and lights out times of the 
-        participant
-    :rtype: (list) (list)  
-    """ 
-    got_up_dates = []
-    got_up_times = []
-    lights_out_dates = []
-    lights_out_times = []
-    
-    start_index = find_start_point(activity, study_period, start_threshold)
-    index = start_index
-    one_hour_epoch = 60
-    sleepRange = one_hour_epoch*3
-    required_epoch_range = study_period*24*60
-    
-    while (index + sleepRange) <= (start_index + required_epoch_range):
-        activity_zeros = count_zeros_in_array(activity[index:index+sleepRange])
-        #print(activity_zeros)
-        if(activity_zeros > activity_sleep_window_threshold):           #TODO: maybe check light
-            lights_out_index = find_lights_out_index(index, activity, lux, sleepRange)
-            
-            lights_out_times.append(time[lights_out_index])
-            lights_out_dates.append(date[lights_out_index])
-            print(time[index])
-            print(time[index+sleepRange])
-            index = index + 12*one_hour_epoch # for now have it jump twelve hours from when the sleep point was found
-        else:    
-            index = index + one_hour_epoch 
-            
-        activity_zeros = 0
- 
-    return got_up_dates, got_up_times, lights_out_times, lights_out_dates
-  
-    
-def find_sleep_windows(date, time, activity, lux):
-    """ Find the sleep window. Does this by getting a list of of all 12 hour
-    periods starting from the start index and then finds the 14 (for a 14 day study)
-    with the most amount of motion below the mean (may change this to counts of zero
-    or motion below sme ther threshold)
+#TODO: Write docstring
+def get_sleep_window_indices(activity, lux, time, window_size):
+    """ Gets the sleep window indices
     """
-    start_index = 0
+    days_of_recorded_activity = int(len(activity)/1440)
+    print(days_of_recorded_activity)
+    start_index = find_start_index(time)
+    days_indices = get_day_indices(start_index, days_of_recorded_activity)
+    
+    sleep_window_indices = list()
+    for i in range(0, len(days_indices)-1):
+        start = days_indices[i]
+        end = days_indices[i+1]        
+        sleep_window_index = find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_index = start + sleep_window_index
+        sleep_window_indices.append(sleep_index)
+    
+    return sleep_window_indices
+    
+def find_sleep_window(activity, lux, size):
+    """ Finds and returns all windows of given size within the date, time, acitivty
+    and lux data given
+    
+    :param (array) activity: 24 hour activity data taken from participant
+    :param (int) size: size given in hours for the sleep range
+    :return: the index corresponding to the start of the mopst likely
+    sleep window within the given set of 24 hour activity data
+    """
     one_hour_epoch = 60
-    sleepRange = one_hour_epoch*12
-    required_epoch_range = 14*24*60
+    sleepRange = size*60
     
     activity_list = list()
     light_list = list()
-    indexRange_list = list()
-    index = start_index
-    while (index + sleepRange) <= (start_index+required_epoch_range):
+    index_list = list()
+    index = 0
+    while (index + sleepRange) <= len(activity):
         light_list.append(lux[index:index+sleepRange])
         activity_list.append(activity[index:index+sleepRange])
-        indexRange_list.append([index, index+sleepRange])
+        index_list.append(index)
         index = index + one_hour_epoch
         
-    sortedWeights, sortedIndexRange = sort_lists(light_list, activity_list, indexRange_list)   
+    sortedIndex = sort_lists(light_list, activity_list, index_list)   
+    sleep_index  = sortedIndex[len(sortedIndex)-1]   
+    return  sleep_index
+     
+def find_start_index(time):
+    """ Find the first 12th hour in the time list and returns its index
+    
+    :param (array) time: a list of datetime.time objects
+    :raises: raises an exception if there was no 12pm hour found
+    :return: returns the first 12pm time
+    :rtype: (int)
+    """    
+    for index in range(0,len(time)):
+        if(time[index].hour == 12):
+            return index
+    
+    raise Exception('did not find any 12pm value within the entire time array')
         
-    return  sortedWeights, sortedIndexRange
- 
+def get_day_indices(start_index, worn_days):
+    """Gets the indices for the start of each day begining at 12pm for the 
+    duration of the study
+    
+    :param (int) start_index: the first 12pm time index
+    :param (int) worn_days: the number of proper data worn days
+    return: A list of the indices which correspond to a time of 12pm
+    :rtype: list<int>
+    """
+    day = 1440
+    start_day_indices = list()
+    index = start_index
+    while index < worn_days*day:
+        start_day_indices.append(index)
+        index = index + day
+    
+    return start_day_indices
+    
 # TODO: complete docstring   
 def sort_lists(lightList, activityList, indexRangeList):
-    """ Sorts the lists by the specified paramters given
+    """ Sorts the lightList by the windows with the least amount of zero light counts
+    first and sorts the activityList by the windows with the most counts below the mean
+    
+    :param (list) lightList: takes a list of sleep windows with lux data
+    :param(list) activityList: takes a list of sleep windows with activity data
+    :param(list) indexRangelist: takes a list of the indices corresponding to
+    the activity and light data points
     """
     activityThreshold = 20
     lightWeight = 1
@@ -148,12 +132,17 @@ def sort_lists(lightList, activityList, indexRangeList):
         val = activityVal*activityWeight + lightWeight*lightVal
         weightedSleepPeriods.append(val)
     
-    sortedWeights, sortedIndexRange = bubbleSort(weightedSleepPeriods, indexRangeList)
+    sortedIndexRange = bubbleSort(weightedSleepPeriods, indexRangeList)
     
-    return sortedWeights, sortedIndexRange
+    return sortedIndexRange
 
 def bubbleSort(arr, arr2): 
-    """ Bubble sorts array and moves other array elements likewise
+    """ Bubble sorts array1 and moves the elements in arr2 in the same manner 
+    as array1 indpenedent of the size the elements within it
+    
+    :param (array<int>) arr: an array of integers
+    :param (array<int>) arr2: an array of any data type
+    :return: returns array 2 sorted using array 1
     """
     n = len(arr) 
   
@@ -162,7 +151,7 @@ def bubbleSort(arr, arr2):
             if arr[j] > arr[j+1] : 
                 arr[j], arr[j+1] = arr[j+1], arr[j]
                 arr2[j], arr2[j+1] = arr2[j+1], arr2[j]
-    return arr, arr2
+    return arr2
 
 def count_below_threshold_in_array(arr, threshold):
     """ Counts the number of elements in array below threshold
@@ -178,54 +167,6 @@ def count_below_threshold_in_array(arr, threshold):
             
     return counter
 
-
-def get_in_bed_time_small_activity(date, time, activity, lux, study_period):
-     """ Finds the lights out and got up times of a participant where 
-    the days for which acitivity was recorded is less than the number
-    of days the study was done over
-    
-    :param (array) time: the times at which the activity and light were recorded
-    :param (array) activity: the activity for the specified epoch
-    :param (array) lux: the lux for the specified epoch
-    :return: Two lists containing the got up and lights out times of the 
-        participant
-    :rtype: (list) (list)  
-    """    
-
-
-
-def find_start_point(activity, study_period, start_threshold):
-    """ Finds the point at which to start determining sleep points given an 
-    activity array that is larger than the length of the study. 
-    
-    :param (array) activity: the activity counts for the participant
-    :param (int) start_threshold: the threshold value for the number 
-        of zeros allowed within an hour recording. Value used to determine
-        when the actual recording for the motionwatch started given data 
-        that exceeds the length of the study
-    :param (int) study_period: the number of days they wore the motionwatch
-    :return: returns the index at which to start the calculation
-    :rtype: (int)
-    """
-    # The number of epochs in total neccesary for the requiried study length
-    required_epoch_range = study_period*24*60
-    # one hour is 60 epochs for one minute epoch length
-    hour = 60
-    start_index = 0
-    for epoch_num in range(0, len(activity)):
-        # check to see if we are exceeding the range of activity
-        if (required_epoch_range + epoch_num >= len(activity)):
-            break
-
-        hour_range = activity[epoch_num:epoch_num+hour]
-        num_zeros = count_zeros_in_array(hour_range)
-        
-        if(num_zeros < start_threshold):
-           start_index = epoch_num 
-        
-    return start_index # if no clear cut start was found it's just going to use the begining of the activity
-                        # data as the start point
-      
 def count_zeros_in_array(arr):
     """ Counts the number of zeros in an array with integer values
     
@@ -248,7 +189,8 @@ def find_lights_out_index(index, activity, lux, sleepRange):
     :param (array) lux: the lux data of the participant over the sleep range
     :return: the index corresponding to the moment the participant went to sleep
     """
-    meanActivity = np.mean(activity)
+    print('entered')
+    meanActivity = 20
     zeroMovementCount = 0;
     zeroLightCount = 0;
     zeroLightActiveCount = 0;
@@ -282,7 +224,7 @@ def find_lights_out_index(index, activity, lux, sleepRange):
                     sleepLightCheck = True
                     lights_out_index = index  
             else:
-                zeroMovementCount = 0
+                zeroLightCount = 0
                 sleepLightCheck = False
                 darkMotion = 0
 
@@ -298,13 +240,8 @@ def find_lights_out_index(index, activity, lux, sleepRange):
                   
             if zeroLightCount >= 15:
                 return lights_out_index
+            
+            index = index + 1
                       
     return lights_out_index
-    
-    
-    
-    
-    
-    
-
       
