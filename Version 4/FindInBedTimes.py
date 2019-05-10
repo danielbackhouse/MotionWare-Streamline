@@ -28,6 +28,10 @@ def find_in_bed_time(dates, time, activity, lux, window_size):
     sleep_window_indices = get_sleep_window_indices(activity,lux,time,window_size)
     lights_out_indices = list()
     got_up_indices = list()
+    lights_out_dates = list()
+    lights_out_times = list()
+    got_up_times = list()
+    got_up_dates = list()
     for index in sleep_window_indices:
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
@@ -43,8 +47,13 @@ def find_in_bed_time(dates, time, activity, lux, window_size):
         got_up_index = find_got_up_index(awake_range_backward, activity, lux, 
                                          awake_range_forward, sleepRangeMean )
         got_up_indices.append(got_up_index)
+        
+        lights_out_times.append(time[lights_out_index])
+        lights_out_dates.append(dates[lights_out_index])
+        got_up_times.append(time[got_up_index])
+        got_up_dates.append(dates[got_up_index])
     
-    return lights_out_indices, got_up_indices
+    return lights_out_dates, lights_out_times, got_up_dates, got_up_times
 
 #TODO: Write docstring
 def get_sleep_window_indices(activity, lux, time, window_size):
@@ -200,7 +209,6 @@ def find_lights_out_index(index, activity, lux, sleepRange):
     :param (array) lux: the lux data of the participant over the sleep range
     :return: the index corresponding to the moment the participant went to sleep
     """
-    print('entered')
     meanActivity = 20
     zeroMovementCount = 0;
     zeroLightCount = 0;
@@ -240,7 +248,6 @@ def find_lights_out_index(index, activity, lux, sleepRange):
                 darkMotion = 0
 
             if darkMotion >= 5:  
-                print('dark motion')
                 return lights_out_index
                   
             if zeroLightActiveCount >= 5:

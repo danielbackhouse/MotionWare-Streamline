@@ -63,22 +63,38 @@ sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory,
                           skiprows_analysis, skiprows_rawdata, 
                           study_name, assesment)
 
-rawData, sleepDiary = sleep_study.return_raw_data_and_diary()
-LO_program, GU_program = sleep_study.get_study_program_times()
-LO_analysis, GU_analysis = sleep_study.get_study_analysis_sleep_times()
+LOdates, LOtimes ,GUdates , GUtimes = sleep_study.get_in_bed_times_noDiary()
 
 
-error = sleep_study.error_in_date_time_lists(LO_program,LO_analysis)
 
-sleepAnalysis = list()
-for i in range(0,len(GU_program)):
-    print(i)
-    for j in range(0,len(GU_program[i])):
-        participant_awake = GU_program[i]
-        participant_sleep = LO_program[i]
-        dictionary = SleepDataAnalysis.findSleepAnalysisData(
-                participant_sleep[j], participant_awake[j], rawData[i])
-        sleepAnalysis.append(dictionary)
+
+
+
+
+#************** Test for with Diaries****************************************#
+sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory, 
+                          sleep_diary_directory, lights_out_index_diary, 
+                          got_up_index_diary, lights_out_index_analysis, 
+                          got_up_index_analysis, skiprows_diary, 
+                          skiprows_analysis, skiprows_rawdata, 
+                          study_name, assesment)
+
+#rawData = sleep_study.raw_data
+#LO_program, GU_program = sleep_study.get_study_program_times()
+#LO_analysis, GU_analysis = sleep_study.get_study_analysis_sleep_times()
+
+
+#error = sleep_study.error_in_date_time_lists(LO_program,LO_analysis)
+
+#sleepAnalysis = list()
+#for i in range(0,len(GU_program)):
+#    print(i)
+#    for j in range(0,len(GU_program[i])):
+#        participant_awake = GU_program[i]
+#        participant_sleep = LO_program[i]
+#        dictionary = SleepDataAnalysis.findSleepAnalysisData(
+#                participant_sleep[j], participant_awake[j], rawData[i])
+#        sleepAnalysis.append(dictionary)
 
 
 

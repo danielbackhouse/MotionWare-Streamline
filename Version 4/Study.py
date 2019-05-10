@@ -8,6 +8,7 @@ import SheetManager
 import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
+import FindInBedTimes
 
 class Study:
     
@@ -29,25 +30,23 @@ class Study:
         self.skiprows_rawdata = skiprows_rawdata
         self.study_name = study_name
         self.assesment = assesment
-        print('\n Getting ' + assesment + ' sleep diary data for ' + study_name + ' study... \n')  
+        print('Getting raw activity and lux data for participants...')
+        raw_data_all, raw_data_id = self.get_raw_data_list()
+        print('\n Found raw activity and lux data...\n')
+        self.participant_list = raw_data_id
+        self.raw_data_id = raw_data_id
+        self.raw_data = raw_data_all
+    
+    # TODO: Add docstring
+    def use_sleep_diaries(self):
+        print('\n Getting ' + self.assesment + ' sleep diary data for ' + self.study_name + ' study... \n')  
         sleep_diaries, unmod_participant_list = self.get_sleep_diary_list_and_participants(
                 self.sleep_diary_directory)
-        print('\n Found sleep diary data... Getting raw activity and lux data for participants with complete sleep diary...')
-        raw_data_all, raw_data_id = self.get_raw_data_list(
-                self.raw_data_directory)
-        print('\n Found raw activity and lux data...\n')
-        self.raw_data_id = raw_data_id
-        self.participant_list = self.modify_participant_list(unmod_participant_list)
-        self.raw_data_all = raw_data_all
-        print(' Participant list succesfully modified')
-        raw_data = self.get_raw_data_with_sleep_diaries()
+        
         self.sleep_diaries = sleep_diaries
+        raw_data = self.get_raw_data_with_sleep_diaries()
         self.raw_data = raw_data
     
-    # Function used for testign    
-    def return_raw_data_and_diary(self):
-        return self.raw_data, self.sleep_diaries
-        
     #TODO: makes this function return two dictionaries where the indices 
     # are given by the partici[ant list]. See how this changes the time of execution
     def get_study_analysis_sleep_times(self):
@@ -213,9 +212,43 @@ class Study:
             errorList.append(error)
         
         return errorList
-            
+ 
+
+    def get_in_bed_times_noDiary(self):
+        """Gets the in bed times for when not using sleep diaries
+        
+        :param: None
+        :return: returns 4 lists, the got up times, got up dates, lights out times
+        and lights out dates
+        :rtype: (list<numpy.datetime64>) (list<numpy.datetime64.time>)
+        """
+        print('\n Finding got up and lights out time using no sleep diary...')
+        window_size = 8
+        index = 0
+        LOdateList = list()
+        GUdateList = list()
+        LOtimeList = list()
+        GUtimeList = list()
+        for file in self.raw_data:
+            print(self.participant_list[index])
+            dates = file.iloc[:,0].values
+            time = file.iloc[:,1].values
+            activity = file.iloc[:,2].values
+            lux = file.iloc[:,3].values
+            LOdates, LOtimes, GUdates, GUtimes = FindInBedTimes.find_in_bed_time(
+                    dates, time, activity, lux, window_size)
+            LOdateList.append(LOdates)
+            LOtimeList.append(LOtimes)
+            GUdateList.append(GUdates)
+            GUtimeList.append(GUtimes)
+        
+            index = index + 1
+    
+        return LOdateList, LOtimeList, GUdateList, GUtimeList
+           
     # All functions form here onward are only called within the class init   
     # *******************************************************************
+    #TODO: not using this guy anymore
     def modify_participant_list(self, participants):
         """Function that modifies the participant list for a given study and removes
         the study code from the string so that just the numbers are left
@@ -237,7 +270,7 @@ class Study:
     
         
     #TODO: modify this function so that populateRawDataList takes a directory
-    def get_raw_data_list(self, rawDataDirectory):
+    def get_raw_data_list(self ):
         """This function uses the SheetManager module and gets the raw Data
         excel files pandas data frame an stores each as a seperate entry in     
         a list
@@ -247,7 +280,8 @@ class Study:
         :return: Returns a list of raw data files stored in dataframes
         :rtype: (list<pandas dataFrame>)
         """
-        rawDataList, participants = SheetManager.populateRawDataList()
+        #TODO Populating raw data list without sleep Diaries for now
+        rawDataList, participants = SheetManager.populateRawDataNoDiary(self.raw_data_directory)
         return rawDataList, participants
     
     #TODO: modify this function so that populateDiaryList takes a directory as

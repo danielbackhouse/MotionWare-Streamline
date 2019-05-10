@@ -45,7 +45,7 @@ def findMatching(fileName):
     
 def populateRawDataList():
     """Creates and populates a list containing all the trials raw data 
-    in numerical order
+    in numerical order matching the sleep dairy to the raw data
     
     
     :param: none
@@ -60,6 +60,32 @@ def populateRawDataList():
             rawDataList.append(pd.read_excel(rawDataDirectory + '\Baseline\\' 
                                            + file, skiprows = 12))  
             participant_id.append(file[3:6])
+
+    return rawDataList, participant_id
+
+#TODO: get so that it returns raw data in right order if it is not already in
+# increasing order
+# TODO: have it figure out how many rows to skip
+def populateRawDataNoDiary(rawDirectory):
+    """Creates and populates a list containing all the trials raw data 
+    in numerical order without checking to see if the sleep diary exsists
+    
+    Note here that if the raw data files are in the wrong order then
+    the results will be likewise
+    
+    :param: none
+    :return: list of all trials raw data
+    :rtype(list)
+    """
+    rawDataList = []
+    participant_id = []
+    rawDataAll = os.listdir(rawDirectory+ '\Baseline')
+    for file in rawDataAll:
+        if file.endswith('.xlsx'):
+            rawDataList.append(pd.read_excel(rawDirectory + '\Baseline\\' 
+                                           + file, skiprows = 12))  
+            participant_id.append(file[3:6])
+            print(file[3:6])
 
     return rawDataList, participant_id
 
