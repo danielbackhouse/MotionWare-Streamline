@@ -10,6 +10,8 @@
     Author: Alan Yan and Daniel Backhouse
 """
 import Study
+import TrimRawData as trim
+import os
 # Sleep Analysis Directory: enter the sleep analysis directory within the double
 # quotations. NOTE THAT THIS FIELD IS NOT REQUIRED AND IS ONLY NEEDED IF COMPARING
 # PROGGRAM VALUES TO PROTOCOL VALUES. So then if there is no sleep analysis directory
@@ -38,7 +40,7 @@ skiprows_diary = 0;
 # Raw Data Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # raw data files are located. The raw data files should be in folders Baseline
 # Midpoint and Final
-raw_data_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data'
+raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoint"
 
 # SkipRows Raw Data: THIS IS A REQUIRED FIELD. This field should not be changed 
 # unless the format of the raw data files has changed. This field is the most
@@ -55,10 +57,17 @@ assesment = "Baseline"
 
 # *************DO NOT MAKE CHANGES TO THE PROGRAM BEYOND THIS POINT**********
 
-sleep_study = Study.Study(sleep_analysis_directory, raw_data_directory, 
-                          lights_out_index_analysis, got_up_index_analysis,  
-                          skiprows_analysis, skiprows_rawdata, 
-                          study_name, assesment)
+sleep_study = Study.Study(raw_data_directory, skiprows_rawdata, study_name, assesment)
 
 LOdates, LOtimes ,GUdates , GUtimes = sleep_study.get_in_bed_times_noDiary()
+
+
+
+
+
+
+
+
+
+
 
