@@ -2,7 +2,7 @@
     Purpose: 
         *******************IMPORTANT PLEASE READ***************************
         This is the main program and SHOULD be used to run the sleep analysis
-        (it shoulda also be the only file you need to open).
+        (it should also be the only file you need to open).
         DO NOT make any changes to any of the other files within the program.
         It is recomondded that you only change the variables specified. There
         should be an explanation of what each variable does
