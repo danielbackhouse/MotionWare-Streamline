@@ -86,13 +86,9 @@ class Study:
                     if file.endswith('.csv'):
                         participant_num = file[3:6]
                         print(participant_num)
-                        if int(participant_num) >= 58:
-                            skiprows = 15
-                            dates, times, lux, activity = trim.trimDataThree(
-                                    self.raw_data_directory+ '\\'+file, skiprows)
-                        else:
-                            dates, times, lux, activity = trim.trimDataThree(
-                                    self.raw_data_directory+ '\\'+file, self.skiprows_rawdata)
+                        #TODO: throw some error if the skiprows is too short
+                        dates, times, lux, activity = trim.trimDataThree(
+                                self.raw_data_directory+ '\\'+file, self.skiprows_rawdata)
                     
                         print(dates[0], times[0])
                         print(dates[-1], times[-1])

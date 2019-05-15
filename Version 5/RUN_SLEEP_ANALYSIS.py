@@ -40,12 +40,12 @@ skiprows_diary = 0;
 # Raw Data Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # raw data files are located. The raw data files should be in folders Baseline
 # Midpoint and Final
-raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoint"
+raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Final"
 
 # SkipRows Raw Data: THIS IS A REQUIRED FIELD. This field should not be changed 
 # unless the format of the raw data files has changed. This field is the most
 # likely to vary between study
-skiprows_rawdata = 12
+skiprows_rawdata = 20
 
 # study_name: THIS IS A REQUIRED FIELD. Enter within the qoutations the
 # abbreviation of the study. An examplen entry would be: "BT" or "FACT".

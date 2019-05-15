@@ -138,7 +138,8 @@ def trimEnds(activity, dates, times, lux):
             if zeroActivity>nonZeroActivity:
                 pop(-1, activity, dates, times, lux)
             else:
-                endFound = False    
+               endFound = False    
+#TODO: make this throw error if data is not ordered correctly in csv
 def trimDataThree(filePath, skiprows):
     file = pd.read_csv(filePath, skiprows = skiprows)
     dates = file.iloc[:,0].tolist()
