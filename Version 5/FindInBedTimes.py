@@ -5,7 +5,7 @@
 """
 import numpy as np
 
-def find_in_bed_time(dates, time, activity, lux, window_size):
+def find_in_bed_time(dateTimes, activity, lux, window_size):
     """ Finds the got up and lights out times using only the activity, light
     and date arrays
     
@@ -25,13 +25,11 @@ def find_in_bed_time(dates, time, activity, lux, window_size):
         participant
     :rtype: (list) (list)
     """
-    sleep_window_indices = get_sleep_window_indices(activity,lux,time,window_size)
+    sleep_window_indices = get_sleep_window_indices(activity,lux,dateTimes,window_size)
     lights_out_indices = list()
     got_up_indices = list()
-    lights_out_dates = list()
-    lights_out_times = list()
-    got_up_times = list()
-    got_up_dates = list()
+    lights_out_dateTimes = list()
+    got_up_dateTimes = list()
     for index in sleep_window_indices:
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
@@ -48,19 +46,17 @@ def find_in_bed_time(dates, time, activity, lux, window_size):
                                          awake_range_forward, sleepRangeMean )
         got_up_indices.append(got_up_index)
         
-        lights_out_times.append(time[lights_out_index])
-        lights_out_dates.append(dates[lights_out_index])
-        got_up_times.append(time[got_up_index])
-        got_up_dates.append(dates[got_up_index])
-    
-    return lights_out_dates, lights_out_times, got_up_dates, got_up_times
+        lights_out_dateTimes.append(dateTimes[lights_out_index])
+        got_up_dateTimes.append(dateTimes[got_up_index])
+        
+    return lights_out_dateTimes, got_up_dateTimes
 
 #TODO: Write docstring
-def get_sleep_window_indices(activity, lux, time, window_size):
+def get_sleep_window_indices(activity, lux, dateTimes, window_size):
     """ Gets the sleep window indices
     """
     days_of_recorded_activity = int(len(activity)/1440)
-    start_index = find_start_index(time)
+    start_index = find_start_index(dateTimes)
     days_indices = get_day_indices(start_index, days_of_recorded_activity)
     
     sleep_window_indices = list()
@@ -100,7 +96,7 @@ def find_sleep_window(activity, lux, size):
     sleep_index  = sortedIndex[len(sortedIndex)-1]   
     return  sleep_index
      
-def find_start_index(time):
+def find_start_index(dateTimes):
     """ Find the first 12th hour in the time list and returns its index
     
     :param (array) time: a list of datetime.time objects
@@ -108,8 +104,8 @@ def find_start_index(time):
     :return: returns the first 12pm time
     :rtype: (int)
     """    
-    for index in range(0,len(time)):
-        if(time[index].hour == 12):
+    for index in range(0,len(dateTimes)):
+        if(dateTimes[index].hour == 12):
             return index
     
     raise Exception('did not find any 12pm value within the entire time array')

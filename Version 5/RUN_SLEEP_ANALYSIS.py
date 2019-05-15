@@ -59,7 +59,7 @@ assesment = "Baseline"
 
 sleep_study = Study.Study(raw_data_directory, skiprows_rawdata, study_name, assesment)
 
-LOdates, LOtimes ,GUdates , GUtimes = sleep_study.get_in_bed_times_noDiary()
+LOdates, GUdates = sleep_study.get_in_bed_times_noDiary()
 
 
 

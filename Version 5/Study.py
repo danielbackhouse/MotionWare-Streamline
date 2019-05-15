@@ -34,26 +34,38 @@ class Study:
         print('\n Finding got up and lights out time using no sleep diary...')
         window_size = 8
         index = 0
-        LOdateList = list()
-        GUdateList = list()
-        LOtimeList = list()
-        GUtimeList = list()
+        LOdatetimeList = list()
+        GUdatetimeList = list()
+
         print('\n getting trimmed data...')
         dates, times, activity, lux, participants = self.get_trimmed_data()
+
         print('\n trimmed data... calculating sleep points...')
         for i in range(0, len(participants)):
-            
-            LOdates, LOtimes, GUdates, GUtimes = FindInBedTimes.find_in_bed_time(
-                    dates[i], times[i], activity[i], lux[i], window_size)
-            LOdateList.append(LOdates)
-            LOtimeList.append(LOtimes)
-            GUdateList.append(GUdates)
-            GUtimeList.append(GUtimes)
+            print(participants[i])
+            datetime_arr = self.convert_date_time(dates[i], times[i])
+            LOdatetime, GUdatetime = FindInBedTimes.find_in_bed_time(
+                    datetime_arr, activity[i], lux[i], window_size)
+            LOdatetimeList.append(LOdatetime)
+            GUdatetimeList.append(GUdatetime)
+
         
             index = index + 1
     
-        return LOdateList, LOtimeList, GUdateList, GUtimeList    
-        
+        return LOdatetimeList, GUdatetimeList 
+    #TODO: WRite out docstring
+    def convert_date_time(self, dates, times):
+        """ Converts date and time arrays (stored as strings) and combines them 
+        both to form one datetime array
+        """
+        datetime_arr = []
+        for i  in range(0, len(dates)):
+            datetimeString = dates[i] + ' ' + times[i]
+            datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
+            
+        return datetime_arr
+
+       
     #TODO: modify this function so that populateRawDataList takes a directory
     #TODO: add docstring
     def get_trimmed_data(self ):
@@ -81,11 +93,14 @@ class Study:
                         else:
                             dates, times, lux, activity = trim.trimDataThree(
                                     self.raw_data_directory+ '\\'+file, self.skiprows_rawdata)
-                            
-                    trim_activity.append(activity)
-                    trim_dates.append(dates)
-                    trim_lux.append(lux)
-                    trim_times.append(times)
-                    participant_id.append(participant_num)
+                    
+                        print(dates[0], times[0])
+                        print(dates[-1], times[-1])
+                        print()
+                        trim_activity.append(activity)
+                        trim_dates.append(dates)
+                        trim_lux.append(lux)
+                        trim_times.append(times)
+                        participant_id.append(participant_num)
     
         return trim_dates, trim_times, trim_activity, trim_lux , participant_id 
