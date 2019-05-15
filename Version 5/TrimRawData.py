@@ -5,7 +5,7 @@ Created on Tue May 14 09:19:40 2019
 @author: dbackhou
 """
 import pandas as pd
-import os
+
 def trimData(filePath):
     file = pd.read_csv(filePath, skiprows = 12)
     dates = file.iloc[:,0].tolist()
@@ -176,11 +176,8 @@ def trimDataThree(filePath, skiprows):
                 if item == len(activity)-300-1:
                     foundBack = True
         trimEnds(activity, dates, times, lux)
-            
-    #print(dates[0], times[0])
-    #print(dates[-1], times[-1])
-    #print()
     return dates, times, lux, activity
+
 def pop(index, activity, dates, times, lux):
     activity.pop(index)
     dates.pop(index)
@@ -188,17 +185,5 @@ def pop(index, activity, dates, times, lux):
     lux.pop(index)
     return
 
-#path = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoint"
-#rawDataAll = os.listdir(path)
-#count = 1
-#skiprows = 12
-#correctBegin = list()
-#for file in rawDataAll:
-#            if file.endswith('.csv'):
-#                print(file)
-#                if file == 'BT-058.csv':
-#                    skiprows = 15
-#                else:
-#                    dates, times, lux, activity = trimDataThree(path+ '\\'+file, skiprows)
 
 
