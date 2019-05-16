@@ -10,37 +10,10 @@
     Author: Alan Yan and Daniel Backhouse
 """
 import Study
-import TrimRawData as trim
-import os
-# Sleep Analysis Directory: enter the sleep analysis directory within the double
-# quotations. NOTE THAT THIS FIELD IS NOT REQUIRED AND IS ONLY NEEDED IF COMPARING
-# PROGGRAM VALUES TO PROTOCOL VALUES. So then if there is no sleep analysis directory
-# just leave enter r"" after the equals sign.
-sleep_analysis_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
-
-# Indicies and SkipRows Analysis: THESE ARE NOT REQUIRED IF NO SLEEP ANALYSIS DIRECTORY
-# IS SPECIFIED. These indices should not be changed unless the format of the 
-# sleep analysis files is different
-lights_out_index_analysis = 2
-got_up_index_analysis = 5
-skiprows_analysis = 16
-
-
-# Sleep Diary Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
-# sleep diary excel files is located.
-sleep_diary_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\Edited Sleep Diary\BT Sleep Diary Edited.xlsx'
-
-# Indices and SkipRows Sleep Diary: THESE FIELDS ARE REQUIRED. These should not
-# be changed unless the file format for the sleep diaries is changed
-lights_out_index_diary = 1;
-got_up_index_diary = 5;
-skiprows_diary = 0;
-
-
 # Raw Data Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # raw data files are located. The raw data files should be in folders Baseline
 # Midpoint and Final
-raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Final"
+raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoint"
 
 # SkipRows Raw Data: THIS IS A REQUIRED FIELD. This field should not be changed 
 # unless the format of the raw data files has changed. This field is the most
@@ -53,7 +26,7 @@ study_name = "BT"
 
 # assesment: THIS A REQUIRED FIELD. Enter whether you want to analyze Baseline,
 # Midpoint or Final. Valid entries then are: "Baseline", "Midpoint", "Final."
-assesment = "Baseline"
+assesment = "Midpoint"
 
 # *************DO NOT MAKE CHANGES TO THE PROGRAM BEYOND THIS POINT**********
 
@@ -61,7 +34,9 @@ sleep_study = Study.Study(raw_data_directory, skiprows_rawdata, study_name, asse
 
 LOdates, GUdates = sleep_study.get_in_bed_times_noDiary()
 
+LOanalyis, GUanalysis = sleep_study.get_study_analysis_sleep_times()
 
+sleep_study.error_in_date_time_lists(LOdates, LOanalyis)
 
 
 
