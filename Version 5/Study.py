@@ -165,9 +165,10 @@ class Study:
                     strDate = datetime.datetime.strptime(day[0:10], '%Y-%m-%d')
                 except:
                     break
-                getUpDateTime = datetime.datetime.combine(strDate, getUpTime)
+                getUpDateTime = datetime.datetime.combine(
+                        strDate + datetime.timedelta(days = 1), getUpTime)
                 lightsOutDateTime = datetime.datetime.combine(
-                        strDate + datetime.timedelta(days = 1), lightsOutTime)
+                        strDate, lightsOutTime)
             else:
                 #TODO fix this because rn just adding one day instead of actually
                 #adding date. (check above as well)
@@ -236,7 +237,6 @@ class Study:
                 error = abs(timeDifference.total_seconds()/(60*len(datetimes_program)))
                 error = error**2
                 errorList.append(error)
-
                     
         return errorList
     

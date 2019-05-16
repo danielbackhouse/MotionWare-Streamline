@@ -34,9 +34,9 @@ sleep_study = Study.Study(raw_data_directory, skiprows_rawdata, study_name, asse
 
 LOdates, GUdates = sleep_study.get_in_bed_times_noDiary()
 
-LOanalyis, GUanalysis = sleep_study.get_study_analysis_sleep_times()
+#LOanalyis, GUanalysis = sleep_study.get_study_analysis_sleep_times()
 
-sleep_study.error_in_date_time_lists(LOdates, LOanalyis)
+#sleep_study.error_in_date_time_lists(LOdates, LOanalyis)
 
 
 
