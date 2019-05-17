@@ -1,7 +1,6 @@
-""" Title: Study
-    Purpose: The study class 
-    Author: Daniel Backhouse and Alan Yan
-"""
+# Class: Study
+# Author: Daniel Backhouse and Alan Yan
+
 # Import extension libraries
 import pandas as pd
 import datetime
@@ -9,11 +8,34 @@ import matplotlib.pyplot as plt
 import FindInBedTimes
 import os
 import TrimRawData as trim
-############### Note participant list changes to just the diaries that are 
-## properly filled once use_sleep_diaries has been called 
 
 class Study:
+    """ The Study class defines a sleep study object
     
+    fields:
+        THOSE SPECIFIED BY USER
+        - raw_data_directory: 
+            The directory containing the raw data CSV files formatted as:
+                Col0: Date
+                Col1: Time
+                Col2: Activity
+                Col3: Lux
+            With data begining by at least the 20th row
+        - skiprows_rawdata:
+            The number of rows that the relevant data starts on. This can be 
+            within the actual data so long as is is not before. 
+        - study_name:
+            The abbreviated name of the study "BT" or "FACT". Would be the starting
+            entry in the participant ID. For example in "RVCI-001" it would be 
+            "RVCI"
+        - assesment:
+            The assesment type (baseline, midpoint, 6 month, final... etc...)
+            
+        THOSE SPECFIED WITHIN CLASS
+        - All the information required to read the sleep analysis files.
+        - This should ONLY be used to compute errors and compute subsequent 
+        weight optimization.         
+    """
     def __init__(self, raw_data_directory, skiprows_rawdata, study_name, assesment):
         
         self.sleep_analysis_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
@@ -29,13 +51,14 @@ class Study:
         self.raw_data = os.listdir(raw_data_directory)
         print('\n Found raw activity and lux data...\n')
 
-    def get_in_bed_times_noDiary(self):
+    def get_in_bed_times(self):
         """Gets the in bed times for when not using sleep diaries
         
+        FOR MORE INFO SEE FindInBedTime.py module
+        
         :param: None
-        :return: returns 4 lists, the got up times, got up dates, lights out times
-        and lights out dates
-        :rtype: (list<numpy.datetime64>) (list<numpy.datetime64.time>)
+        :return: returns got up and lights out times of participants in study
+        :rtype: (list<datetime) (list<datetime>)
         """
         print('\n Finding got up and lights out time using no sleep diary...')
         window_size = 8
@@ -54,15 +77,16 @@ class Study:
                     datetime_arr, activity[i], lux[i], window_size)
             LOdatetimeList.append(LOdatetime)
             GUdatetimeList.append(GUdatetime)
-
-        
             index = index + 1
     
         return LOdatetimeList, GUdatetimeList 
-    #TODO: WRite out docstring
+
     def convert_date_time(self, dates, times):
         """ Converts date and time arrays (stored as strings) and combines them 
         both to form one datetime array
+        
+        :param (arr) dates: array of dates
+        :param (arr) times: array of times
         """
         datetime_arr = []
         for i  in range(0, len(dates)):
@@ -70,18 +94,13 @@ class Study:
             datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
             
         return datetime_arr
-
        
-    #TODO: modify this function so that populateRawDataList takes a directory
-    #TODO: add docstring
     def get_trimmed_data(self ):
-        """This function uses the SheetManager module and gets the raw Data
-        excel files pandas data frame an stores each as a seperate entry in     
-        a list
+        """Gets the trimmed raw data using the TrimRaw data module
         
         :param: none
-        :return: Returns a list of raw data files stored in dataframes
-        :rtype: (list<pandas dataFrame>)
+        :return: Returns the set of trimmed pieces of data
+        :rtype: list<datetime>, list<datetime.time>, list<int>, list<int>
         """
         trim_activity = []
         trim_lux = []
@@ -108,7 +127,7 @@ class Study:
         return trim_dates, trim_times, trim_activity, trim_lux , participant_id 
 
 
-        #TODO: makes this function return two dictionaries where the indices 
+    #TODO: makes this function return two dictionaries where the indices 
     # are given by the partici[ant list]. See how this changes the time of execution
     def get_study_analysis_sleep_times(self):
         """Gets the lights and and got up times for the protocol method of 

@@ -21,7 +21,7 @@ raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoin
 skiprows_rawdata = 20
 
 # study_name: THIS IS A REQUIRED FIELD. Enter within the qoutations the
-# abbreviation of the study. An examplen entry would be: "BT" or "FACT".
+# abbreviation of the study. An example entry would be: "BT" or "FACT".
 study_name = "BT"
 
 # assesment: THIS A REQUIRED FIELD. Enter whether you want to analyze Baseline,
@@ -32,7 +32,7 @@ assesment = "Midpoint"
 
 sleep_study = Study.Study(raw_data_directory, skiprows_rawdata, study_name, assesment)
 
-LOdates, GUdates = sleep_study.get_in_bed_times_noDiary()
+LOdates, GUdates = sleep_study.get_in_bed_times()
 
 #LOanalyis, GUanalysis = sleep_study.get_study_analysis_sleep_times()
 

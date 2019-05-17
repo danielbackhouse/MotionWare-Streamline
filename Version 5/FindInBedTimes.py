@@ -1,31 +1,83 @@
-""" Title: MotionWareSleepAnalysis 
-    Purpose: To determine the sleep points and awake times from raw data and 
-            sleep diaries for given.
-    Author: Daniel Backhouse and Alan Yan
-"""
+# Module: FindInBedTimes.py
+# Purpose: This module is used to find the Got Up and Lights Out times 
+# of participant using the datetime, activity and lux data of said participant.
+# Authors: Daniel Backhouse and Alan Yan
+
 import numpy as np
 
+#TODO: Modify docstring to once sleep analysis is completed
 def find_in_bed_time(dateTimes, activity, lux, window_size):
-    """ Finds the got up and lights out times using only the activity, light
-    and date arrays
+    """ Finds the got up and lights out times of a participant
     
-    Based on the length of the activity (i.e. the number of days of activity 
-    for which data was recorded). The find_in_bed_time function will find the
-    in bed and got up times of the participant and return the two as a list.
-    The length of the list will vary depending on the number of days and 
-    the study period.
+    ****NOTE: This module and corresponding program has ONLY been validated
+    on CamNTech's Motion Watch 8 Actigraphs for:
+        - 1 minute epoch length
+        - unaxial measurment
+        - light exposure set to on
+    Therefore sleep analysis results can NOT be guaranteed for any other actigraph
+    or subsequent settings.
     
-    :param (array) date: the dates over which activity and light were recorded
-    :param (array) time: the times at which the activity and light were recorded
-    :param (array) activity: the activity for the specified epochtime
-    :param (array) lux: the lux for the specified epoch
+    The program was validated on three studies (*see repository for more information
+    on software validation).
+    
+    The find_in_bed_time function is the only function within the FindInBedTimes.py
+    module intended to be public. It is important that the arrays sent to this
+    function are formatted correctly else the function will NOT return the
+    correct value. The arrays should each be formatted as follows:
+        - dateTimes:
+            - an array of datetime objects in chronological order
+            with the oldest date as the first entry.
+            - each procedding element in the array must contain a datetime
+            object 1 minute ahead of the previous datetime element
+        - activity:
+            - an array of int datatypes containing the acitivity data
+            from a uniaxial actigraph recorded for a one minute epoch length
+            - each element in the array must share the index of its corresponding
+            date and time within the datetime array
+        - lux:
+            - an array of int objects containing the light exposure data
+            from a uniaxial actigraph recorded for a one minute epoch length
+            - each element in the array must share the index of its corresponding
+            date and time within the datetime array
+    
+    The function begins by searching for the index corresponding
+    to the first 12pm time within the dateTimes array. It then segments the
+    rest of the data into 24 hour segment starting and ending at 12pm and places
+    them in a list. 
+    
+    Each 24 hour segment is then further broken down into all possible window_size 
+    segments within the 24 hour period seperated by an hours length. 
+    
+    The window_size segments are then sorted based on the number of zero activity
+    counts and zero light counts within that time period (added using some
+    weights). The segment with the largest value is then selected and is 
+    classified as the sleep range. 
+    
+    The sleep range is then sent to Light's Out algrithim and the Got Up 
+    algorithim (these can be found in the main folder of the repository under
+    the folder (sleep window algorithms)).
+    
+    The function then uses the Light's Out and Got Up times determined by
+    their respective algorithms to execute the sleep analysis. Note here
+    that all sleep analysis calculations have been done according to the 
+    methods given in the MotionWare Software Manual which can also be found
+    in this repository.
+    
+    The execution of this function relies on several private functions not 
+    intended to be used outside of this module.
+    
+    :param (array) dateTime: the dates and times over which activity and light 
+        were recorded
+    :param (array) activity: the activity for the specified epoch length
+    :param (array) lux: the lux for the specified epoch length
     :param (int) window_size: the size in hours of the window to check for sleep
     windows
     :return: Two lists containing the got up and lights out times of the 
         participant
     :rtype: (list) (list)
+    :raises: Exception (no 12pm in array)
     """
-    sleep_window_indices = get_sleep_window_indices(activity,lux,dateTimes,window_size)
+    sleep_window_indices = __get_sleep_window_indices(activity,lux,dateTimes,window_size)
     lights_out_indices = list()
     got_up_indices = list()
     lights_out_dateTimes = list()
@@ -33,7 +85,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
     for index in sleep_window_indices:
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
-        lights_out_index = find_lights_out_index(sleep_range_backward, activity,
+        lights_out_index = __find_lights_out_index(sleep_range_backward, activity,
                                                  lux, sleep_range_forward )    
         lights_out_indices.append(lights_out_index)
         
@@ -42,44 +94,48 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
         sleepRangeMean = np.mean(activity[start:end])
         awake_range_backward = index + 3*60
         awake_range_forward = index + 9*60
-        got_up_index = find_got_up_index(awake_range_backward, activity, lux, 
+        got_up_index = __find_got_up_index(awake_range_backward, activity, lux, 
                                          awake_range_forward, sleepRangeMean )
         got_up_indices.append(got_up_index)
         
-        #TODO: changre funcion name
-        get_sleep_analysis(activity[lights_out_index: got_up_index], 
-                           dateTimes[lights_out_index: got_up_index])
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
         
     return lights_out_dateTimes, got_up_dateTimes
 
-#TODO: Write docstring
-def get_sleep_window_indices(activity, lux, dateTimes, window_size):
-    """ Gets the sleep window indices
+def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
+    """ Gets the sleep window indices ( the sleep ranges of window_size)
+    
+    :param (array) dateTime: the dates and times over which activity and light 
+        were recorded
+    :param (array) activity: the activity for the specified epoch length
+    :param (array) lux: the lux for the specified epoch length
+    :param (int) window_size: the size in hours of the window to check for sleep
+    windows
+    :return: a list containing the indicies that each sleep window start at
+    :rtype: (list)
     """
     days_of_recorded_activity = int(len(activity)/1440)
-    start_index = find_start_index(dateTimes)
-    days_indices = get_day_indices(start_index, days_of_recorded_activity)
+    start_index = __find_start_index(dateTimes)
+    days_indices = __get_day_indices(start_index, days_of_recorded_activity)
     
     sleep_window_indices = list()
     for i in range(0, len(days_indices)-1):
         start = days_indices[i]
         end = days_indices[i+1]        
-        sleep_window_index = find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_window_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
     
-    # Get from last index to end of raw data file
     return sleep_window_indices
     
-def find_sleep_window(activity, lux, size):
+def __find_sleep_window(activity, lux, size):
     """ Finds and returns all windows of given size within the date, time, acitivty
     and lux data given
     
     :param (array) activity: 24 hour activity data taken from participant
-    :param (int) size: size given in hours for the sleep range
-    :return: the index corresponding to the start of the mopst likely
+    :param (int) size: size given in hours for the sleep range (window_size)
+    :return: the index corresponding to the start of the most likely
     sleep window within the given set of 24 hour activity data
     """
     one_hour_epoch = 60
@@ -95,14 +151,14 @@ def find_sleep_window(activity, lux, size):
         index_list.append(index)
         index = index + one_hour_epoch
         
-    sortedIndex = sort_lists(light_list, activity_list, index_list)
+    sortedIndex = __sort_lists(light_list, activity_list, index_list)
     sleep_index  = sortedIndex[len(sortedIndex)-1]   
     return  sleep_index
      
-def find_start_index(dateTimes):
+def __find_start_index(dateTimes):
     """ Find the first 12th hour in the time list and returns its index
     
-    :param (array) time: a list of datetime.time objects
+    :param (array) time: a list of datetime objects
     :raises: raises an exception if there was no 12pm hour found
     :return: returns the first 12pm time
     :rtype: (int)
@@ -110,16 +166,15 @@ def find_start_index(dateTimes):
     for index in range(0,len(dateTimes)):
         if(dateTimes[index].hour == 12):
             return index
-    
     raise Exception('did not find any 12pm value within the entire time array')
         
-def get_day_indices(start_index, worn_days):
+def __get_day_indices(start_index, worn_days):
     """Gets the indices for the start of each day begining at 12pm for the 
     duration of the study
     
     :param (int) start_index: the first 12pm time index
     :param (double) worn_days: the number of proper data worn days
-    return: A list of the indices which correspond to a time of 12pm
+    :return: A list of the indices which correspond to a time of 12pm
     :rtype: list<int>
     """
     day = 1440
@@ -131,31 +186,32 @@ def get_day_indices(start_index, worn_days):
     
     return start_day_indices
     
-# TODO: complete docstring   
-def sort_lists(lightList, activityList, indexRangeList):
-    """ Sorts the lightList by the windows with the least amount of zero light counts
-    first and sorts the activityList by the windows with the most counts below the mean
+def __sort_lists(lightList, activityList, indexRangeList):
+    """ Creates a list of weighted sums of the zero activity counts and zero 
+    light counts for each sleep range and sorts them from small to largest
     
     :param (list) lightList: takes a list of sleep windows with lux data
     :param(list) activityList: takes a list of sleep windows with activity data
     :param(list) indexRangelist: takes a list of the indices corresponding to
     the activity and light data points
+    :return: A list of sleep window start indicies sorted from smallest to largest
+    zero light count and zero acitivty count weighted sum
     """
     activityThreshold = 20
     lightWeight = 1
     activityWeight = 1
     weightedSleepPeriods = list()
     for i in range(0 , len(activityList)):
-        activityVal =  count_below_threshold_in_array(activityList[i], activityThreshold)
-        lightVal = count_zeros_in_array(lightList[i])
+        activityVal =  __count_below_threshold_in_array(activityList[i], activityThreshold)
+        lightVal = __count_zeros_in_array(lightList[i])
         val = activityVal*activityWeight + lightWeight*lightVal
         weightedSleepPeriods.append(val)
     
-    sortedIndexRange = bubbleSort(weightedSleepPeriods, indexRangeList)
+    sortedIndexRange = __bubbleSort(weightedSleepPeriods, indexRangeList)
     
     return sortedIndexRange
 
-def bubbleSort(arr, arr2): 
+def __bubbleSort(arr, arr2): 
     """ Bubble sorts array1 and moves the elements in arr2 in the same manner 
     as array1 indpenedent of the size the elements within it
     
@@ -164,7 +220,6 @@ def bubbleSort(arr, arr2):
     :return: returns array 2 sorted using array 1
     """
     n = len(arr) 
-  
     for i in range(n): 
         for j in range(0, n-i-1): 
             if arr[j] > arr[j+1] : 
@@ -172,7 +227,7 @@ def bubbleSort(arr, arr2):
                 arr2[j], arr2[j+1] = arr2[j+1], arr2[j]
     return arr2
 
-def count_below_threshold_in_array(arr, threshold):
+def __count_below_threshold_in_array(arr, threshold):
     """ Counts the number of elements in array below threshold
     
     :param (array) arr: an array of int's
@@ -186,7 +241,7 @@ def count_below_threshold_in_array(arr, threshold):
             
     return counter
 
-def count_zeros_in_array(arr):
+def __count_zeros_in_array(arr):
     """ Counts the number of zeros in an array with integer values
     
     :param (array) arr: an array of int's
@@ -200,12 +255,14 @@ def count_zeros_in_array(arr):
             
     return zero_counter
 
-def find_lights_out_index(index, activity, lux, sleepRange):
+def __find_lights_out_index(index, activity, lux, sleepRange):
     """ Finds the lights out time of the participant given activity sleep range
     and lux sleep range
     
-    :param (array) activity: the activity data of the participant over a sleep range
-    :param (array) lux: the lux data of the participant over the sleep range
+    :param (array) activity: the activity data of the participant
+    :param (array) lux: the lux data of the participant 
+    :param (int) index: the starting index of the sleep_range
+    :param (int) sleepRange: the size of the sleep range (window_size)
     :return: the index corresponding to the moment the participant went to sleep
     """
     meanActivity = 20
@@ -215,7 +272,7 @@ def find_lights_out_index(index, activity, lux, sleepRange):
     darkMotion = 0;
     sleepActiveCheck = False
     sleepLightCheck = False
-    lights_out_index = index   #Intialize lights out time
+    lights_out_index = index
     while index <= sleepRange:       
 
             if activity[index] == 0:
@@ -245,7 +302,7 @@ def find_lights_out_index(index, activity, lux, sleepRange):
                 zeroLightCount = 0
                 sleepLightCheck = False
                 darkMotion = 0
-
+                
             if darkMotion >= 5:  
                 return lights_out_index
                   
@@ -262,22 +319,21 @@ def find_lights_out_index(index, activity, lux, sleepRange):
                       
     return lights_out_index
     
-def find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
+def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
     """ Finds the got up time of the participant
     
-    :param (array) activity: the activity data of the participant over a sleep range
-    :param (array) lux: the lux data of the participant over the sleep range
+    :param (array) activity: the activity data of the participant
+    :param (array) lux: the lux data of the participant
     :param (int) sleep_range: the index corresponding to the end of the passed
         sleep range
+    :param (int) sleep_range: the size of the sleep range (window_size)
     :param (double) sleepRangeMean: mean activity count over estimated sleep range
     :return: the index corresponding to the moment the participant went to sleep
     :rtype: (int)
     """
     zeroStirringCount = 0;
-    got_up_index = index
-    
+    got_up_index = index 
     while index < sleep_range:
-
         if lux[index] != 0 and activity[index] >= sleepRangeMean:
             zeroStirringCount = zeroStirringCount + 1
             if zeroStirringCount == 1:
@@ -289,6 +345,5 @@ def find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
             return got_up_index
             
         index = index + 1
-                 
-             
+                       
     return got_up_index
