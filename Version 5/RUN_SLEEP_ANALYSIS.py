@@ -10,6 +10,7 @@
     Author: Alan Yan and Daniel Backhouse
 """
 import Study
+import ProtocolSleepAnalysis as ps
 # Raw Data Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # raw data files are located. The raw data files should be in folders Baseline
 # Midpoint and Final
@@ -32,11 +33,11 @@ assesment = "Midpoint"
 
 sleep_study = Study.Study(raw_data_directory, skiprows_rawdata, study_name, assesment)
 
-LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_times_noDiary()
+LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_times()
 
-#LOanalyis, GUanalysis = sleep_study.get_study_analysis_sleep_times()
+protocol = ps.ProtocolSleepAnalysis(participant_list, study_name, assesment)
 
-#sleep_study.error_in_date_time_lists(LOdates, LOanalyis)
+LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
 
 
 
