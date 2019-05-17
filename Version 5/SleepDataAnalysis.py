@@ -447,21 +447,21 @@ def convert_date_time(dates, times):
         datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
         
     return datetime_arr
-path = r'C:\Users\dbackhou\Desktop\BT-001_Baseline.csv'
-file = pd.read_csv(path, skiprows = 12)
-dates = file.iloc[:,0].tolist()
-times = file.iloc[:,1].tolist()
-activity = file.iloc[:,2].tolist()
-datetimes  = convert_date_time(dates,times)
-trimActivity = activity[923-10:1330+11]
-trimDatetimes = datetimes[923:1330+1]
-findSleepAnalysisData(trimActivity,trimDatetimes)
+#path = r'C:\Users\dbackhou\Desktop\BT-001_Baseline.csv'
+#file = pd.read_csv(path, skiprows = 12)
+#dates = file.iloc[:,0].tolist()
+#times = file.iloc[:,1].tolist()
+#activity = file.iloc[:,2].tolist()
+#datetimes  = convert_date_time(dates,times)
+#trimActivity = activity[923-10:1330+11]
+#trimDatetimes = datetimes[923:1330+1]
+#findSleepAnalysisData(trimActivity,trimDatetimes)
 
-trimActivity = activity[2356-10:2896+11]
-trimDatetimes = datetimes[2356:2896+1]
-findSleepAnalysisData(trimActivity,trimDatetimes)
+#trimActivity = activity[2356-10:2896+11]
+#trimDatetimes = datetimes[2356:2896+1]
+#findSleepAnalysisData(trimActivity,trimDatetimes)
 
-trimActivity = activity[3823-10:4350+11]
-trimDatetimes = datetimes[3823:4350+1]
-findSleepAnalysisData(trimActivity,trimDatetimes)
+#trimActivity = activity[3823-10:4350+11]
+#trimDatetimes = datetimes[3823:4350+1]
+#findSleepAnalysisData(trimActivity,trimDatetimes)
 

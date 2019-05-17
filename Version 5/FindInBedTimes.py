@@ -30,6 +30,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
     got_up_indices = list()
     lights_out_dateTimes = list()
     got_up_dateTimes = list()
+    sleep_analysis_list = list()
     
     for index in sleep_window_indices:
         sleep_range_backward = index - 2*60
@@ -51,10 +52,11 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
         sleepAnalysisInfo = SleepDataAnalysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
                            dateTimes[lights_out_index: got_up_index+1])
         
+        sleep_analysis_list.append(sleepAnalysisInfo)
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
         
-    return lights_out_dateTimes, got_up_dateTimes
+    return lights_out_dateTimes, got_up_dateTimes, sleep_analysis_list
 
 #TODO: Write docstring
 def get_sleep_window_indices(activity, lux, dateTimes, window_size):

@@ -42,6 +42,7 @@ class Study:
         index = 0
         LOdatetimeList = list()
         GUdatetimeList = list()
+        SleepInfoList = list()
 
         print('\n getting trimmed data...')
         dates, times, activity, lux, participants = self.get_trimmed_data()
@@ -50,15 +51,15 @@ class Study:
         for i in range(0, len(participants)):
             print(participants[i])
             datetime_arr = self.convert_date_time(dates[i], times[i])
-            LOdatetime, GUdatetime = FindInBedTimes.find_in_bed_time(
+            LOdatetime, GUdatetime, SleepInfo = FindInBedTimes.find_in_bed_time(
                     datetime_arr, activity[i], lux[i], window_size)
             LOdatetimeList.append(LOdatetime)
             GUdatetimeList.append(GUdatetime)
-
+            SleepInfoList.append(SleepInfo)
         
             index = index + 1
     
-        return LOdatetimeList, GUdatetimeList 
+        return LOdatetimeList, GUdatetimeList, SleepInfoList, self.participant_list
     #TODO: WRite out docstring
     def convert_date_time(self, dates, times):
         """ Converts date and time arrays (stored as strings) and combines them 
