@@ -6,7 +6,6 @@
     Author: Alan Yan and Daniel Backhouse
 """
 #Import extension libraries
-import MotionWareAnalysis
 import datetime
 import pandas as pd
 
@@ -14,77 +13,68 @@ import pandas as pd
 activityThreshold = 6
 requiredEpochsConsecutiveSleep = 10
 requiredEpochsConsecutiveWake = 5
-numberAboveThresholdAllowedSleep = 1
-numberAboveThresholdAllowedWake = 2
+minutesAboveThresholdAllowedSleep = 1
+minutesAboveThresholdAllowedWake = 2
 epochLength = 1
+errors = 0
 
-def findTimeDifferenceInMinutes(timeOne, timeTwo):
-    """Finds the difference in minutes between two date times. Time one MUST 
-    be before Time two.
+def findSleepPoint(activity, datetime, minutesRange = requiredEpochsConsecutiveSleep):
+    """Finds the sleep point for one sleep period
     
-    :param: timeOne and timeTwo
-    :return: Returns the number of minutes between two times
-    :rtype(int)
-    """
-    minutes = 0
-    while timeOne != timeTwo:
-        timeOne += datetime.timedelta(minutes = 1)
-        minutes += 1
-    return minutes
-
-def findSleepPoint(inBedPoint, formattedData, threshold = requiredEpochsConsecutiveSleep):
-    """Finds the sleep point based on the inBedPoint, the formatted data and the
-    threshold
+    Uses the activity and datetime arrays to look 10 minutes ahead of a time, 
+    starting with the in bed time, if more minutes are above the allowed threshold, 
+    then it moves one miunte later and tried again, until there is a 10 minute window
+    after a time, where the minutes above the activity threshold
+    are less than or equal to the number of minutes threshold
     
-    the inBedPoint is used as the basepoint to find the fellAsleepTime, 10 minutes
-    after the fellAsleepTime are looked at and if the activity in that minute
-    is greater than the threshold, then higherThanThresholdCount gains one.
-    If there is more epochs above the number allowed in the 10 minutes,
-    a minute is added to the fellAsleepTime, continues until a time is found.
-    
-    :param: inBedPoint, formattedData, threshold
-    :return: Returns the time when the person fell asleep
-    :rtype(datetime)
+    :param: activity, datetime, minutesRange
+    :return: Returns the sleep point as a datetime and the index for the activity list
+    :rtype(datetime, int)
     """
     passedThreshold = False
-    fellAsleepTime = inBedPoint
-    while passedThreshold == False:
+    index = 0
+    while passedThreshold == False and index < len(activity)-10:
         higherThanThresholdCount = 0
-        for minutes in range(threshold+1):
-            time = fellAsleepTime + datetime.timedelta(minutes = minutes)
-            if int(formattedData.loc[time, 'Activity (MW counts)']) >=  activityThreshold:
+        for minutes in range(minutesRange+1):
+            if activity[index + minutes] >=  activityThreshold:
                 higherThanThresholdCount += 1
-        if higherThanThresholdCount <= numberAboveThresholdAllowedSleep:
+        if higherThanThresholdCount <= minutesAboveThresholdAllowedSleep:
             passedThreshold = True
-            return fellAsleepTime
-        fellAsleepTime += datetime.timedelta(minutes = epochLength)
-
-
-def findWakePoint(outOfBedPoint, formattedData, threshold = requiredEpochsConsecutiveWake):
-    """Finds the wake point based on the outOfBedPoint, the formatted data and the
-    threshold
+            return datetime[index], index
+        index += 1
+        if index == len(activity)-10:
+            return 'N/A', 'N/A'
+        
+def findWakePoint(activity, datetime, minutesThreshold = requiredEpochsConsecutiveWake):
+    """Finds the wake point for one sleep period
     
-    Same idea as findSleepPoint, except different thresholds and working backwards
-    from the out of bed point, only looking at 5 minute windows.
+    Uses the activity and datetime arrays to look 5 minutes before a time, starting
+    with the out of bed time, if more minutes are above the threshold, then
+    it moves one miunte earlier and tried again, until there is a 5 minute window
+    before a time, where the number minutes above the activity threshold
+    are less than or equal to the number of minutes threshold
     
-    :param: outOfBedPoint, formattedData, threshold
-    :return: Returns the time when the person woke 
-    :rtype(datetime)
+    
+    :param: activity, datetime, minutesRange
+    :return: Returns the wake point as a datetime and the index for the activity list
+    :rtype(datetime, int)
     """
     passedThreshold = False
-    wokeUpTime = outOfBedPoint
-    while passedThreshold == False:
+    index = len(activity)-1
+    while passedThreshold == False and index >= 5:
         higherThanThresholdCount = 0
-        for minutes in range(threshold+1):
-            time = wokeUpTime - datetime.timedelta(minutes = minutes)
-            if int(formattedData.loc[time, 'Activity (MW counts)']) >=  activityThreshold:
+        for minutes in range(minutesThreshold+1):
+            if activity[index - minutes] >=  activityThreshold:
                 higherThanThresholdCount += 1
-        if higherThanThresholdCount <= numberAboveThresholdAllowedWake:
+        if higherThanThresholdCount <= minutesAboveThresholdAllowedWake:
             passedThreshold = True
-            return wokeUpTime
-        wokeUpTime -= datetime.timedelta(minutes = epochLength)
+            return datetime[index-10], index-10
+        index -= 1
+        if index == 4:
+            return 'N/A', 'N/A'
 
-def findActualSleepTime(fellAsleepTime, wokeUpTime, activityArray):
+
+def findActualSleepTime(activityArray):
     """Finds the actual sleep minutes, percent asleep, awake minutes, percent awake,
     and a sleepWakeList used for later analysis
     
@@ -93,7 +83,7 @@ def findActualSleepTime(fellAsleepTime, wokeUpTime, activityArray):
     each epoch in the sleep window. If the total is below the threshold, the
     minute is considered a sleep minute, if not, then it is an awake minute.
     
-    :param: fellAsleepTime, wokeUpTime, activityArray
+    :param: activityArray
     :return: Returns the actual sleep minutes, awake minutes, assume sleep minutes,
     and percentages for awake and asleep.
     :rtype(int, int, float, int, float, list)
@@ -101,7 +91,7 @@ def findActualSleepTime(fellAsleepTime, wokeUpTime, activityArray):
     sleepMinutes = 0
     actualSleepMinutes = 0
     sleepWakeList = []
-    for index in range(2,(len(activityArray)-2-1)):
+    for index in range(2,(len(activityArray)-2)):
         total = activityArray[index-2]*0.04 + activityArray[index-1]*0.2 + \
                 activityArray[index] + activityArray[index+1]*0.2 + activityArray[index+2]*0.04
         if total <= 20:
@@ -117,26 +107,16 @@ def findActualSleepTime(fellAsleepTime, wokeUpTime, activityArray):
     percentAwake = 100-percentSleep
     return actualSleepMinutes, sleepMinutes, percentSleep, awakeMinutes, percentAwake, sleepWakeList
 
-def findSleepEfficiency(inBedPoint, outOfBedPoint, actualSleepMinutes):
-    """Finds the sleep efficiency of the person, which is actual asleep over
-    time in bed
+def findSleepEfficiency(timeInBed, actualSleepMinutes):
+    """Finds the sleep efficiency
     
-    :param: inBedPoint, outOfBedPoint, actualSleepMinutes
-    :return: Returns the sleep efficiency
+    Sleep efficiency is the actual sleep minutes over the time in bed
+    
+    :param: timeInBed and the actualSleepMinutes
+    :return: sleep efficiency %
     :rtype(float)
     """
-    timeInBed = findTimeDifferenceInMinutes(inBedPoint, outOfBedPoint)
     return actualSleepMinutes/timeInBed*100
-
-def findSleepLatency(inBedPoint, fellAsleepTime):
-    """Finds the sleep latency of the person, which is how long it took
-    for the person to fall asleep
-    
-    :param: inBedPoint, fellAsleepTime
-    :return: Returns the minute difference between the two parameters
-    :rtype(int)
-    """
-    return findTimeDifferenceInMinutes(inBedPoint, fellAsleepTime)
 
 def findBouts(sleepWakeList):
     """Finds the number of sleep and awake bouts, along with the
@@ -180,8 +160,14 @@ def findBouts(sleepWakeList):
         if wakeOrSleep == 0:
             sleepBoutLengths.append(boutCount)
             sleepBout += 1
-    meanSleepBoutLength = sum(sleepBoutLengths)/len(sleepBoutLengths)*60
-    meanWakeBoutLength = sum(wakeBoutLengths)/len(wakeBoutLengths)*60
+    if len(sleepBoutLengths):     
+        meanSleepBoutLength = sum(sleepBoutLengths)/len(sleepBoutLengths)*60
+    else:
+        meanSleepBoutLength = 0
+    if len(wakeBoutLengths):
+        meanWakeBoutLength = sum(wakeBoutLengths)/len(wakeBoutLengths)*60
+    else:
+        meanWakeBoutLength = 0
     
     return sleepBout, wakeBout, meanSleepBoutLength, meanWakeBoutLength
             
@@ -200,13 +186,6 @@ def findMobileImmobileMinutes(activityList):
     and a mobile immobile list
     :rtype(int, int, float, float, list)
     """
-    activityList.pop(0)
-    activityList.pop(0)
-    activityList.reverse()
-    activityList.pop(0)
-    activityList.pop(0)
-    activityList.pop(0)
-    activityList.reverse()
     mobileMinutes = 0
     immobileMinutes = 0
     mobileImmobileList = []
@@ -281,24 +260,11 @@ def findTotalActivity(activityList):
     for item in activityList:
         if item:
             nonZeroEpoch += 1
-    meanActivityPerNonZeroEpoch = totalActivity/nonZeroEpoch
+    if nonZeroEpoch:
+        meanActivityPerNonZeroEpoch = totalActivity/nonZeroEpoch
+    else:
+        meanActivityPerNonZeroEpoch = 0
     return totalActivity, meanActivityPerEpoch, meanActivityPerNonZeroEpoch
-
-def activityToList(fellAsleepTime, wokeUpTime, formattedData):
-    """Reads the formatted data and puts the activity data into a list to spee
-    d up program.
-    
-    :param: fellAsleepTime, wokeUpTime, formattedData
-    :return: Returns an array of activity data for that sleep period
-    :rtype(list)
-    """
-    activityInNight = list()
-    fellAsleepTime -= datetime.timedelta(minutes=2)
-    wokeUpTime += datetime.timedelta(minutes = 2)
-    while fellAsleepTime != (wokeUpTime + datetime.timedelta(minutes = 1)):
-        activityInNight.append(formattedData.loc[fellAsleepTime, 'Activity (MW counts)'])
-        fellAsleepTime += datetime.timedelta(minutes = 1)
-    return activityInNight
 
 def findFragmentationIndex(mobilePercent, boutsLessThanOnePercent):
     """Finds the fragmentation index, which is mobile % added to the immobile
@@ -310,35 +276,54 @@ def findFragmentationIndex(mobilePercent, boutsLessThanOnePercent):
     """
     return mobilePercent + boutsLessThanOnePercent 
 
-def findSleepAnalysisData(inBedPoint, outOfBedPoint, rawData):
+def findSleepAnalysisData(activity, datetimes):
     """This method finds all the sleep analysis data by calling the other 
     methods
     
-    The method takes in the inBedPoint and outOfBedPoint found by 
-    MotionWareAnalysis.py, along with the raw data to find all the sleep analysis
-    data for one night. This is method to be called to find the sleep statistics,
+    The method takes in the activity list and datetimes list found by 
+    FindInBedTimes.py, to find all the sleep analysis data for one sleep period. 
+    This is the method to be called to find the sleep statistics,
     these are returned in a dictionary for ease of printing to an excel doc or
-    onto console.
+    onto console. Also includes error management and warnings.
     
-    :param: inBedPoint, outOfBedPoint, rawData
+    :param: activity, datetimes
     :return: Returns a dictionary of all the sleep analysis stats
     :rtype(dictionary)
     """
+    global errors
     
-    formattedData = MotionWareAnalysis.sleepDataFormatter(rawData)
-    fellAsleepTime = findSleepPoint(inBedPoint, formattedData)
-    wokeUpTime = findWakePoint(outOfBedPoint, formattedData)
-    activityList = activityToList(fellAsleepTime, wokeUpTime, formattedData)
-    timeInBedMinutes = findTimeDifferenceInMinutes(inBedPoint, outOfBedPoint)
-    actualSleepMinutes, sleepMinutes, percentSleep, awakeMinutes, percentAwake, sleepWakeList = findActualSleepTime(fellAsleepTime, wokeUpTime, activityList)
-    sleepEfficiency = findSleepEfficiency(inBedPoint, outOfBedPoint, actualSleepMinutes)
-    sleepLatency = findSleepLatency(inBedPoint, fellAsleepTime)
+    #Calcs
+    trimmedActivity = activity[10:-10]
+    sleepActivity = activity[8:-8]
+    fellAsleepTime, sleepIndex = findSleepPoint(activity[10:], datetimes)
+    wokeUpTime, wakeIndex = findWakePoint(activity[:-10], datetimes)
+    
+    #ERRORS
+    if wokeUpTime == 'N/A' or fellAsleepTime == 'N/A':
+        print("ERROR: CANNOT FIND SLEEP OR WAKE POINT BASED ON DATA")
+        print("")
+        print("Info:")
+        errors +=1
+        print('Activity: ' ,activity)
+        print('Acitivty List Length: ', len(activity))
+        print('Start: ', datetimes[0])
+        print('End', datetimes[-1])
+        input("To Skip and Continue, Press Enter")
+        
+        return -1
+    
+    #Calcs
+    timeInBedMinutes = len(trimmedActivity)-1
+    actualSleepMinutes, sleepMinutes, percentSleep, awakeMinutes, percentAwake, sleepWakeList = findActualSleepTime(sleepActivity[sleepIndex+2-2:wakeIndex+2+2])
+    sleepEfficiency = findSleepEfficiency(timeInBedMinutes, actualSleepMinutes)
+    sleepLatency = sleepIndex
     sleepBout, wakeBout, meanSleepBoutSeconds, meanWakeBoutSeconds = findBouts(sleepWakeList)
-    mobileMinutes, immobileMinutes, mobilePercent, immobilePercent, mobileImmobileList = findMobileImmobileMinutes(activityList)
+    mobileMinutes, immobileMinutes, mobilePercent, immobilePercent, mobileImmobileList = findMobileImmobileMinutes(trimmedActivity[sleepIndex: wakeIndex])
     immobileBout,  meanImmobileBoutSeconds, boutsLessThanOne, boutsLessThanOnePercent = findImmobileBout(mobileImmobileList)
-    totalActivity, meanActivityPerEpoch, meanActivityPerNonZeroEpoch = findTotalActivity(activityList)
+    totalActivity, meanActivityPerEpoch, meanActivityPerNonZeroEpoch = findTotalActivity(trimmedActivity[sleepIndex:wakeIndex])
     fragmentationIndex = findFragmentationIndex(mobilePercent, boutsLessThanOnePercent)
     
+    #Integers to Time
     timeInBed = datetime.timedelta(minutes = timeInBedMinutes)
     sleepTime = datetime.timedelta(minutes = sleepMinutes)
     actualSleepTime = datetime.timedelta(minutes = actualSleepMinutes)
@@ -348,10 +333,44 @@ def findSleepAnalysisData(inBedPoint, outOfBedPoint, rawData):
     meanWakeBoutTime = datetime.timedelta(seconds = meanWakeBoutSeconds)
     meanImmobileBoutTime = datetime.timedelta(seconds = meanImmobileBoutSeconds)
     
-    print("Lights Out: ",  inBedPoint)
+    #ERRORS
+    if meanWakeBoutSeconds == 0:
+        print("Warning: There are no wake bouts, this is possible, but likely a trimming error")
+        print('SleepWakeList: ', sleepWakeList)
+        print('Start: ', datetimes[0])
+        print('End', datetimes[-1])
+        answer = input("Click Enter to continue, 'N' to skip and continue")
+        if(answer == 'N'):
+            errors += 1
+            return -1
+    if meanActivityPerNonZeroEpoch == 'N/A':
+        print("Warning: No Nonzero Epoches")
+        answer = input("Click Enter to continue, 'N' to skip and continue")
+        if(answer == 'N'):
+            errors += 1
+            return -1    
+    if meanSleepBoutSeconds == 0:
+        print("ERROR: THERE IS NO SLEEP BOUTS, THIS SHOULD NEVER HAPPEN")
+        print("")
+        print("Info:")
+        errors += 1
+        print('Activity: ' ,activity)
+        print('Acitivty List Length: ', len(activity))
+        print('Start: ', datetimes[0])
+        print('End', datetimes[-1])
+        input("To Skip and Continue, Press Enter")
+        return -1
+    if sleepEfficiency > 100 or percentSleep > 100 or percentAwake > 100 or mobilePercent > 100 or immobilePercent > 100:
+        print("ERROR: PERCENTAGE OVER 100, SHOULD NEVER HAPPEN")
+        errors += 1
+        input("To Skip and Continue, Press Enter")
+        return -1
+    
+    #Output
+    print("Lights Out: ",  datetimes[0])
     print("Fell Asleep: ", fellAsleepTime)
     print("Woke Up: ", wokeUpTime)
-    print("Got out of bed: ", outOfBedPoint)
+    print("Got out of bed: ", datetimes[-1])
     print("Time in bed: ", timeInBed)
     print("Assumed sleep: ", sleepTime)
     print("Actual sleep time: " , actualSleepTime)
@@ -374,17 +393,21 @@ def findSleepAnalysisData(inBedPoint, outOfBedPoint, rawData):
     print("Immobile bouts <= 1% ", round(boutsLessThanOnePercent,1))
     print("Total Activity: ", totalActivity )
     print("Mean Activity per epoch: ", round(meanActivityPerEpoch,2))
-    print("Mean Nonzero activity per epoch: ", round(meanActivityPerNonZeroEpoch,2))
+    if meanActivityPerNonZeroEpoch == 'N/A':
+        print("Mean Nonzero activity per epoch: ", meanActivityPerNonZeroEpoch)
+    else:
+        print("Mean Nonzero activity per epoch: ", round(meanActivityPerNonZeroEpoch,2))
     print("Fragmentation Index: ", round(fragmentationIndex,1))
-    
     print("")
-    print("")
+    print("")   
+    print('Number of Incomplete Days Due to Error In Data: ',errors)
     
+    #Actual Returned
     perNightDictionary = {
-        "Lights Out": inBedPoint,
+        "Lights Out": datetimes[0],
         "Fell Asleep": fellAsleepTime,
         "Woke Up": wokeUpTime,
-        "Out Of Bed": outOfBedPoint,
+        "Out Of Bed": datetimes[-1],
         "Time in bed": timeInBed,
         "Assumed sleep": sleepTime,
         "Actual sleep time": actualSleepTime,
@@ -411,42 +434,34 @@ def findSleepAnalysisData(inBedPoint, outOfBedPoint, rawData):
         "Fragmentation Index": fragmentationIndex
     }
     return perNightDictionary
-    
 
 
 #TEST with BT-001 First 8 days
-#path = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\RAW data\Baseline\BT-001_Baseline.xlsx'
-#rawData = pd.read_excel(path, skiprows = 12)
-#rawDataList = SheetManager.populateRawDataList()
+def convert_date_time(dates, times):
+    """ Converts date and time arrays (stored as strings) and combines them 
+    both to form one datetime array
+    """
+    datetime_arr = []
+    for i  in range(0, len(dates)):
+        datetimeString = dates[i] + ' ' + times[i]
+        datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
+        
+    return datetime_arr
+path = r'C:\Users\dbackhou\Desktop\BT-001_Baseline.csv'
+file = pd.read_csv(path, skiprows = 12)
+dates = file.iloc[:,0].tolist()
+times = file.iloc[:,1].tolist()
+activity = file.iloc[:,2].tolist()
+datetimes  = convert_date_time(dates,times)
+trimActivity = activity[923-10:1330+11]
+trimDatetimes = datetimes[923:1330+1]
+findSleepAnalysisData(trimActivity,trimDatetimes)
 
-#sampleSleep = datetime.datetime(2017, 4, 27, 23, 23)
-#sampleWake = datetime.datetime(2017, 4, 28, 6, 10)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
+trimActivity = activity[2356-10:2896+11]
+trimDatetimes = datetimes[2356:2896+1]
+findSleepAnalysisData(trimActivity,trimDatetimes)
 
-#sampleSleep = datetime.datetime(2017, 4, 28, 23, 16)
-#sampleWake = datetime.datetime(2017, 4, 29, 8, 16)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
+trimActivity = activity[3823-10:4350+11]
+trimDatetimes = datetimes[3823:4350+1]
+findSleepAnalysisData(trimActivity,trimDatetimes)
 
-#sampleSleep = datetime.datetime(2017, 4, 29, 23, 43)
-#sampleWake = datetime.datetime(2017, 4, 30, 8, 30)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
-
-#sampleSleep = datetime.datetime(2017, 4, 30, 23, 17)
-#sampleWake = datetime.datetime(2017, 5, 1, 7, 18)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
-
-#sampleSleep = datetime.datetime(2017, 5, 1, 23, 17)
-#sampleWake = datetime.datetime(2017, 5, 2, 7, 19)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
-
-#sampleSleep = datetime.datetime(2017, 5, 2, 23, 11)
-#sampleWake = datetime.datetime(2017, 5, 3, 6, 43)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
-
-#sampleSleep = datetime.datetime(2017, 5, 3, 23, 18)
-#sampleWake = datetime.datetime(2017, 5, 4, 7, 12)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)
-
-#sampleSleep = datetime.datetime(2017, 5, 4, 23, 27)
-#sampleWake = datetime.datetime(2017, 5, 5, 7, 13)
-#dictionary = findSleepAnalysisData(sampleSleep, sampleWake, rawData)

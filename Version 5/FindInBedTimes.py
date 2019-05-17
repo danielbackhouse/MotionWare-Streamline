@@ -4,7 +4,7 @@
     Author: Daniel Backhouse and Alan Yan
 """
 import numpy as np
-
+import SleepDataAnalysis
 def find_in_bed_time(dateTimes, activity, lux, window_size):
     """ Finds the got up and lights out times using only the activity, light
     and date arrays
@@ -30,6 +30,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
     got_up_indices = list()
     lights_out_dateTimes = list()
     got_up_dateTimes = list()
+    
     for index in sleep_window_indices:
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
@@ -46,9 +47,10 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
                                          awake_range_forward, sleepRangeMean )
         got_up_indices.append(got_up_index)
         
-        #TODO: changre funcion name
-        get_sleep_analysis(activity[lights_out_index: got_up_index], 
-                           dateTimes[lights_out_index: got_up_index])
+        #TODO: Do something with the returned dictionary
+        sleepAnalysisInfo = SleepDataAnalysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
+                           dateTimes[lights_out_index: got_up_index+1])
+        
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
         
