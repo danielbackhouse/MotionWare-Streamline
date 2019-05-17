@@ -152,7 +152,7 @@ def trimDataThree(filePath, skiprows):
     trimEnds(activity, dates, times, lux)
     while foundBack == False and foundFront  == False:
         if foundFront == False:
-            for item in range(60*24*1):
+            for item in range(60*24*2):
                 nonZero = 0
                 for x in range(300):
                     if activity[item+x]:
@@ -164,7 +164,7 @@ def trimDataThree(filePath, skiprows):
                 if item == 60*24-1:
                     foundFront = True
         if foundBack == False:
-            for item in range(len(activity)-60*24*1,len(activity)-300):
+            for item in range(len(activity)-60*24*2,len(activity)-300):
                 nonZero = 0
                 for x in range(300):
                     if activity[item+x]:
@@ -177,7 +177,53 @@ def trimDataThree(filePath, skiprows):
                     foundBack = True
         trimEnds(activity, dates, times, lux)
     return dates, times, lux, activity
+def trimDataFour(filePath, skiprows):
+    file = pd.read_csv(filePath, skiprows = skiprows)
+    dates = file.iloc[:,0].tolist()
+    times = file.iloc[:,1].tolist()
+    activity = file.iloc[:,2].tolist()
+    lux = file.iloc[:,3].tolist()
+    
+    zoneList = findZoneList(activity)
+    
+    return zoneList
 
+def findZoneList(activity):
+    zoneList = list(list())
+    zoneTwo = list()
+    index = 0 
+    counter = 0
+    while index < len(activity):
+        if activity[index] == 0:
+            length, endIndex = findLengthOfZeroSection(activity, index)
+            if length > 30:
+                if counter:
+                    if index-zoneList[counter-1][1] < 10:
+                        zoneList[counter-1][1] = endIndex
+                    else:
+                        zoneTwo = []
+                        zoneTwo.append(index)
+                        zoneTwo.append(endIndex)
+                        zoneList.append(zoneTwo)
+                        counter += 1
+                else:
+                    zoneTwo.append(index)
+                    zoneTwo.append(endIndex)
+                    zoneList.append(zoneTwo)
+                    print(zoneList)
+                    counter += 1
+            index = endIndex
+        else:
+            index += 1
+    return zoneList
+def findLengthOfZeroSection(activity, index):
+    counter = 0
+    for newIndex in range(index, len(activity)):
+        if activity[newIndex] == 0:
+            counter += 1
+        else:
+            return counter, newIndex
+    return counter, newIndex
 def pop(index, activity, dates, times, lux):
     activity.pop(index)
     dates.pop(index)
@@ -185,5 +231,5 @@ def pop(index, activity, dates, times, lux):
     lux.pop(index)
     return
 
-
+zoneList = trimDataFour(r'C:\Users\dbackhou\Desktop\BT-001_Baseline.csv', 12)
 
