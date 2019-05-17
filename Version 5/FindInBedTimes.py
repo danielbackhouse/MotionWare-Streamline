@@ -46,6 +46,9 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
                                          awake_range_forward, sleepRangeMean )
         got_up_indices.append(got_up_index)
         
+        #TODO: changre funcion name
+        get_sleep_analysis(activity[lights_out_index: got_up_index], 
+                           dateTimes[lights_out_index: got_up_index])
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
         
