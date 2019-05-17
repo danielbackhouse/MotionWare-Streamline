@@ -145,13 +145,12 @@ class Study:
         lights_out_analysis_study_times = list()
         got_up_analysis_study_times = list()
         
-        for participant_id in self.participant_list:
+        for participant_id in self.participant_list:    # Gets analysis for participants that were done by program
             lightsOutTimes, gotUpTimes = self.get_participant_sleep_analysis_times(
                     self.sleep_analysis_directory, participant_id)
             
             lights_out_analysis_study_times.append(lightsOutTimes)
-            got_up_analysis_study_times.append(gotUpTimes)
-            
+            got_up_analysis_study_times.append(gotUpTimes) 
 
         return lights_out_analysis_study_times, got_up_analysis_study_times
 
@@ -196,9 +195,9 @@ class Study:
                 lightsOutDateTime = datetime.datetime.combine(
                         day, lightsOutTime)
                 
-            lightsOutAnalysisTimes.append(lightsOutDateTime)         # Note here that we are assuming that the lightsOutTime dates and 
-            gotUpAnalysisTimes.append(getUpDateTime)                # getUpTime dates are the same as those given by the program
-        
+            lightsOutAnalysisTimes.append(lightsOutDateTime)          
+            gotUpAnalysisTimes.append(getUpDateTime)
+            
         return lightsOutAnalysisTimes, gotUpAnalysisTimes
         
     def get_dates(self,sleepAnalysis):
@@ -216,46 +215,4 @@ class Study:
         dates.reverse()
         
         return dates
-    
-    def error_in_date_time_lists(self, program, protocol):
-        """Computes the errors between two list of lists
-        
-        :param (list<list>) GU_program: errors between two times 
-        :return: Returns error between the two lists of lists
-        :rtype: (list) 
-        
-        """
-        sum_of_squares_error_study = list()
-        for i in range(0, len(program)):
-            errorList = self.get_error_list_participant(program[i], protocol[i])
-            error =  sum(errorList)
-            sum_of_squares_error_study.append(error)
-        
-        plt.figure()
-        plt.plot(self.participant_list, sum_of_squares_error_study)
-        plt.rc('xtick', labelsize = 8)
-        return sum_of_squares_error_study
-    
-    def get_error_list_participant(self,datetimes_program, datetimes_protocol):
-        """Computes the errors between two datetime lists
-        
-        :param (list<datetime>): The datetims participant went to sleep over study
-            according to analysis
-        :param (list<datetime>): The datetimes participant went to sleep over
-            study according to program
-        :return: The difference of the errors in minutes between the two squared
-        :rtype: (list)
-        """
-        errorList = list()
-        #TODO:Note here that currently some of the lists are empty
-        # for the program times so we are still returning null on some values
-        # Will need to add some conditional statement to check that both are the same length
-        
-        for i in range(0, len(datetimes_protocol)):
-                timeDifference = datetimes_program[i] - datetimes_protocol[i]
-                error = abs(timeDifference.total_seconds()/(60*len(datetimes_program)))
-                error = error**2
-                errorList.append(error)
-                    
-        return errorList
     

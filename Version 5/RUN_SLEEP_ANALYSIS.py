@@ -36,8 +36,6 @@ LOdates, GUdates = sleep_study.get_in_bed_times()
 
 #LOanalyis, GUanalysis = sleep_study.get_study_analysis_sleep_times()
 
-#sleep_study.error_in_date_time_lists(LOdates, LOanalyis)
-
 
 
 
