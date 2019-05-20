@@ -18,6 +18,14 @@ class Study:
         print('Getting raw activity and lux data for participants...')
         self.raw_data = os.listdir(raw_data_directory)
         print('\n Found raw activity and lux data...\n')
+        print('\n getting untrimmed data...')
+        dates, times, activity, lux, participants = self.get_trimmed_data()
+        print('\n Got untrimmed data...')
+        self.dates = dates
+        self.times = times
+        self.activity = activity
+        self.lux = lux
+        self.participant_list = participants
 
     def get_in_bed_times(self):
         """Gets the in bed times for when not using sleep diaries
@@ -33,16 +41,12 @@ class Study:
         LOdatetimeList = list()
         GUdatetimeList = list()
         SleepInfoList = list()
-
-        print('\n getting trimmed data...')
-        dates, times, activity, lux, participants = self.get_trimmed_data()
-        self.participant_list = participants
-        print('\n trimmed data... calculating sleep points...')
-        for i in range(0, len(participants)):
-            print(participants[i])
-            datetime_arr = self.convert_date_time(dates[i], times[i])
+        
+        for i in range(0, len(self.participant_list)):
+            print(self.participant_list[i])
+            datetime_arr = self.convert_date_time(self.dates[i], self.times[i])
             LOdatetime, GUdatetime, SleepInfo = FindInBedTimes.find_in_bed_time(
-                    datetime_arr, activity[i], lux[i], window_size)
+                    datetime_arr, self.activity[i], self.lux[i], window_size)
             LOdatetimeList.append(LOdatetime)
             GUdatetimeList.append(GUdatetime)
             SleepInfoList.append(SleepInfo)
@@ -84,12 +88,9 @@ class Study:
                         participant_num = file[3:6]
                         print(participant_num)
                         #TODO: throw some error if the skiprows is too short
-                        dates, times, lux, activity = trim.trimDataThree(
+                        dates, times, lux, activity = trim.untrimmed_data(
                                 self.raw_data_directory+ '\\'+file, self.skiprows_rawdata)
                     
-                        print(dates[0], times[0])
-                        print(dates[-1], times[-1])
-                        print()
                         trim_activity.append(activity)
                         trim_dates.append(dates)
                         trim_lux.append(lux)

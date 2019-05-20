@@ -7,7 +7,7 @@ import datetime
 class ProtocolSleepAnalysis:
     
     def __init__(self, participant_list, study_name, assesment):
-        self.sleep_analysis_directory = r'C:\Users\dbackhou\Desktop\Buying Time Study Copy\BT Sleep Analysis 2019-03-19.xlsx'
+        self.sleep_analysis_directory = r'C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\BT Sleep Analysis 2019-03-19.xlsx'
         self.lights_out_index_analysis = 2
         self.got_up_index_analysis = 5
         self.skiprows_analysis = 1
@@ -39,7 +39,7 @@ class ProtocolSleepAnalysis:
             lights_out_analysis_study_times.append(lightsOutTimes)
             got_up_analysis_study_times.append(gotUpTimes)
             
-
+            
         return lights_out_analysis_study_times, got_up_analysis_study_times
 
     
@@ -53,53 +53,29 @@ class ProtocolSleepAnalysis:
             specified within the sleep analysis spreadsheet
         :rtype: (list) (list)
         """
+        LOdatetime = []
+        GUdatetime = []
         sheetName = self.study_name + '-' + participant_id + ' ' + self.assesment
         print(sheetName)
-        sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, 
-                                      sheet_name = sheetName,
-                                      skiprows = self.skiprows_analysis )
-        dates = self.get_dates(sleepAnalysis)     #get the dates the study was done over
-        lightsOutAnalysisTimes = list()
-        gotUpAnalysisTimes = list()
-        for day in dates:
-            lightsOutTime = sleepAnalysis.get_value(
-                    self.lights_out_index_analysis, day)
+        try:
+            sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, sheet_name = sheetName)
+        except:
+            print('No such sheet in sleep analysis excel sheet')
+            return LOdatetime, GUdatetime
+        
+        lightsOutDates = sleepAnalysis.iloc[15,1:15].tolist()
+        lightsOutTimes = sleepAnalysis.iloc[18,1:15].tolist()
+        gotUpDates = sleepAnalysis.iloc[17,1:15].tolist()
+        gotUpTimes = sleepAnalysis.iloc[21, 1:15].tolist()
+        
+
+        
+        for i in range(0, len(lightsOutDates)):
+            try:
+                LOdatetime.append(datetime.datetime.combine(lightsOutDates[i], lightsOutTimes[i]))
+                GUdatetime.append(datetime.datetime.combine(gotUpDates[i], gotUpTimes[i]))
+            except:
+                break
+        
+        return LOdatetime, GUdatetime
             
-            getUpTime = sleepAnalysis.get_value(self.got_up_index_analysis, day)
-            if(isinstance(day, str)):
-                try:
-                    strDate = datetime.datetime.strptime(day[0:10], '%Y-%m-%d')
-                except:
-                    break
-                getUpDateTime = datetime.datetime.combine(
-                        strDate + datetime.timedelta(days = 1), getUpTime)
-                lightsOutDateTime = datetime.datetime.combine(
-                        strDate, lightsOutTime)
-            else:
-                #TODO fix this because rn just adding one day instead of actually
-                #adding date. (check above as well)
-                getUpDateTime = datetime.datetime.combine(
-                        day + datetime.timedelta(days = 1), getUpTime)
-                lightsOutDateTime = datetime.datetime.combine(
-                        day, lightsOutTime)
-                
-            lightsOutAnalysisTimes.append(lightsOutDateTime)         # Note here that we are assuming that the lightsOutTime dates and 
-            gotUpAnalysisTimes.append(getUpDateTime)                # getUpTime dates are the same as those given by the program
-        
-        return lightsOutAnalysisTimes, gotUpAnalysisTimes
-            
-    def get_dates(self,sleepAnalysis):
-        """Gets the dates the study was done over give the analysis dataframe
-        
-        :param (pandas dataframe) sleepAnalysis: sleep analysis excel scan
-        :return: Returns the dates the study was done over as a list
-        :rtype: (list<datetime.datetime>)
-        """
-        dates = list(sleepAnalysis)
-        dates.pop()
-        dates.pop()
-        dates.reverse()
-        dates.pop()
-        dates.reverse()
-        
-        return dates

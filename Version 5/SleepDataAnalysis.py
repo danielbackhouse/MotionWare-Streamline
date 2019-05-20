@@ -308,7 +308,7 @@ def findSleepAnalysisData(activity, datetimes):
         print('Acitivty List Length: ', len(activity))
         print('Start: ', datetimes[0])
         print('End', datetimes[-1])
-        input("To Skip and Continue, Press Enter")
+        #input("To Skip and Continue, Press Enter")
         
         return -1
     
@@ -339,16 +339,16 @@ def findSleepAnalysisData(activity, datetimes):
         print('SleepWakeList: ', sleepWakeList)
         print('Start: ', datetimes[0])
         print('End', datetimes[-1])
-        answer = input("Click Enter to continue, 'N' to skip and continue")
-        if(answer == 'N'):
-            errors += 1
-            return -1
+        #answer = input("Click Enter to continue, 'N' to skip and continue")
+        #if(answer == 'N'):
+         #   errors += 1
+         #   return -1
     if meanActivityPerNonZeroEpoch == 'N/A':
         print("Warning: No Nonzero Epoches")
-        answer = input("Click Enter to continue, 'N' to skip and continue")
-        if(answer == 'N'):
-            errors += 1
-            return -1    
+        #answer = input("Click Enter to continue, 'N' to skip and continue")
+        #if(answer == 'N'):
+        #    errors += 1
+        #    return -1    
     if meanSleepBoutSeconds == 0:
         print("ERROR: THERE IS NO SLEEP BOUTS, THIS SHOULD NEVER HAPPEN")
         print("")
@@ -358,12 +358,12 @@ def findSleepAnalysisData(activity, datetimes):
         print('Acitivty List Length: ', len(activity))
         print('Start: ', datetimes[0])
         print('End', datetimes[-1])
-        input("To Skip and Continue, Press Enter")
+        #input("To Skip and Continue, Press Enter")
         return -1
     if sleepEfficiency > 100 or percentSleep > 100 or percentAwake > 100 or mobilePercent > 100 or immobilePercent > 100:
         print("ERROR: PERCENTAGE OVER 100, SHOULD NEVER HAPPEN")
         errors += 1
-        input("To Skip and Continue, Press Enter")
+        #input("To Skip and Continue, Press Enter")
         return -1
     
     #Output

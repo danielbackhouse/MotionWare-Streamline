@@ -11,10 +11,11 @@
 """
 import Study
 import ProtocolSleepAnalysis as ps
+import pandas as pd
 # Raw Data Directory: THIS IS A REQUIRED FIELD. Enter the directory where the 
 # raw data files are located. The raw data files should be in folders Baseline
 # Midpoint and Final
-raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoint"
+raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Baseline"
 
 # SkipRows Raw Data: THIS IS A REQUIRED FIELD. This field should not be changed 
 # unless the format of the raw data files has changed. This field is the most
@@ -22,12 +23,12 @@ raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Midpoin
 skiprows_rawdata = 20
 
 # study_name: THIS IS A REQUIRED FIELD. Enter within the qoutations the
-# abbreviation of the study. An examplen entry would be: "BT" or "FACT".
+# abbreviation of the study. An example entry would be: "BT" or "FACT".
 study_name = "BT"
 
 # assesment: THIS A REQUIRED FIELD. Enter whether you want to analyze Baseline,
 # Midpoint or Final. Valid entries then are: "Baseline", "Midpoint", "Final."
-assesment = "Midpoint"
+assesment = "Baseline"
 
 # *************DO NOT MAKE CHANGES TO THE PROGRAM BEYOND THIS POINT**********
 
@@ -38,8 +39,6 @@ LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_t
 protocol = ps.ProtocolSleepAnalysis(participant_list, study_name, assesment)
 
 LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
-
-
 
 
 

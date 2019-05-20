@@ -141,12 +141,31 @@ def trimEnds(activity, dates, times, lux):
                endFound = False    
 #TODO: make this throw error if data is not ordered correctly in csv
 def trimDataThree(filePath, skiprows):
-    file = pd.read_csv(filePath, skiprows = skiprows)
-    dates = file.iloc[:,0].tolist()
-    times = file.iloc[:,1].tolist()
-    activity = file.iloc[:,2].tolist()
-    lux = file.iloc[:,3].tolist()
-    
+    try:
+        file = pd.read_csv(filePath, skiprows = skiprows)
+    except:
+        print('Failed to open file at ' + filePath)
+    try:
+        dates = file.iloc[:,0].tolist()
+    except:
+        print('Error no dates found in csv file at ' + filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        times = file.iloc[:,1].tolist()
+    except:
+        print('Error no times found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        activity = file.iloc[:,2].tolist()
+    except:
+        print('Error no activity data found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        lux = file.iloc[:,3].tolist()
+    except:
+        print('Error no lught exposure data found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+        
     foundBack = False
     foundFront = False    
     trimEnds(activity, dates, times, lux)
@@ -231,5 +250,33 @@ def pop(index, activity, dates, times, lux):
     lux.pop(index)
     return
 
-zoneList = trimDataFour(r'C:\Users\dbackhou\Desktop\BT-001_Baseline.csv', 12)
+def untrimmed_data(filePath, skiprows):
+    try:
+        file = pd.read_csv(filePath, skiprows = skiprows)
+    except:
+        print('Failed to open file at ' + filePath)
+    try:
+        dates = file.iloc[:,0].tolist()
+    except:
+        print('Error no dates found in csv file at ' + filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        times = file.iloc[:,1].tolist()
+    except:
+        print('Error no times found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        activity = file.iloc[:,2].tolist()
+    except:
+        print('Error no activity data found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        lux = file.iloc[:,3].tolist()
+    except:
+        print('Error no lught exposure data found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+        
+    return dates, times, lux, activity
+        
+#zoneList = trimDataFour(r'C:\Users\dbackhou\Desktop\BT-001_Baseline.csv', 12)
 

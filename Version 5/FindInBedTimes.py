@@ -49,10 +49,10 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
         got_up_indices.append(got_up_index)
         
         #TODO: Do something with the returned dictionary
-        sleepAnalysisInfo = SleepDataAnalysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
-                           dateTimes[lights_out_index: got_up_index+1])
+        #sleepAnalysisInfo = SleepDataAnalysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
+        #                   dateTimes[lights_out_index: got_up_index+1])
         
-        sleep_analysis_list.append(sleepAnalysisInfo)
+        #sleep_analysis_list.append(sleepAnalysisInfo)
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
         
@@ -69,8 +69,10 @@ def get_sleep_window_indices(activity, lux, dateTimes, window_size):
     sleep_window_indices = list()
     for i in range(0, len(days_indices)-1):
         start = days_indices[i]
-        end = days_indices[i+1]        
+        end = days_indices[i+1]      
+        
         sleep_window_index = find_sleep_window(activity[start:end], lux[start:end], window_size)
+
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
     
@@ -100,7 +102,9 @@ def find_sleep_window(activity, lux, size):
         index = index + one_hour_epoch
         
     sortedIndex = sort_lists(light_list, activity_list, index_list)
-    sleep_index  = sortedIndex[len(sortedIndex)-1]   
+    sleep_index  = sortedIndex[len(sortedIndex)-1]
+
+        
     return  sleep_index
      
 def find_start_index(dateTimes):
@@ -238,7 +242,7 @@ def find_lights_out_index(index, activity, lux, sleepRange):
              
             if lux[index] == 0:
                 zeroLightCount = zeroLightCount + 1
-                      
+
                 if activity[index] <= meanActivity:
                     darkMotion = darkMotion + 1;            
                 
@@ -258,6 +262,7 @@ def find_lights_out_index(index, activity, lux, sleepRange):
                     
             if zeroMovementCount >= 20:
                 return lights_out_index
+                
                   
             if zeroLightCount >= 15:
                 return lights_out_index
