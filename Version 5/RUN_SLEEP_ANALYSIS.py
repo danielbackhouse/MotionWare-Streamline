@@ -40,7 +40,12 @@ protocol = ps.ProtocolSleepAnalysis(participant_list, study_name, assesment)
 
 LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
 
-
+for i in range(0, len(LOprotocol)):
+    protocolDates = LOprotocol[i]
+    dates = LOdates[i]
+    print(i)
+    if(protocolDates[0].date() < dates[0].date()):
+        print('f')
 
 
 
