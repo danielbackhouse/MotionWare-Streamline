@@ -6,12 +6,15 @@
 import datetime
 import os
 import sys
+import pandas as pd
 import motionwatch.compute.find_in_bed_times as find_in_bed_times
 import motionwatch.compute.raw_data_editor as raw_data_editor
 
 class Study:
     
-    def __init__(self, raw_data_directory, skiprows_rawdata, study_name, assesment, trim_type):
+    def __init__(self, raw_data_directory, skiprows_rawdata, study_name, 
+                 assesment, trim_type, sd_directory):
+        
         self.raw_data_directory = raw_data_directory
         self.skiprows_rawdata = skiprows_rawdata
         self.study_name = study_name
@@ -28,6 +31,8 @@ class Study:
             print('\n Getting program trimmed data...' )
             dates, times, activity, lux, participant = self.__get_trimmed_data()
         elif (trim_type == 2):
+            print('Getting study dates...')
+            self.study_dates = self.__get_study_dates(sd_directory)
             print('\n Getting trimmed data based on study dates')
             dates, times, activity, lux, partcipant = self.__get_study_trimmed_data()
         else:
@@ -58,18 +63,21 @@ class Study:
         
         for i in range(0, len(self.participant_list)):
             print(self.participant_list[i])
-            datetime_arr = self.convert_date_time(self.dates[i], self.times[i])
+            datetime_arr = self.__convert_date_time(self.dates[i], self.times[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     datetime_arr, self.activity[i], self.lux[i], window_size)
             LOdatetimeList.append(LOdatetime)
             GUdatetimeList.append(GUdatetime)
             SleepInfoList.append(SleepInfo)
+            #TODO fix day analysis here
+            #DayDataAnalysis.findDayInfo(participants[i],LOindex, GUindex, activity[i], dates[i], times[i])
         
             index = index + 1
     
         return LOdatetimeList, GUdatetimeList, SleepInfoList, self.participant_list
+    
     #TODO: Write out docstring
-    def convert_date_time(self, dates, times):
+    def __convert_date_time(self, dates, times):
         """ Converts date and time arrays (stored as strings) and combines them 
         both to form one datetime array
         """
@@ -79,6 +87,16 @@ class Study:
             datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
             
         return datetime_arr
+    
+    def __get_study_dates(self, sd_directory):
+        """ Read the sleep diary file and gets the 
+        dates the study was done over for each participant
+        """
+        file = pd.read_excel(sd_directory, sheet_name = None)
+        raw_dates = []
+        for sheets in file.values():
+            raw_dates.append(list(sheets))
+    
     #TODO: fix docstring
     def __get_untrimmed_data(self ):
         """This function uses the SheetManager module and gets the raw Data
@@ -109,6 +127,7 @@ class Study:
                         participant_id.append(participant_num)
     
         return trim_dates, trim_times, trim_activity, trim_lux , participant_id 
+    
     #TODO: fix docstring
     def __get_trimmed_data(self):
         """This function uses the SheetManager module and gets the raw Data

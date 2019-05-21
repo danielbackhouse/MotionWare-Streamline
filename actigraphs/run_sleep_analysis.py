@@ -13,13 +13,14 @@ import motionwatch.create.Study as study
 import motionwatch.create.ProtocolSleepAnalysis
 
 raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Baseline"
+sleep_diary_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\BT Sleep Diary.xlsx"
 skiprows_rawdata = 20
 study_name = "BT"
 assesment = "Baseline"
-trim_type = 0
+trim_type = 2
 
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
-                          assesment, trim_type)
+                          assesment, trim_type, sleep_diary_directory)
 
 LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_times()
 
