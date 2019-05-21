@@ -7,8 +7,8 @@ import datetime
 import os
 import sys
 import pandas as pd
-import motionwatch.compute.find_in_bed_times as find_in_bed_times
-import motionwatch.compute.raw_data_editor as raw_data_editor
+import compute.find_in_bed_times as find_in_bed_times
+import compute.raw_data_editor as raw_data_editor
 
 class Study:
     
@@ -20,6 +20,16 @@ class Study:
         self.study_name = study_name
         self.assesment = assesment
         
+        if(assesment == "Baseline"):
+            self.sd_skiprows = 0
+        elif(assesment == "Midpoint"):
+            self.sd_skiprows = 16
+        elif(assesment == "Final"):
+            self.sd_skiprows = 0
+        else:
+            print('Entered an invalid assemsent type: specify either Baseline, Midpoint or Final')
+            sys.exit()
+        
         print(' Getting raw activity and lux data for participants...')
         self.raw_data = os.listdir(raw_data_directory)
         print('\n Found raw activity and lux data...')
@@ -29,12 +39,13 @@ class Study:
             dates, times, activity, lux, participants = self.__get_untrimmed_data()
         elif (trim_type == 1):
             print('\n Getting program trimmed data...' )
-            dates, times, activity, lux, participant = self.__get_trimmed_data()
+            dates, times, activity, lux, participants = self.__get_trimmed_data()
         elif (trim_type == 2):
             print('Getting study dates...')
-            self.study_dates = self.__get_study_dates(sd_directory)
+            study_dates, participant_num = self.__get_study_dates(sd_directory)
             print('\n Getting trimmed data based on study dates')
-            dates, times, activity, lux, partcipant = self.__get_study_trimmed_data()
+            dates, times, activity, lux, participants = self.__get_study_trimmed_data(
+                    study_dates, participant_num)
         else:
             print('\n Error you entered an invalid trim_type (enter number between 0-2)')
             print('Terminating program...')
@@ -92,10 +103,58 @@ class Study:
         """ Read the sleep diary file and gets the 
         dates the study was done over for each participant
         """
-        file = pd.read_excel(sd_directory, sheet_name = None)
+        file = pd.read_excel(sd_directory, sheet_name = None, 
+                             skiprows = self.sd_skiprows)
         raw_dates = []
         for sheets in file.values():
             raw_dates.append(list(sheets))
+        
+        raw_dates.reverse() #Removing the template sheet
+        raw_dates.pop()
+        raw_dates.reverse()
+        
+        real_dates = self.__get_study_days(raw_dates)
+        
+        participant_nums = self.__format_diary_participants(list(file.keys()))
+        
+        return real_dates, participant_nums
+    
+    def __format_diary_participants(self, participants):
+        """ Formats the diary participants ID's correctly
+        
+        :param (list) participants: a list of the participant ID's taken from
+        the sleep diaries
+        """
+        participants.reverse()
+        participants.pop()
+        participants.reverse()
+        ID_num = []
+        for ID in participants:
+            ID_num.append(ID[len(self.study_name)+1:6])
+        
+        return ID_num
+    
+    def __get_study_days(self, raw_dates):
+        """ Looks at the raw study date files and finds the first and last entry
+        these correspond to the start and end of the relevant study days given in
+        the diary.
+        """
+        real_dates = []
+        for participant in raw_dates:
+            for dates in participant:
+                if(isinstance(dates, datetime.datetime )):
+                    start_date = dates
+                    break
+            
+            participant.reverse()
+            for dates in participant:
+                if(isinstance(dates, datetime.datetime )):
+                    end_dates = dates
+                    break
+                
+            real_dates.append([start_date, end_dates])
+            
+        return real_dates
     
     #TODO: fix docstring
     def __get_untrimmed_data(self ):
@@ -159,6 +218,37 @@ class Study:
     
         return trim_dates, trim_times, trim_activity, trim_lux , participant_id 
     
-    def __get_study_trimmed_data(self):
-        """ This function gets the study trimmed data
+    def __get_study_trimmed_data(self, study_dates, participants_sd):
+        """ This function gets the study trimmed data 
         """
+        trim_activity = []
+        trim_lux = []
+        trim_dates = []
+        trim_times = []
+        participant_id = []
+        dates_counter = 0
+        for sd_participant in participants_sd:
+            for file in self.raw_data:
+                if(file.endswith('.csv') and sd_participant == file[3:6]):
+                    participant_num = file[3:6]
+                    print(participant_num)
+                    part_dates = study_dates[dates_counter]
+                    start = part_dates[0]
+                    end = part_dates[1]
+                    dates, times, lux, activity = raw_data_editor.study_trimmed_data(
+                                self.raw_data_directory+ '\\'+file, 
+                                self.skiprows_rawdata, start, end)
+                    
+                    trim_activity.append(activity)
+                    trim_dates.append(dates)
+                    trim_lux.append(lux)
+                    trim_times.append(times)
+                    participant_id.append(participant_num)
+                    
+            dates_counter = dates_counter + 1
+            
+        return trim_dates, trim_times, trim_activity, trim_lux, participant_id
+    
+    
+    
+    

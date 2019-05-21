@@ -22,7 +22,8 @@ def study_trimmed_data(filepath, skiprows, startdate, enddate):
     :raises: Print error if one of the 4 paramters are missing in the CSV
     """
     #TODO
-    print('TODO')
+    print('great sucess')
+    return list(), list(), list(), list()
 
 def trimmed_data(filePath, skiprows):
     """ Gets the trimmed data from the specified file path 
