@@ -3,8 +3,10 @@
 # activity and light data
 # Authors: Alan Yan
 import pandas as pd
+import datetime
+#TODO: create open file function as I don't have so much copy pasted code
 
-def study_trimmed_data(filepath, skiprows, startdate, enddate):
+def study_trimmed_data(filePath, skiprows, startdate, enddate):
     """ Get's the trimmed data from specified file path based on the 
     start and enddates
     
@@ -21,9 +23,50 @@ def study_trimmed_data(filepath, skiprows, startdate, enddate):
     :param (datetime) enddate: the enddate to cut the data at
     :raises: Print error if one of the 4 paramters are missing in the CSV
     """
-    #TODO
-    print('great sucess')
-    return list(), list(), list(), list()
+    try:
+        file = pd.read_csv(filePath, skiprows = skiprows)
+    except:
+        print('Failed to open file at ' + filePath)
+    try:
+        dates = file.iloc[:,0].tolist()
+    except:
+        print('Error no dates found in csv file at ' + filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        times = file.iloc[:,1].tolist()
+    except:
+        print('Error no times found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        activity = file.iloc[:,2].tolist()
+    except:
+        print('Error no activity data found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    try:
+        lux = file.iloc[:,3].tolist()
+    except:
+        print('Error no lught exposure data found in csv file at ' +  filePath)
+        print('Make sure raw activity and light file is formatted correctly')
+    
+    start = 0
+    end = len(activity)-1
+    for index in range(0, len(dates)):
+        dateTime = datetime.datetime.strptime(
+                dates[index], '%Y-%m-%d') 
+        if(dateTime == startdate - datetime.timedelta(days = 1)):
+            start = index
+            break
+         
+    index = len(dates) - 1
+    while index >= start:
+        dateTime = datetime.datetime.strptime(
+                dates[index], '%Y-%m-%d')
+        if(dateTime == enddate + datetime.timedelta(days=1)):
+            end = index
+            break
+        index = index - 1
+    
+    return dates[start:end], times[start:end], lux[start:end], activity[start:end]
 
 def trimmed_data(filePath, skiprows):
     """ Gets the trimmed data from the specified file path 
