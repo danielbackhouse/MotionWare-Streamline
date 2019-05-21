@@ -12,11 +12,11 @@
 import create.Study as study
 import create.ProtocolSleepAnalysis as ps
 
-raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Baseline"
+raw_data_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\Final"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\BT Sleep Diary.xlsx"
 skiprows_rawdata = 20
 study_name = "BT"
-assesment = "Baseline"
+assesment = "Final"
 trim_type = 2
 
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,

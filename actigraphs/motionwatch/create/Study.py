@@ -25,7 +25,7 @@ class Study:
         elif(assesment == "Midpoint"):
             self.sd_skiprows = 16
         elif(assesment == "Final"):
-            self.sd_skiprows = 0
+            self.sd_skiprows = 32
         else:
             print('Entered an invalid assemsent type: specify either Baseline, Midpoint or Final')
             sys.exit()
