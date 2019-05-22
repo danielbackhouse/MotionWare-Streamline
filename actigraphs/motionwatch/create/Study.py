@@ -130,8 +130,8 @@ class Study:
         participants.reverse()
         ID_num = []
         for ID in participants:
-            ID_num.append(ID[len(self.study_name)+1:6])
-        
+            ID_num.append(ID[len(self.study_name)+1:len(ID)])
+            print(ID[len(self.study_name)+1:len(ID)])
         return ID_num
     
     def __get_study_days(self, raw_dates):
@@ -173,7 +173,7 @@ class Study:
         participant_id = []
         for file in self.raw_data:
                     if file.endswith('.csv'):
-                        participant_num = file[3:6]
+                        participant_num = file[len(self.study_name)+1:len(file)-4]
                         print(participant_num)
                         #TODO: throw some error if the skiprows is too short
                         dates, times, lux, activity = raw_data_editor.untrimmed_data(
@@ -204,7 +204,7 @@ class Study:
         participant_id = []
         for file in self.raw_data:
                     if file.endswith('.csv'):
-                        participant_num = file[3:6]
+                        participant_num = file[len(self.study_name)+1:len(file)-4]
                         print(participant_num)
                         #TODO: throw some error if the skiprows is too short
                         dates, times, lux, activity = raw_data_editor.trimmed_data(
@@ -229,12 +229,15 @@ class Study:
         dates_counter = 0
         for sd_participant in participants_sd:
             for file in self.raw_data:
-                if(file.endswith('.csv') and sd_participant == file[3:6]):
-                    participant_num = file[3:6]
+                if(file.endswith('.csv') and 
+                   sd_participant == file[len(self.study_name)+1:len(file)-4]):
+                    
+                    participant_num = file[len(self.study_name)+1:len(file)-4]
                     print(participant_num)
                     part_dates = study_dates[dates_counter]
                     start = part_dates[0]
                     end = part_dates[1]
+                    #TODO add detection for unentered sleep diary
                     dates, times, lux, activity = raw_data_editor.study_trimmed_data(
                                 self.raw_data_directory+ '\\'+file, 
                                 self.skiprows_rawdata, start, end)

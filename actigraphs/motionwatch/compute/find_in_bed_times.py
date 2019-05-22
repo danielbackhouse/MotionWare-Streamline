@@ -316,7 +316,7 @@ def __find_lights_out_index(index, activity, lux, sleepRange):
             if zeroLightActiveCount >= 5:
                 return lights_out_index
                     
-            if zeroMovementCount >= 20:
+            if zeroMovementCount >= 45:
                 return lights_out_index
                   
             if zeroLightCount >= 15:

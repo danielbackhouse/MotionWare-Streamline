@@ -6,8 +6,8 @@ import datetime
 
 class ProtocolSleepAnalysis:
     
-    def __init__(self, participant_list, study_name, assesment):
-        self.sleep_analysis_directory = r'C:\Users\dbackhou\Desktop\Bulk Raw Data Export BT\BT Sleep Analysis 2019-03-19.xlsx'
+    def __init__(self, sleep_analysis_directory, participant_list, study_name, assesment):
+        self.sleep_analysis_directory = sleep_analysis_directory
         self.lights_out_index_analysis = 2
         self.got_up_index_analysis = 5
         self.skiprows_analysis = 1

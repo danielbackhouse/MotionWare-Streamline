@@ -45,7 +45,7 @@ def study_trimmed_data(filePath, skiprows, startdate, enddate):
     try:
         lux = file.iloc[:,3].tolist()
     except:
-        print('Error no lught exposure data found in csv file at ' +  filePath)
+        print('Error no light exposure data found in csv file at ' +  filePath)
         print('Make sure raw activity and light file is formatted correctly')
     
     start = 0
