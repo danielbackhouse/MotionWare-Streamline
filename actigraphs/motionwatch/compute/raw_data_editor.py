@@ -61,7 +61,8 @@ def study_trimmed_data(filePath, skiprows, startdate, enddate):
     while index >= start:
         dateTime = datetime.datetime.strptime(
                 dates[index], '%Y-%m-%d')
-        if(dateTime == enddate + datetime.timedelta(days=1)):
+        if(dateTime.month == (enddate + datetime.timedelta(days=1)).month and
+           dateTime.day == (enddate + datetime.timedelta(days=1)).day):
             end = index
             break
         index = index - 1

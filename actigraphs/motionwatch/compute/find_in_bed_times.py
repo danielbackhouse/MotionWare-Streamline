@@ -77,6 +77,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
     :rtype: (list) (list)
     :raises: Exception (no 12pm in array)
     """
+    #TODO: Bug in __get_sleep_window indicies (BT 002 Final)
     sleep_window_indices = __get_sleep_window_indices(activity,lux,dateTimes,window_size)
     lights_out_indices = list()
     got_up_indices = list()
