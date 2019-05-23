@@ -42,11 +42,11 @@ for i in range(0, len(LOdates)):
     
 protocol = ps.ProtocolSleepAnalysis(sa_directory, participant_list, study_name, assesment)
 
-LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
+#LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
 
-LOprotocolDic = {}
-for i in range(0, len(LOdates)):
-    LOprotocolDic[participant_list[i]] = LOprotocol[i]
-    
+#LOprotocolDic = {}
+#for i in range(0, len(LOdates)):
+#    LOprotocolDic[participant_list[i]] = LOprotocol[i]
+#    
 
-error_dic = err.get_error_study(LOdates, LOprotocol, participant_list)
+#error_dic = err.get_error_study(LOdates, LOprotocol, participant_list)

@@ -4,6 +4,7 @@
 # Authors: Daniel Backhouse and Alan Yan
 
 import numpy as np
+import datetime
 
 #TODO: Modify docstring to once sleep analysis is completed
 def find_in_bed_time(dateTimes, activity, lux, window_size):
@@ -135,6 +136,21 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
     
+    if(dateTimes[days_indices[-1]] + datetime.timedelta(hours = window_size) > dateTimes[-1]):
+        print('dont add entry')
+    if(days_indices[-1] + 24*60 >= len(dateTimes)):
+        print('add last datetime')
+        start = days_indices[-1]
+        end = len(dateTimes) - 1
+        last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_window_indices.append(start + last_index)
+    else:
+        start = days_indices[-1]
+        end = start + 24*60
+        last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_window_indices.append(start + last_index)
+        print('add 12pm entry')
+        
     return sleep_window_indices
     
 def __find_sleep_window(activity, lux, size):
