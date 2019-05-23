@@ -9,7 +9,6 @@ import sys
 import pandas as pd
 import compute.find_in_bed_times as find_in_bed_times
 import compute.raw_data_editor as raw_data_editor
-
 class Study:
     
     def __init__(self, raw_data_directory, skiprows_rawdata, study_name, 
@@ -33,7 +32,6 @@ class Study:
         print(' Getting raw activity and lux data for participants...')
         self.raw_data = os.listdir(raw_data_directory)
         print('\n Found raw activity and lux data...')
-        
         if (trim_type == 0):
             print('\n Getting untrimmed data...')
             dates, times, activity, lux, participants = self.__get_untrimmed_data()
