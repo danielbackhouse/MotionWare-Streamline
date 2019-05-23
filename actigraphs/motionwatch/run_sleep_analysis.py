@@ -23,12 +23,12 @@ def get_error_participant(program_part, protocol_part):
         
     return participant_error
 
-raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Final"
+raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
 sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
 skiprows_rawdata = 20
 study_name = "BT"
-assesment = "Final"
+assesment = "Baseline"
 trim_type = 2
 
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
