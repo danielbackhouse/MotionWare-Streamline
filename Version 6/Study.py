@@ -95,7 +95,7 @@ class Study:
                         participant_num = file[3:6]
                         print(participant_num)
                         #TODO: throw some error if the skiprows is too short
-                        dates, times, lux, activity = trim.trimDataThree(
+                        dates, times, lux, activity = trim.trimDataFour(
                                 self.raw_data_directory+ '\\'+file, self.skiprows_rawdata)
                     
                         print(dates[0], times[0])
