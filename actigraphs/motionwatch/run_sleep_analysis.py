@@ -12,16 +12,8 @@
 import create.Study as study
 import create.ProtocolSleepAnalysis as ps
 import compute.error_analysis as err
+import optimize.threshold_optimization as thresh
     
-def get_error_participant(program_part, protocol_part):
-    participant_error = []
-    index = 0
-    while index < len(program_part) and len(protocol_part):
-        error = program_part(index) - protocol_part(index)
-        participant_error.append(error)
-        index = index + 1
-        
-    return participant_error
 
 raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
@@ -34,19 +26,24 @@ trim_type = 2
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
                           assesment, trim_type, sleep_diary_directory)
 
-LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_times()
-
-LOprogramDic = {}
-for i in range(0, len(LOdates)):
-    LOprogramDic[participant_list[i]] = LOdates[i]
+#LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_times()
+#LOprogramDic = {}
+#for i in range(0, len(LOdates)):
+#    LOprogramDic[participant_list[i]] = LOdates[i]
     
-protocol = ps.ProtocolSleepAnalysis(sa_directory, participant_list, study_name, assesment)
-
+protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list, study_name, assesment)
 LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
-
-LOprotocolDic = {}
-for i in range(0, len(LOdates)):
-    LOprotocolDic[participant_list[i]] = LOprotocol[i]
+#LOprotocolDic = {}
+#for i in range(0, len(LOdates)):
+#    LOprotocolDic[participant_list[i]] = LOprotocol[i]
     
 
-error_dic = err.get_error_study(LOdates, LOprotocol, participant_list)
+#error_per_participant = err.get_error_per_participant(LOdates, LOprotocol, participant_list)
+#error_study, useful_participants = err.get_error_study(
+#        LOdates, LOprotocol, participant_list)
+#err.plot_study_error(error_study, useful_participants)
+
+#std_per_participant = err.get_std_per_participant(LOdates, LOprotocol, participant_list)
+
+thresh.optimize_LO_times(sleep_study, LOprotocol)
+
