@@ -4,11 +4,13 @@
 
 import compute.error_analysis as err
 import time
+import numpy as np 
+
 def optimize_LO_times(sleep_study, LOprotocol):
     ws = 10
     dm = 30
     error_averages = []
-    
+    std_study = []
     while ws > 3:
         print('count')
         print(ws)
@@ -19,6 +21,7 @@ def optimize_LO_times(sleep_study, LOprotocol):
             error_study, useful_participants = err.get_error_study(LOdates, LOprotocol, 
                                                                    participant_list)
             error_averages.append(err.total_error(error_study))
+            std_study.append(np.std(list(error_study.values())), ddof = 1)
             dm = dm - 1
             end = time.time()
             print('Time elapsed')
