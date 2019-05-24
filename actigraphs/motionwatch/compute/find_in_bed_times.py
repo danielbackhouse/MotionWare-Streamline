@@ -4,6 +4,7 @@
 # Authors: Daniel Backhouse and Alan Yan
 
 import numpy as np
+import datetime
 
 #TODO: Modify docstring to once sleep analysis is completed
 def find_in_bed_time(dateTimes, activity, lux, window_size):
@@ -134,7 +135,21 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
         sleep_window_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
-    
+    # window size has tob e plus 2 so that the got up guess does not exceed the index limit
+    #TODO fix this ting
+    if(dateTimes[days_indices[-1]] + datetime.timedelta(hours = window_size + 2) > dateTimes[-1]):
+        print('dont add entry')
+    if(days_indices[-1] + 24*60 >= len(dateTimes)):
+        start = days_indices[-1]
+        end = len(dateTimes) - 1
+        last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_window_indices.append(start + last_index)
+    else:
+        start = days_indices[-1]
+        end = start + 24*60
+        last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_window_indices.append(start + last_index)
+        
     return sleep_window_indices
     
 def __find_sleep_window(activity, lux, size):
@@ -170,7 +185,7 @@ def __find_start_index(dateTimes):
     :raises: raises an exception if there was no 12pm hour found
     :return: returns the first 12pm time
     :rtype: (int)
-    """    
+    """   
     for index in range(0,len(dateTimes)):
         if(dateTimes[index].hour == 12):
             return index
@@ -311,7 +326,7 @@ def __find_lights_out_index(index, activity, lux, sleepRange):
                 sleepLightCheck = False
                 darkMotion = 0
                 
-            if darkMotion >= 5:  
+            if darkMotion >= 10:  
                 return lights_out_index
                   
             if zeroLightActiveCount >= 5:
@@ -341,9 +356,9 @@ def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
     """
     zeroStirringCount = 0;
     got_up_index = index 
-    while index < sleep_range:
-        if lux[index] != 0 and activity[index] >= sleepRangeMean:
-            zeroStirringCount = zeroStirringCount + 1
+    while index < sleep_range and index < len(activity): # added less than end of len activity                                                      
+        if lux[index] != 0 and activity[index] >= sleepRangeMean: # so that if the last indice
+            zeroStirringCount = zeroStirringCount + 1   # happens to be late we account for that
             if zeroStirringCount == 1:
                 got_up_index = index               
         else:
