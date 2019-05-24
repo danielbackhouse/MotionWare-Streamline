@@ -45,7 +45,7 @@ err.plot_study_error(error_study, useful_participants)
 
 std_per_participant = err.get_std_per_participant(LOdates, LOprotocol, participant_list)
     
-
+error_average = err.total_error(error_study)
 #error_averages = thresh.optimize_LO_times(sleep_study, LOprotocol)
 
 #ws = 10
