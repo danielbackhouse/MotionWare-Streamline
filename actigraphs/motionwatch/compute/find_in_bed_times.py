@@ -186,7 +186,7 @@ def __find_start_index(dateTimes):
     :raises: raises an exception if there was no 12pm hour found
     :return: returns the first 12pm time
     :rtype: (int)
-    """    
+    """   
     for index in range(0,len(dateTimes)):
         if(dateTimes[index].hour == 12):
             return index
@@ -357,9 +357,9 @@ def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
     """
     zeroStirringCount = 0;
     got_up_index = index 
-    while index < sleep_range:
-        if lux[index] != 0 and activity[index] >= sleepRangeMean:
-            zeroStirringCount = zeroStirringCount + 1
+    while index < sleep_range and index < len(activity): # added less than end of len activity                                                      
+        if lux[index] != 0 and activity[index] >= sleepRangeMean: # so that if the last indice
+            zeroStirringCount = zeroStirringCount + 1   # happens to be late we account for that
             if zeroStirringCount == 1:
                 got_up_index = index               
         else:
