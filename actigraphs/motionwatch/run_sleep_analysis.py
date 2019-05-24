@@ -38,6 +38,9 @@ for i in range(0, len(LOdates)):
     LOprotocolDic[participant_list[i]] = LOprotocol[i]
     
 
-error_per_day = err.get_error_study(LOdates, LOprotocol, participant_list)
-error_per_participant = err.get_overall_error(LOdates, LOprotocol, participant_list)
-err.plot_study_error(error_per_participant, participant_list)
+error_per_participant = err.get_error_per_participant(LOdates, LOprotocol, participant_list)
+error_study, useful_participants = err.get_error_study(
+        LOdates, LOprotocol, participant_list)
+err.plot_study_error(error_per_participant, useful_participants)
+
+std_per_participant = err.get_std_per_participant(LOdates, LOprotocol, participant_list)

@@ -136,10 +136,10 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
     # window size has tob e plus 2 so that the got up guess does not exceed the index limit
+    #TODO fix this ting
     if(dateTimes[days_indices[-1]] + datetime.timedelta(hours = window_size + 2) > dateTimes[-1]):
         print('dont add entry')
     if(days_indices[-1] + 24*60 >= len(dateTimes)):
-        print('add last datetime')
         start = days_indices[-1]
         end = len(dateTimes) - 1
         last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
@@ -149,7 +149,6 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
         end = start + 24*60
         last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
         sleep_window_indices.append(start + last_index)
-        print('add 12pm entry')
         
     return sleep_window_indices
     
