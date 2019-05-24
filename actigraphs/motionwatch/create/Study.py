@@ -57,7 +57,7 @@ class Study:
         self.lux = lux
         self.participant_list = participants
 
-    def get_in_bed_times(self):
+    def get_in_bed_times(self, window_size, dm):
         """Gets the in bed times for when not using sleep diaries
         
         :param: None
@@ -65,8 +65,7 @@ class Study:
         and lights out dates
         :rtype: (list<numpy.datetime64>) (list<numpy.datetime64.time>)
         """
-        print('\n Finding got up and lights out time using no sleep diary...')
-        window_size = 8
+        print('\nFinding got up and lights out times...')
         index = 0
         LOdatetimeList = list()
         GUdatetimeList = list()
@@ -76,7 +75,7 @@ class Study:
             print(self.participant_list[i])
             datetime_arr = self.__convert_date_time(self.dates[i], self.times[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
-                    datetime_arr, self.activity[i], self.lux[i], window_size)
+                    datetime_arr, self.activity[i], self.lux[i], window_size, dm)
             LOdatetimeList.append(LOdatetime)
             GUdatetimeList.append(GUdatetime)
             SleepInfoList.append(SleepInfo)

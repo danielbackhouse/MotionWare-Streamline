@@ -7,7 +7,7 @@ import numpy as np
 import datetime
 
 #TODO: Modify docstring to once sleep analysis is completed
-def find_in_bed_time(dateTimes, activity, lux, window_size):
+def find_in_bed_time(dateTimes, activity, lux, window_size, dm):
     """ Finds the got up and lights out times of a participant
     
     ****NOTE: This module and corresponding program has ONLY been validated
@@ -90,7 +90,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size):
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
         lights_out_index = __find_lights_out_index(sleep_range_backward, activity,
-                                                 lux, sleep_range_forward )    
+                                                 lux, sleep_range_forward, dm )    
         lights_out_indices.append(lights_out_index)
         
         start = index
@@ -278,7 +278,7 @@ def __count_zeros_in_array(arr):
             
     return zero_counter
 
-def __find_lights_out_index(index, activity, lux, sleepRange):
+def __find_lights_out_index(index, activity, lux, sleepRange, dm):
     """ Finds the lights out time of the participant given activity sleep range
     and lux sleep range
     
@@ -326,7 +326,7 @@ def __find_lights_out_index(index, activity, lux, sleepRange):
                 sleepLightCheck = False
                 darkMotion = 0
                 
-            if darkMotion >= 10:  
+            if darkMotion >= dm:  
                 return lights_out_index
                   
             if zeroLightActiveCount >= 5:
