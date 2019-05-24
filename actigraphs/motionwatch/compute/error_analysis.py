@@ -65,20 +65,18 @@ def get_error_study(LOdates, LOprotocol, participant_list):
         protocol_part = LOprotocol[i]
         participant_error = __sum_errors(program_part, protocol_part)
         if(participant_error != 0):
-            error_dic[participant_list[i]] = participant_error
+            error_dic[participant_list[i]] = participant_error[0]
             rel_participants.append(participant_list[i])
         
     return error_dic, rel_participants
 
 def __sum_errors(program_part, protocol_part):
-    """ Gets the absoulate error in the lights out or got up times
-    of the participant for each day summed.
+    """ Sums the errors between two arrays
     
     :param (array) program_part: the program determined times of the participant
     :param (array) protocol_part: the protocol determined times of the participant
-    :return: An array containing the relative errors. If the error is greater
-    than 12 hours it ignores this and returns an empty list
-    :rtype: (arr)
+    :return: The absoualte value of the sum of the errors in minutes
+    :rtype: (int)
     """
     participant_error = 0
     index = 0
@@ -124,8 +122,9 @@ def plot_study_error(error_dic, participant_list):
     plt.plot(participant_list, errors,  'ro')   
     plt.ylabel('Absolute Error per Day')
     plt.xlabel('Participant ID')
-    plt.title('Average Absoulate Error Per Participant')
+    plt.title('Average Absolute Error Per Participant')
     plt.rc('xtick', labelsize = 2)
+    plt.ylim([0, 300])
 
 def plot_participant_error(error_arr, participant_id):
     """ Plots the error of a single participant given an array and the participant ID 
@@ -139,4 +138,14 @@ def plot_participant_error(error_arr, participant_id):
     plt.xlabel('Day # in Study')
     plt.title(participant_id)
     
+def total_error(error_study):
+    """ Sums all the average errors for each participant and returns one overall
+    error value per participant
     
+    :param (dic) error_study: an dictioantry where the values are floats
+    :return: The error per participant in a study
+    :rtype: float
+    """
+    error = list(error_study.values())
+    average_error  = sum(error)/len(error)
+    return average_error
