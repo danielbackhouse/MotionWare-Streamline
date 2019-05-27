@@ -66,13 +66,11 @@ class Study:
         and lights out dates
         :rtype: (list<numpy.datetime64>) (list<numpy.datetime64.time>)
         """
-        print('\nFinding got up and lights out times...')
         index = 0
         LOdatetimeList = list()
         GUdatetimeList = list()
         SleepInfoList = list()
         for i in range(0, len(self.participant_list)):
-            print(self.participant_list[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
                     dm, zmc, zac, zlc, ta)
