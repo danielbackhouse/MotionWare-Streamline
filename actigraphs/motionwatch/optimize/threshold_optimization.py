@@ -38,24 +38,27 @@ def optimize_LO_times(sleep_study, LOprotocol):
     
     return error_averages, std_study
 
-def gradient_descent(X, max_iterations, learning_rate):
+def gradient_descent(X, max_iterations, learning_rate, study, protocol):
     error = function(X, study, protocol)
     
     for i in range(0, max_iterations):
-        error = error + learning_rage*gradient(X)
+        print('Iteration number:')
+        print(i)
+        error = error - learning_rate*gradient(X, learning_rate, study, protocol)
         
-        
+    return error, X
 
-def gradient(X, learning_rate):
-    Xahead = X*learning_rate
+def gradient(X, learning_rate, study, protocol):
+    Xahead = X+learning_rate
+    deltaX = Xahead - X
     Yahead = function(X, study, protocol)
-    Ybehind = function(X, study, protocol)
-    partial_deriavtives = (Yahead - Ybehind)/2*X  #X will be made into a vector containing the weights
+    Y = function(X, study, protocol)
+    partial_derivatives = (Yahead - Y)/deltaX  #X will be made into a vector containing the weights
     
     return partial_derivatives
     
 def function(X, study, protocol):
-        LO, GU, SI, Pl = study.get_in_bed_times(X)
-        error_study, useful_participants = err.get_error_study(LO, protocol, pl)
-        Y = err.total_error(error_study)
+    LO, GU, SI, PL = study.get_in_bed_times(X)
+    error_study, useful_participants = err.get_error_study(LO, protocol, PL)
+    Y = err.total_error(error_study)
     return Y
