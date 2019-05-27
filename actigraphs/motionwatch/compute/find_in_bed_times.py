@@ -7,7 +7,7 @@ import numpy as np
 import datetime
 
 #TODO: Modify docstring to once sleep analysis is completed
-def find_in_bed_time(dateTimes, activity, lux, window_size, dm):
+def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, ta):
     """ Finds the got up and lights out times of a participant
     
     ****NOTE: This module and corresponding program has ONLY been validated
@@ -90,7 +90,8 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm):
         sleep_range_backward = index - 2*60
         sleep_range_forward = index + 3*60 
         lights_out_index = __find_lights_out_index(sleep_range_backward, activity,
-                                                 lux, sleep_range_forward, dm )    
+                                                 lux, sleep_range_forward,
+                                                 dm, zmc, zac, zlc, ta )    
         lights_out_indices.append(lights_out_index)
         
         start = index
@@ -127,7 +128,6 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
     days_of_recorded_activity = int(len(activity)/1440)
     start_index = __find_start_index(dateTimes)
     days_indices = __get_day_indices(start_index, days_of_recorded_activity)
-    
     sleep_window_indices = list()
     for i in range(0, len(days_indices)-1):
         start = days_indices[i]
@@ -173,9 +173,9 @@ def __find_sleep_window(activity, lux, size):
         activity_list.append(activity[index:index+sleepRange])
         index_list.append(index)
         index = index + one_hour_epoch
-        
+    
     sortedIndex = __sort_lists(light_list, activity_list, index_list)
-    sleep_index  = sortedIndex[len(sortedIndex)-1]   
+    sleep_index  = sortedIndex[-1]   
     return  sleep_index
      
 def __find_start_index(dateTimes):
@@ -278,7 +278,7 @@ def __count_zeros_in_array(arr):
             
     return zero_counter
 
-def __find_lights_out_index(index, activity, lux, sleepRange, dm):
+def __find_lights_out_index(index, activity, lux, sleepRange, dm, zmc, zac, zlc, ta):
     """ Finds the lights out time of the participant given activity sleep range
     and lux sleep range
     
@@ -288,7 +288,6 @@ def __find_lights_out_index(index, activity, lux, sleepRange, dm):
     :param (int) sleepRange: the size of the sleep range (window_size)
     :return: the index corresponding to the moment the participant went to sleep
     """
-    meanActivity = 20
     zeroMovementCount = 0;
     zeroLightCount = 0;
     zeroLightActiveCount = 0;
@@ -315,7 +314,7 @@ def __find_lights_out_index(index, activity, lux, sleepRange, dm):
             if lux[index] == 0:
                 zeroLightCount = zeroLightCount + 1
                       
-                if activity[index] <= meanActivity:
+                if activity[index] <= ta:
                     darkMotion = darkMotion + 1;            
                 
                 if sleepLightCheck == False:
@@ -326,17 +325,18 @@ def __find_lights_out_index(index, activity, lux, sleepRange, dm):
                 sleepLightCheck = False
                 darkMotion = 0
                 
-            if darkMotion >= dm:  
+            if darkMotion >= dm:
                 return lights_out_index
                   
-            if zeroLightActiveCount >= 5:
+            if zeroLightActiveCount >= zac:
                 return lights_out_index
                     
-            if zeroMovementCount >= 45:
+            if zeroMovementCount >= zmc:
                 return lights_out_index
                   
-            if zeroLightCount >= 15:
+            if zeroLightCount >= zlc:
                 return lights_out_index
+            
             
             index = index + 1
                       

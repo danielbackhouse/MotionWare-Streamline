@@ -9,7 +9,6 @@ import sys
 import pandas as pd
 import compute.find_in_bed_times as find_in_bed_times
 import compute.raw_data_editor as raw_data_editor
-
 class Study:
     
     def __init__(self, raw_data_directory, skiprows_rawdata, study_name, 
@@ -56,8 +55,10 @@ class Study:
         self.activity = activity
         self.lux = lux
         self.participant_list = participants
-
-    def get_in_bed_times(self, window_size, dm):
+        print('\n Converting date and times...')
+        self.datetime_arr = self.__convert_date_time()
+    
+    def get_in_bed_times(self, window_size, dm, zmc, zac, zlc, ta):
         """Gets the in bed times for when not using sleep diaries
         
         :param: None
@@ -70,33 +71,38 @@ class Study:
         LOdatetimeList = list()
         GUdatetimeList = list()
         SleepInfoList = list()
-        
         for i in range(0, len(self.participant_list)):
             print(self.participant_list[i])
-            datetime_arr = self.__convert_date_time(self.dates[i], self.times[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
-                    datetime_arr, self.activity[i], self.lux[i], window_size, dm)
+                    self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
+                    dm, zmc, zac, zlc, ta)
             LOdatetimeList.append(LOdatetime)
             GUdatetimeList.append(GUdatetime)
             SleepInfoList.append(SleepInfo)
             #TODO fix day analysis here
             #DayDataAnalysis.findDayInfo(participants[i],LOindex, GUindex, activity[i], dates[i], times[i])
-        
             index = index + 1
     
         return LOdatetimeList, GUdatetimeList, SleepInfoList, self.participant_list
     
     #TODO: Write out docstring
-    def __convert_date_time(self, dates, times):
+    def __convert_date_time(self):
         """ Converts date and time arrays (stored as strings) and combines them 
         both to form one datetime array
         """
-        datetime_arr = []
-        for i  in range(0, len(dates)):
-            datetimeString = dates[i] + ' ' + times[i]
-            datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
+        datetime_study = []
+        for j in range(0, len(self.participant_list)):
+            datetime_arr = []
+            dates_participant = self.dates[j]
+            times_participant = self.times[j]
+            print(self.participant_list[j])
+            for i  in range(0, len(dates_participant)):
+                datetimeString = dates_participant[i]+ ' ' + times_participant[i]
+                datetime_arr.append(datetime.datetime.strptime(datetimeString, '%Y-%m-%d %I:%M:%S %p'))
+
+            datetime_study.append(datetime_arr)
             
-        return datetime_arr
+        return datetime_study
     
     def __get_study_dates(self, sd_directory):
         """ Read the sleep diary file and gets the 

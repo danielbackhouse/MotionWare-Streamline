@@ -149,3 +149,21 @@ def total_error(error_study):
     error = list(error_study.values())
     average_error  = sum(error)/len(error)
     return average_error
+
+def entries_over_fifteen(error_per_participant):
+    """ Count the number of entries in each participant where the error
+    is over 15
+    
+    :param 
+    """
+    count_per_participant = []
+    for participant in list(error_per_participant.values()):
+        fifteen_count = 0
+        for error in participant:
+            if error >= 30:
+                fifteen_count = fifteen_count + 1
+        count_per_participant.append(fifteen_count)    
+        
+    return sum(count_per_participant)
+
+    
