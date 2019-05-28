@@ -30,4 +30,5 @@ protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)
 LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
 
-error_averages, std_study = thresh.optimize_LO_times(sleep_study, LOprotocol)
+#error_averages, std_study = thresh.optimize_LO_times(sleep_study, LOprotocol)
+ws, dm, zmc, zac, zlc, ta, error_averages, std_study = thresh.gradient_descent(sleep_study, LOprotocol)

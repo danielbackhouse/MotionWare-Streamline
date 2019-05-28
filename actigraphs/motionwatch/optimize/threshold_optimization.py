@@ -37,27 +37,88 @@ def optimize_LO_times(sleep_study, LOprotocol):
         ws = ws - 1
     
     return error_averages, std_study
-
-def gradient_descent(X, max_iterations, learning_rate, study, protocol):
-    error = function(X, study, protocol)
+def gradient_descent(study, protocol):
+    interval = 1
+    learning_rate = .2
+    ws = 5
+    dm = 5
+    zmc  = 6
+    zac = 4
+    zlc = 4
+    ta = 4
+    totalGrad = 2
+    iteration = 1
     
-    for i in range(0, max_iterations):
-        print('Iteration number:')
-        print(i)
-
+    error_averages = []
+    std_study = []
+    while iteration < 1000 and totalGrad > 1:
+        print(iteration)
+        ws = int(ws)
+        dm = int(dm)
+        zmc = int(zmc)
+        zac = int(zac)
+        zlc = int(zlc)
+        ta = int(ta)
         
-    return error, X
+        LOdates, GUdates, SleepAnalysisInfo, participant_list = study.get_in_bed_times(
+                    ws,dm,zmc, zac, zlc, ta)
+        error_study, useful_participants = err.get_error_study(LOdates, protocol, 
+                                                               participant_list)
+        error_averages.append(err.total_error(error_study))
+        std_study.append(np.std(list(error_study.values()), ddof = 1))
+        
+        start = time.time()
 
-def gradient(X, learning_rate, study, protocol):
-    Xahead = X+learning_rate    deltaX = Xahead - X
-    Yahead = function(X, study, protocol)
-    Y = function(X, study, protocol)
-    partial_derivatives = (Yahead - Y)/deltaX  #X will be made into a vector containing the weights
+        WSahead = function(ws+interval, dm, zmc, zac, zlc, ta, study, protocol)
+        WSbehind =  function(ws-interval, dm, zmc, zac, zlc, ta, study, protocol)
+        WSMove = (WSahead-WSbehind)/(interval*2)
+        
+        DMahead = function(ws, dm+interval, zmc, zac, zlc, ta, study, protocol)
+        DMbehind =  function(ws, dm-interval, zmc, zac, zlc, ta, study, protocol)
+        DMMove = (DMahead-DMbehind)/(interval*2)
+        
+        ZMCahead = function(ws, dm, zmc+interval, zac, zlc, ta, study, protocol)
+        ZMCbehind =  function(ws, dm, zmc-interval, zac, zlc, ta, study, protocol)
+        ZMCMove = (ZMCahead-ZMCbehind)/(interval*2)
+        
+        ZACahead = function(ws, dm, zmc, zac+interval, zlc, ta, study, protocol)
+        ZACbehind =  function(ws, dm, zmc, zac, zlc-interval, ta, study, protocol)
+        ZACMove = (ZACahead-ZACbehind)/(interval*2)
+        
+        ZLCahead = function(ws, dm, zmc, zac, zlc+interval, ta, study, protocol)
+        ZLCbehind =  function(ws, dm, zmc, zac, zlc-interval, ta, study, protocol)
+        ZLCMove = (ZLCahead-ZLCbehind)/(interval*2)
+        
+        TAahead = function(ws, dm, zmc, zac, zlc, ta+interval, study, protocol)
+        TAbehind =  function(ws, dm, zmc, zac, zlc, ta-interval, study, protocol)
+        TAMove = (TAahead-TAbehind)/(interval*2)
+        
+        ws -= WSMove*learning_rate
+        dm -= DMMove*learning_rate
+        zmc -= ZMCMove*learning_rate
+        zac -= ZACMove*learning_rate
+        zlc -= ZLCMove*learning_rate
+        ta -= TAMove*learning_rate
+        
+        totalGrad = (WSMove*learning_rate)**2 + (DMMove*learning_rate)**2 + (ZMCMove*learning_rate)**2 + (ZACMove*learning_rate)**2 + (ZLCMove*learning_rate)**2 + (TAMove*learning_rate)**2
+        
+        totalGrad = totalGrad**(1/2)
+        end = time.time()
+        print('Time elapsed')
+        print(end-start)
+        print(totalGrad)
+        print(ws, dm, zmc, zac, zlc, ta, error_averages, std_study)
+        print('')
+        iteration += 1
     
-    return partial_derivatives
+    return ws, dm, zmc, zac, zlc, ta, error_averages, std_study
+        
+        
     
-def function(X, study, protocol):
-    LO, GU, SI, PL = study.get_in_bed_times(X)
+def function(ws, dm, zmc, zac, zlc, ta, study, protocol):
+    LOdates, GUdates, SleepAnalysisInfo, participant_list = study.get_in_bed_times(
+                    ws,dm,zmc, zac, zlc, ta)
+    LO, GU, SI, PL = study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
     error_study, useful_participants = err.get_error_study(LO, protocol, PL)
     Y = err.total_error(error_study)
     return Y
