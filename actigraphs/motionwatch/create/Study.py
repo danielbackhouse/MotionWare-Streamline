@@ -3,6 +3,7 @@
     Author: Daniel Backhouse and Alan Yan
 """
 # Import extension libraries
+import time
 import datetime
 import os
 import sys
@@ -10,7 +11,7 @@ import pandas as pd
 import compute.find_in_bed_times as find_in_bed_times
 import compute.raw_data_editor as raw_data_editor
 class Study:
-    
+
     def __init__(self, raw_data_directory, skiprows_rawdata, study_name, 
                  assesment, trim_type, sd_directory):
         
@@ -71,6 +72,7 @@ class Study:
         GUdatetimeList = list()
         SleepInfoList = list()
         for i in range(0, len(self.participant_list)):
+            print(self.participant_list[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
                     dm, zmc, zac, zlc, ta)

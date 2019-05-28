@@ -5,6 +5,7 @@
 
 import numpy as np
 import datetime
+import time 
 
 #TODO: Modify docstring to once sleep analysis is completed
 def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, ta):
@@ -79,7 +80,12 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
     :raises: Exception (no 12pm in array)
     """
     #TODO: Bug in __get_sleep_window indicies (BT 002 Final)
-    sleep_window_indices = __get_sleep_window_indices(activity,lux,dateTimes,window_size)
+    start = time.time()
+    weights = get_weight_matrix(activity)
+    sleep_window_indices = __get_sleep_window_indices(activity,lux,dateTimes,
+                                                      window_size, weights)
+    print('per sleep window index time')
+    print(time.time() - start)
     lights_out_indices = list()
     got_up_indices = list()
     lights_out_dateTimes = list()
@@ -113,7 +119,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
         
     return lights_out_dateTimes, got_up_dateTimes, sleep_analysis_list
 
-def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
+def __get_sleep_window_indices(activity, lux, dateTimes, window_size, weights):
     """ Gets the sleep window indices ( the sleep ranges of window_size)
     
     :param (array) dateTime: the dates and times over which activity and light 
@@ -132,7 +138,8 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
     for i in range(0, len(days_indices)-1):
         start = days_indices[i]
         end = days_indices[i+1]        
-        sleep_window_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
+        sleep_window_index = __find_sleep_window(activity[start:end], lux[start:end],
+                                                 window_size, weights[start:end])
         sleep_index = start + sleep_window_index
         sleep_window_indices.append(sleep_index)
     # window size has tob e plus 2 so that the got up guess does not exceed the index limit
@@ -147,12 +154,13 @@ def __get_sleep_window_indices(activity, lux, dateTimes, window_size):
     else:
         start = days_indices[-1]
         end = start + 24*60
-        last_index = __find_sleep_window(activity[start:end], lux[start:end], window_size)
+        last_index = __find_sleep_window(activity[start:end], lux[start:end], 
+                                         window_size, weights[start:end])
         sleep_window_indices.append(start + last_index)
         
     return sleep_window_indices
     
-def __find_sleep_window(activity, lux, size):
+def __find_sleep_window(activity, lux, size, weights):
     """ Finds and returns all windows of given size within the date, time, acitivty
     and lux data given
     
@@ -164,17 +172,22 @@ def __find_sleep_window(activity, lux, size):
     one_hour_epoch = 60
     sleepRange = size*60
     
-    activity_list = list()
+    #activity_list = list()
     light_list = list()
     index_list = list()
     index = 0
+    weight_list = []
     while (index + sleepRange) <= len(activity):
         light_list.append(lux[index:index+sleepRange])
-        activity_list.append(activity[index:index+sleepRange])
+        #activity_list.append(activity[index:index+sleepRange])
+        weight_list.append(weights[index:index+sleepRange])
         index_list.append(index)
         index = index + one_hour_epoch
-    
-    sortedIndex = __sort_lists(light_list, activity_list, index_list)
+    start = time.time()
+    #sortedIndex = __sort_lists(light_list, activity_list, index_list)
+    sortedIndex = __sort_weights(weight_list, light_list, index_list )
+    print('sort index time:')
+    print(time.time() - start)
     sleep_index  = sortedIndex[-1]   
     return  sleep_index
      
@@ -224,14 +237,17 @@ def __sort_lists(lightList, activityList, indexRangeList):
     lightWeight = 1
     activityWeight = 1
     weightedSleepPeriods = list()
+    start = time.time()
     for i in range(0 , len(activityList)):
         activityVal =  __count_below_threshold_in_array(activityList[i], activityThreshold)
         lightVal = __count_zeros_in_array(lightList[i])
         val = activityVal*activityWeight + lightWeight*lightVal
         weightedSleepPeriods.append(val)
     
-    sortedIndexRange = __bubbleSort(weightedSleepPeriods, indexRangeList)
+    print('getting weight time:')
+    print(time.time() - start)
     
+    sortedIndexRange = __bubbleSort(weightedSleepPeriods, indexRangeList)
     return sortedIndexRange
 
 def __bubbleSort(arr, arr2): 
@@ -370,3 +386,30 @@ def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
         index = index + 1
                        
     return got_up_index
+
+#TODO: add docstring
+def get_weight_matrix(activity):
+    """
+    """
+    activityThreshold = 20
+    weights = []
+    for act in  activity:
+        if(act < activityThreshold):
+            weights.append(0)
+        else:
+            weights.append(act)
+    return weights
+
+def __sort_weights(weight_list, light_list, indexRangeList):
+    lightWeight = 1
+    activityWeight = 1
+    weightedSleepPeriods = list()
+    for i in range(0 , len(light_list)):
+        activityVal =  np.count_nonzero(weight_list[i]==0)
+        lightVal = np.count_nonzero(light_list[i]==0)
+        val = activityVal*activityWeight + lightWeight*lightVal
+        weightedSleepPeriods.append(val)
+    
+    sortedIndexRange = __bubbleSort(weightedSleepPeriods, indexRangeList)
+    return sortedIndexRange
+    

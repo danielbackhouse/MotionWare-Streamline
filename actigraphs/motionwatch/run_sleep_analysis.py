@@ -26,8 +26,15 @@ trim_type = 2
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
                           assesment, trim_type, sleep_diary_directory)
 
-protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
-                                    study_name, assesment)
-LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
+ws = 6
+dm = 5
+zmc = 5
+zac = 30
+zlc = 30
+ta = 20
+LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
 
-error_averages, std_study = thresh.optimize_LO_times(sleep_study, LOprotocol)
+#protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
+#                                    study_name, assesment)
+#LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
+
