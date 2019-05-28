@@ -5,7 +5,7 @@
 
 import numpy as np
 import datetime
-
+import time
 #TODO: Modify docstring to once sleep analysis is completed
 def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, ta):
     """ Finds the got up and lights out times of a participant
@@ -162,8 +162,7 @@ def __find_sleep_window(activity, lux, size):
     sleep window within the given set of 24 hour activity data
     """
     one_hour_epoch = 60
-    sleepRange = size*60
-    
+    sleepRange = size*60  
     activity_list = list()
     light_list = list()
     index_list = list()
@@ -174,8 +173,16 @@ def __find_sleep_window(activity, lux, size):
         index_list.append(index)
         index = index + one_hour_epoch
     
-    sortedIndex = __sort_lists(light_list, activity_list, index_list)
-    sleep_index  = sortedIndex[-1]   
+    activityThreshold = 20
+    lightWeight = 1
+    activityWeight = 1
+    weightedSleepPeriods = list()
+    for i in range(0 , len(activity_list)):
+        activityVal =  __count_below_threshold_in_array(activity_list[i], activityThreshold)
+        lightVal = __count_zeros_in_array(light_list[i])
+        val = activityVal*activityWeight + lightWeight*lightVal
+        weightedSleepPeriods.append(val)
+    sleep_index  = max(range(len(weightedSleepPeriods)), key=weightedSleepPeriods.__getitem__)
     return  sleep_index
      
 def __find_start_index(dateTimes):
@@ -208,47 +215,6 @@ def __get_day_indices(start_index, worn_days):
         index = index + day
     
     return start_day_indices
-    
-def __sort_lists(lightList, activityList, indexRangeList):
-    """ Creates a list of weighted sums of the zero activity counts and zero 
-    light counts for each sleep range and sorts them from small to largest
-    
-    :param (list) lightList: takes a list of sleep windows with lux data
-    :param(list) activityList: takes a list of sleep windows with activity data
-    :param(list) indexRangelist: takes a list of the indices corresponding to
-    the activity and light data points
-    :return: A list of sleep window start indicies sorted from smallest to largest
-    zero light count and zero acitivty count weighted sum
-    """
-    activityThreshold = 20
-    lightWeight = 1
-    activityWeight = 1
-    weightedSleepPeriods = list()
-    for i in range(0 , len(activityList)):
-        activityVal =  __count_below_threshold_in_array(activityList[i], activityThreshold)
-        lightVal = __count_zeros_in_array(lightList[i])
-        val = activityVal*activityWeight + lightWeight*lightVal
-        weightedSleepPeriods.append(val)
-    
-    sortedIndexRange = __bubbleSort(weightedSleepPeriods, indexRangeList)
-    
-    return sortedIndexRange
-
-def __bubbleSort(arr, arr2): 
-    """ Bubble sorts array1 and moves the elements in arr2 in the same manner 
-    as array1 indpenedent of the size the elements within it
-    
-    :param (array<int>) arr: an array of integers
-    :param (array<int>) arr2: an array of any data type
-    :return: returns array 2 sorted using array 1
-    """
-    n = len(arr) 
-    for i in range(n): 
-        for j in range(0, n-i-1): 
-            if arr[j] > arr[j+1] : 
-                arr[j], arr[j+1] = arr[j+1], arr[j]
-                arr2[j], arr2[j+1] = arr2[j+1], arr2[j]
-    return arr2
 
 def __count_below_threshold_in_array(arr, threshold):
     """ Counts the number of elements in array below threshold
