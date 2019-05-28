@@ -3,61 +3,50 @@
 # Author: Daniel Backhouse and Alan Yan
 
 import compute.error_analysis as err
+import numpy as np
 import time
-import numpy as np 
 
 def optimize_LO_times(sleep_study, LOprotocol):
-    ws = 10
-    dm = 30
-    zmc = 45
-    zac = 5
-    zlc = 30
+    ws = 6
     ta = 20
-    
     error_averages = []
     std_study = []
-    while ws > 3:
-        print('count')
-        print(ws)
-        while dm > 3:
-            print('Optimizing... (kinda)')
-            start = time.time()
-            LOdates, GUdates, SleepAnalysisInfo, participant_list = sleep_study.get_in_bed_times(
-                    ws,dm,zmc, zac, zlc, ta)
-            error_study, useful_participants = err.get_error_study(LOdates, LOprotocol, 
-                                                                   participant_list)
-            error_averages.append(err.total_error(error_study))
-            std_study.append(np.std(list(error_study.values()), ddof = 1))
-            dm = dm - 1
-            end = time.time()
-            print('Time elapsed')
-            print(start-end)
-            print(dm)
-        dm = 30
-        ws = ws - 1
-    
-    return error_averages, std_study
-
-def gradient_descent(X, max_iterations, learning_rate, study, protocol):
-    error = function(X, study, protocol)
-    
-    for i in range(0, max_iterations):
-        print('Iteration number:')
-        print(i)
-
-        
-    return error, X
-
-def gradient(X, learning_rate, study, protocol):
-    Xahead = X+learning_rate    deltaX = Xahead - X
-    Yahead = function(X, study, protocol)
-    Y = function(X, study, protocol)
-    partial_derivatives = (Yahead - Y)/deltaX  #X will be made into a vector containing the weights
-    
-    return partial_derivatives
-    
-def function(X, study, protocol):
-    LO, GU, SI, PL = study.get_in_bed_times(X)
-    error_study, useful_participants = err.get_error_study(LO, protocol, PL)
-    Y = err.total_error(error_study)
-    return Y
+    count = []
+    indices = []
+    errors = []
+    print('Begining calculation....')
+    index = 0
+    begin = time.time()
+    for dm in range(3, 10):
+        for zac in range(3,10):
+            for zlc in range(10,45):
+                for zmc in range(10,45):
+                    try:
+                        start = time.time()
+                        LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
+                        error_study, UP = err.get_error_study(LO,LOprotocol,PL)
+                        error_per_participant = err.get_error_per_participant(LO, LOprotocol, PL)
+                        
+                        count.append(err.entries_over_fifteen(error_per_participant))
+                        error_averages.append(err.total_error(error_study))
+                        std_study.append(np.std(list(error_study.values()), ddof = 1))
+                        indices.append([dm, zac, zlc, zmc])
+                        print('[dm zac zlc zmc]')
+                        print([dm, zac, zlc, zmc])
+                        print('Iteration number:')
+                        print(index)
+                        print('Time of iteration:')
+                        print(time.time() - start)
+                        print('Total program runtime:')
+                        print(time.time() - begin)
+                        index += 1
+                    except:
+                        print('Error with calculation:')
+                        print([dm, zac, zlc, zmc])
+                        errors.append([dm, zac, zlc, zmc])
+                        count.append(None)
+                        error_averages.append(None)
+                        std_study.append(None)
+                        indices.append([dm, zac, zlc, zmc])
+                    
+    return error_averages, std_study, count, indices
