@@ -44,13 +44,12 @@ def gradient_descent(X, max_iterations, learning_rate, study, protocol):
     for i in range(0, max_iterations):
         print('Iteration number:')
         print(i)
-        error = error - learning_rate*gradient(X, learning_rate, study, protocol)
+
         
     return error, X
 
 def gradient(X, learning_rate, study, protocol):
-    Xahead = X+learning_rate
-    deltaX = Xahead - X
+    Xahead = X+learning_rate    deltaX = Xahead - X
     Yahead = function(X, study, protocol)
     Y = function(X, study, protocol)
     partial_derivatives = (Yahead - Y)/deltaX  #X will be made into a vector containing the weights
