@@ -11,7 +11,6 @@
 """
 import create.Study as study
 import create.ProtocolSleepAnalysis as ps
-import compute.error_analysis as err
 import optimize.threshold_optimization as thresh
     
 
@@ -30,4 +29,5 @@ protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)
 LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
 
-error_averages, std_study = thresh.optimize_LO_times(sleep_study, LOprotocol)
+error_averages, std_study, count, indices = thresh.optimize_LO_times(sleep_study, LOprotocol)
+
