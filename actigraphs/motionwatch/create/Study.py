@@ -70,6 +70,7 @@ class Study:
         LOdatetimeList = list()
         GUdatetimeList = list()
         SleepInfoList = list()
+        LOdic = {}
         for i in range(0, len(self.participant_list)):
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
@@ -80,8 +81,9 @@ class Study:
             #TODO fix day analysis here
             #DayDataAnalysis.findDayInfo(participants[i],LOindex, GUindex, activity[i], dates[i], times[i])
             index = index + 1
+            LOdic[self.participant_list[i]] = LOdatetime
     
-        return LOdatetimeList, GUdatetimeList, SleepInfoList, self.participant_list
+        return LOdatetimeList, GUdatetimeList, SleepInfoList, self.participant_list, LOdic
     
     #TODO: Write out docstring
     def __convert_date_time(self):
