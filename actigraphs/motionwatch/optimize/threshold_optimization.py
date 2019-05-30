@@ -17,10 +17,10 @@ def optimize_LO_times(sleep_study, LOprotocol):
     print('Begining calculation....')
     index = 0
     begin = time.time()
-    for dm in range(3, 10):
-        for zac in range(3,10):
-            for zlc in range(10,45):
-                for zmc in range(10,45):
+    for dm in range(4, 30):
+        for zac in range(25,26):
+            for zlc in range(45,46):
+                for zmc in range(45,46):
                     try:
                         start = time.time()
                         LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
@@ -49,4 +49,4 @@ def optimize_LO_times(sleep_study, LOprotocol):
                         std_study.append(None)
                         indices.append([dm, zac, zlc, zmc])
                     
-    return error_averages, std_study, count, indices
+    return error_averages, std_study, count, indices, errors

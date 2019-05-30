@@ -31,16 +31,17 @@ class ProtocolSleepAnalysis:
         print('\n Getting study analysis sleep times...')
         lights_out_analysis_study_times = list()
         got_up_analysis_study_times = list()
-        
+        LOdic = {}
         for participant_id in self.participant_list:
             lightsOutTimes, gotUpTimes = self.get_participant_sleep_analysis_times(
                     self.sleep_analysis_directory, participant_id)
             
             lights_out_analysis_study_times.append(lightsOutTimes)
             got_up_analysis_study_times.append(gotUpTimes)
+            LOdic[participant_id] = lightsOutTimes
             
             
-        return lights_out_analysis_study_times, got_up_analysis_study_times
+        return lights_out_analysis_study_times, got_up_analysis_study_times, LOdic
 
     
     def get_participant_sleep_analysis_times(self, sleepAnalysisDirectory, participant_id):
