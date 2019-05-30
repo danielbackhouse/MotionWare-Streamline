@@ -87,7 +87,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
     sleep_analysis_list = list()
     
     for index in sleep_window_indices:
-        sleep_range_backward = index - 2*60
+        sleep_range_backward = index - 3*60
         sleep_range_forward = index + 3*60 
         lights_out_index = __find_lights_out_index(sleep_range_backward, activity,
                                                  lux, sleep_range_forward,
@@ -326,15 +326,19 @@ def __find_lights_out_index(index, activity, lux, sleepRange, dm, zmc, zac, zlc,
                 darkMotion = 0
                 
             if darkMotion >= dm:
+                print('darkmation')
                 return lights_out_index
                   
             if zeroLightActiveCount >= zac:
+                print('zeroLightActiveCount')
                 return lights_out_index
                     
             if zeroMovementCount >= zmc:
+                print('zeroMovementCount')
                 return lights_out_index
                   
             if zeroLightCount >= zlc:
+                print('zerolightCount')
                 return lights_out_index
             
             

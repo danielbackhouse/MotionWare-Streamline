@@ -14,18 +14,18 @@ import create.ProtocolSleepAnalysis as ps
 import optimize.threshold_optimization as thresh
 import compute.error_analysis as err
 
-raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Final"
+raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
 sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
 skiprows_rawdata = 20
 study_name = "BT"
-assesment = "Final"
+assesment = "Baseline"
 trim_type = 2
 ws = 6
 dm = 12 
 zac = 25
-zmc = 45
-zlc = 45
+zmc = 180
+zlc = 180
 ta = 20 
 
 

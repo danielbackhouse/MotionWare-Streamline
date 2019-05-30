@@ -72,6 +72,7 @@ class Study:
         SleepInfoList = list()
         LOdic = {}
         for i in range(0, len(self.participant_list)):
+            print(self.participant_list[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
                     dm, zmc, zac, zlc, ta)
