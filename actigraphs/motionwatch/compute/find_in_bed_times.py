@@ -5,6 +5,7 @@
 
 import numpy as np
 import datetime
+import compute.sleep_analysis as sleep_analysis
 
 #TODO: Modify docstring to once sleep analysis is completed
 def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, ta):
@@ -104,10 +105,10 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
         got_up_indices.append(got_up_index)
         
         #TODO: Do something with the returned dictionary
-        #sleepAnalysisInfo = SleepDataAnalysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
-        #                   dateTimes[lights_out_index: got_up_index+1])
+        sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
+                           dateTimes[lights_out_index: got_up_index+1])
         
-        #sleep_analysis_list.append(sleepAnalysisInfo)
+        sleep_analysis_list.append(sleepAnalysisInfo)
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
         

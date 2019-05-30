@@ -38,8 +38,6 @@ protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)
 LOprotocol, GUprotocol, LOdicProtocol = protocol.get_study_analysis_sleep_times()
 
-#error_averages, std_study, count, indices, errors = thresh.optimize_LO_times(sleep_study, LOprotocol)
-
 LO, GU, SI, PL, LOdicProgram = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
 error_study_GU, RP = err.get_error_study(GU,GUprotocol,PL)
 error_per_participant_GU = err.get_error_per_participant(GU, GUprotocol, PL)
