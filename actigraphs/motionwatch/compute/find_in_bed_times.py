@@ -326,19 +326,15 @@ def __find_lights_out_index(index, activity, lux, sleepRange, dm, zmc, zac, zlc,
                 darkMotion = 0
                 
             if darkMotion >= dm:
-                print('darkmation')
                 return lights_out_index
                   
             if zeroLightActiveCount >= zac:
-                print('zeroLightActiveCount')
                 return lights_out_index
                     
             if zeroMovementCount >= zmc:
-                print('zeroMovementCount')
                 return lights_out_index
                   
             if zeroLightCount >= zlc:
-                print('zerolightCount')
                 return lights_out_index
             
             
