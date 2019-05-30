@@ -41,7 +41,12 @@ LOprotocol, GUprotocol, LOdicProtocol = protocol.get_study_analysis_sleep_times(
 #error_averages, std_study, count, indices, errors = thresh.optimize_LO_times(sleep_study, LOprotocol)
 
 LO, GU, SI, PL, LOdicProgram = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
-error_study, RP = err.get_error_study(LO,LOprotocol,PL)
-error_per_participant = err.get_error_per_participant(LO, LOprotocol, PL)
-count = err.entries_over_fifteen(error_per_participant)
-error = err.total_error(error_study)
+error_study_GU, RP = err.get_error_study(GU,GUprotocol,PL)
+error_per_participant_GU = err.get_error_per_participant(GU, GUprotocol, PL)
+count_GU = err.entries_over_fifteen(error_per_participant_GU)
+error_GU = err.total_error(error_study_GU)
+
+error_study_LO, RP = err.get_error_study(LO,LOprotocol,PL)
+error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
+count_LO = err.entries_over_fifteen(error_per_participant_LO)
+error_LO = err.total_error(error_study_LO)

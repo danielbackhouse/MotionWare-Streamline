@@ -97,8 +97,8 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
         start = index
         end = index + window_size*60
         sleepRangeMean = np.mean(activity[start:end])
-        awake_range_backward = index + 3*60
-        awake_range_forward = index + 9*60
+        awake_range_backward = index + 5*60
+        awake_range_forward = index + 12*60
         got_up_index = __find_got_up_index(awake_range_backward, activity, lux, 
                                          awake_range_forward, sleepRangeMean )
         got_up_indices.append(got_up_index)
