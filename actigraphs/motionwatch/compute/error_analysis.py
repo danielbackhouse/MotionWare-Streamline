@@ -128,7 +128,7 @@ def plot_study_error(error_dic, participant_list):
     plt.xlabel('Participant ID')
     plt.title('Average Absolute Error Per Participant')
     plt.rc('xtick', labelsize = 2)
-    plt.ylim([0, 300])
+    plt.ylim([0, 160])
 
 def plot_participant_error(error_arr, participant_id):
     """ Plots the error of a single participant given an array and the participant ID 

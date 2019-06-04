@@ -56,6 +56,11 @@ error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
 count_LO = err.entries_over_fifteen(error_per_participant_LO)
 error_LO = err.total_error(error_study_LO)
 
+plt.figure('Lights Out Error')
+err.plot_study_error(error_study_LO, RP)
+plt.figure('Got Up Error')
+err.plot_study_error(error_study_GU, RP)
+
 # compare to event markers
 marker_dir = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline Markers"
 marker_data = os.listdir(marker_dir)
@@ -73,25 +78,46 @@ fig, ax = plt.subplots(figsize = (10,10))
 
 # add the x-axis and the y-axis to the plot
 BT23 = markers['013']
-BT23Program = LO['023']
+BT23ProgramLO = LO['023']
+BT23ProgramGU = GU['023']
+BT23ProtocolLO = LOprotocol['023']
+BT23ProtocolGU = GUprotocol['023']
 
 LOdates = []
 LOtimes = []
-for dateTime in BT23Program:
+for dateTime in BT23ProgramLO:
     LOdates.append(dateTime.date())
     LOtimes.append(dateTime.time())
-    
+
+GUdates = []
+GUtimes = []  
+for dateTime in BT23ProgramGU:
+    GUdates.append(dateTime.date())
+    GUtimes.append(dateTime.time())
+
+LOdatespro = []
+LOtimespro = []
+for dateTime in BT23ProtocolLO:
+    LOdatespro.append(dateTime.date())
+    LOtimespro.append(dateTime.time())
+
+GUdatespro = []
+GUtimespro = []  
+for dateTime in BT23ProtocolGU:
+    GUdatespro.append(dateTime.date())
+    GUtimespro.append(dateTime.time())
 
 
-ax.plot(BT23[0], 
-        BT23[1], 
-        'ro')
 
+ax.plot(BT23[0], BT23[1], 'ro')
 ax.plot(LOdates, LOtimes, 'bs')
-#ax.plot(BT23[0], datetime.time(3,0,0))
-#ax.set_ylim([datetime.time(3, 0, 0), datetime.time(1, 0, 0)])
+ax.plot(GUdates, GUtimes, 'bs')
+ax.plot(LOdatespro, LOtimespro, 'go')
+ax.plot(GUdatespro, GUtimespro, 'go')
 # rotate tick labels
-plt.setp(ax.get_xticklabels(), rotation=45)
+plt.xlim([LOdatespro[0], GUdatespro[-1]])
+#plt.setp(rotation=45)
+plt.rc('xtick', labelsize = 6)
 
 # set title and labels for axes
 ax.set(xlabel="Date",
