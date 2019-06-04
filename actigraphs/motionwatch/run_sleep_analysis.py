@@ -77,11 +77,11 @@ for file in marker_data:
 fig, ax = plt.subplots(figsize = (10,10))
 
 # add the x-axis and the y-axis to the plot
-BT23 = markers['013']
-BT23ProgramLO = LO['023']
-BT23ProgramGU = GU['023']
-BT23ProtocolLO = LOprotocol['023']
-BT23ProtocolGU = GUprotocol['023']
+BT23 = markers['025']
+BT23ProgramLO = LO['025']
+BT23ProgramGU = GU['025']
+BT23ProtocolLO = LOprotocol['025']
+BT23ProtocolGU = GUprotocol['025']
 
 LOdates = []
 LOtimes = []
@@ -109,16 +109,15 @@ for dateTime in BT23ProtocolGU:
 
 
 
-ax.plot(BT23[0], BT23[1], 'ro')
-ax.plot(LOdates, LOtimes, 'bs')
-ax.plot(GUdates, GUtimes, 'bs')
-ax.plot(LOdatespro, LOtimespro, 'go')
-ax.plot(GUdatespro, GUtimespro, 'go')
+ax.plot(BT23[0], BT23[1], 'rs')
+ax.plot(LOdates, LOtimes, 'bo')
+ax.plot(GUdates, GUtimes, 'bo')
+ax.plot(LOdatespro, LOtimespro, 'g^')
+ax.plot(GUdatespro, GUtimespro, 'g^')
 # rotate tick labels
 plt.xlim([LOdatespro[0], GUdatespro[-1]])
 #plt.setp(rotation=45)
 plt.rc('xtick', labelsize = 6)
-
 # set title and labels for axes
 ax.set(xlabel="Date",
        ylabel="Time",
