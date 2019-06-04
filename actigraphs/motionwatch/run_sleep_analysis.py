@@ -13,6 +13,11 @@ import create.Study as study
 import create.ProtocolSleepAnalysis as ps
 import optimize.threshold_optimization as thresh
 import compute.error_analysis as err
+import os
+import pandas as pd
+import datetime
+import matplotlib.pyplot as plt
+import numpy as np
 
 raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
@@ -48,3 +53,32 @@ error_study_LO, RP = err.get_error_study(LO,LOprotocol,PL)
 error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
 count_LO = err.entries_over_fifteen(error_per_participant_LO)
 error_LO = err.total_error(error_study_LO)
+
+marker_dir = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline Markers"
+marker_data = os.listdir(marker_dir)
+markers = {}
+
+for file in marker_data:
+    if(file.endswith('.xlsx')):
+        sheet = pd.read_excel(marker_dir + '\\' + file, skiprows = 16)
+        dates = sheet.iloc[:,1]
+        times = sheet.iloc[:,2]
+        markers[file[3:6]] = [dates, times]
+        
+# create the plot space upon which to plot the data
+fig, ax = plt.subplots(figsize = (10,10))
+
+# add the x-axis and the y-axis to the plot
+BT23 = markers['023']
+ax.plot(BT23[0], 
+        BT23[1], 
+        color = 'red')
+
+# rotate tick labels
+plt.setp(ax.get_xticklabels(), rotation=45)
+
+# set title and labels for axes
+ax.set(xlabel="Date",
+       ylabel="Time",
+       title="Times vs Date");
+
