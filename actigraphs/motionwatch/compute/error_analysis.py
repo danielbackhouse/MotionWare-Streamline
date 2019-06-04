@@ -25,7 +25,7 @@ def get_error_per_day(program_part, protocol_part):
         index = index + 1        
     return participant_error
 
-def get_error_per_participant(LOdates, LOprotocol, participant_list):
+def get_error_per_participant(LOdatesDic, LOprotocolDic, participant_list):
     """ Gets the absoulate error in the lights out or got up times
     for each participant in the whole study
     
@@ -36,6 +36,8 @@ def get_error_per_participant(LOdates, LOprotocol, participant_list):
     are arrays containing the relative errors of each day for each participant
     :rtype: (dic)
     """
+    LOdates = list(LOdatesDic.values())
+    LOprotocol = list(LOprotocolDic.values())
     error_per_participant = {}
     for i in range(0, len(LOdates)):
         program_part = LOdates[i]
@@ -45,7 +47,7 @@ def get_error_per_participant(LOdates, LOprotocol, participant_list):
         
     return error_per_participant
     
-def get_error_study(LOdates, LOprotocol, participant_list):
+def get_error_study(LOdatesDic, LOprotocolDic, participant_list):
     """ Gets the absoulate error in the lights out or got up times
     for each participant where the error values is the average error
     of each day in minutes
@@ -58,6 +60,8 @@ def get_error_study(LOdates, LOprotocol, participant_list):
     summed over the entire study
     :rtype: (dic)
     """
+    LOdates = list(LOdatesDic.values())
+    LOprotocol = list(LOprotocolDic.values())
     error_dic = {}
     rel_participants = []
     for i in range(0, len(LOdates)):

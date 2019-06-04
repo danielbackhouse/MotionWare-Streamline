@@ -35,15 +35,17 @@ ta = 20
 
 
 
-
+# Get the times for the protocol and program
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
                           assesment, trim_type, sleep_diary_directory)
+LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
 
 protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)
-LOprotocol, GUprotocol, LOdicProtocol = protocol.get_study_analysis_sleep_times()
+LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
 
-LO, GU, SI, PL, LOdicProgram = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
+
+#get the error vaues
 error_study_GU, RP = err.get_error_study(GU,GUprotocol,PL)
 error_per_participant_GU = err.get_error_per_participant(GU, GUprotocol, PL)
 count_GU = err.entries_over_fifteen(error_per_participant_GU)
@@ -54,6 +56,7 @@ error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
 count_LO = err.entries_over_fifteen(error_per_participant_LO)
 error_LO = err.total_error(error_study_LO)
 
+# compare to event markers
 marker_dir = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline Markers"
 marker_data = os.listdir(marker_dir)
 markers = {}
@@ -61,19 +64,32 @@ markers = {}
 for file in marker_data:
     if(file.endswith('.xlsx')):
         sheet = pd.read_excel(marker_dir + '\\' + file, skiprows = 16)
-        dates = sheet.iloc[:,1]
-        times = sheet.iloc[:,2]
+        dates = list(sheet.iloc[:,1])
+        times = list(sheet.iloc[:,2])
         markers[file[3:6]] = [dates, times]
         
 # create the plot space upon which to plot the data
 fig, ax = plt.subplots(figsize = (10,10))
 
 # add the x-axis and the y-axis to the plot
-BT23 = markers['023']
+BT23 = markers['013']
+BT23Program = LO['023']
+
+LOdates = []
+LOtimes = []
+for dateTime in BT23Program:
+    LOdates.append(dateTime.date())
+    LOtimes.append(dateTime.time())
+    
+
+
 ax.plot(BT23[0], 
         BT23[1], 
-        color = 'red')
+        'ro')
 
+ax.plot(LOdates, LOtimes, 'bs')
+#ax.plot(BT23[0], datetime.time(3,0,0))
+#ax.set_ylim([datetime.time(3, 0, 0), datetime.time(1, 0, 0)])
 # rotate tick labels
 plt.setp(ax.get_xticklabels(), rotation=45)
 

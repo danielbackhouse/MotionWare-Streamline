@@ -67,24 +67,22 @@ class Study:
         :rtype: (list<numpy.datetime64>) (list<numpy.datetime64.time>)
         """
         index = 0
-        LOdatetimeList = list()
-        GUdatetimeList = list()
-        SleepInfoList = list()
-        LOdic = {}
+        LOdatetimeDic = {}
+        GUdatetimeDic = {}
+        SleepInfoDic = {}
         for i in range(0, len(self.participant_list)):
             print(self.participant_list[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
                     dm, zmc, zac, zlc, ta)
-            LOdatetimeList.append(LOdatetime)
-            GUdatetimeList.append(GUdatetime)
-            SleepInfoList.append(SleepInfo)
+            LOdatetimeDic[self.participant_list[i]] = LOdatetime
+            GUdatetimeDic[self.participant_list[i]] = GUdatetime
+            SleepInfoDic[self.participant_list[i]] = SleepInfo
             #TODO fix day analysis here
             #DayDataAnalysis.findDayInfo(participants[i],LOindex, GUindex, activity[i], dates[i], times[i])
             index = index + 1
-            LOdic[self.participant_list[i]] = LOdatetime
     
-        return LOdatetimeList, GUdatetimeList, SleepInfoList, self.participant_list, LOdic
+        return LOdatetimeDic, GUdatetimeDic, SleepInfoDic, self.participant_list
     
     #TODO: Write out docstring
     def __convert_date_time(self):

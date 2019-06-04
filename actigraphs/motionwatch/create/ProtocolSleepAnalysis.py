@@ -29,19 +29,19 @@ class ProtocolSleepAnalysis:
         :rtype: (list<list>) (list<list>)
         """
         print('\n Getting study analysis sleep times...')
-        lights_out_analysis_study_times = list()
-        got_up_analysis_study_times = list()
+        lights_out_analysis = {}
+        got_up_analysis = {}
         LOdic = {}
         for participant_id in self.participant_list:
             lightsOutTimes, gotUpTimes = self.get_participant_sleep_analysis_times(
                     self.sleep_analysis_directory, participant_id)
             
-            lights_out_analysis_study_times.append(lightsOutTimes)
-            got_up_analysis_study_times.append(gotUpTimes)
+            lights_out_analysis[participant_id] = lightsOutTimes
+            got_up_analysis[participant_id] = (gotUpTimes)
             LOdic[participant_id] = lightsOutTimes
             
             
-        return lights_out_analysis_study_times, got_up_analysis_study_times, LOdic
+        return lights_out_analysis, got_up_analysis
 
     
     def get_participant_sleep_analysis_times(self, sleepAnalysisDirectory, participant_id):
