@@ -11,14 +11,10 @@
 """
 import create.Study as study
 import create.ProtocolSleepAnalysis as ps
-import optimize.threshold_optimization as thresh
 import compute.error_analysis as err
 import os
 import pandas as pd
-import datetime
 import matplotlib.pyplot as plt
-import numpy as np
-
 raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
 sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
