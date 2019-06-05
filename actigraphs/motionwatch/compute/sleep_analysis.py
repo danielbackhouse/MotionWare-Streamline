@@ -307,7 +307,7 @@ def findSleepAnalysisData(activity, datetimes):
         print('Acitivty List Length: ', len(activity))
         print('Start: ', datetimes[0])
         print('End', datetimes[-1])
-        #input("To Skip and Continue, Press Enter")
+        input("To Skip and Continue, Press Enter")
         
         return -1
     
@@ -338,16 +338,16 @@ def findSleepAnalysisData(activity, datetimes):
         print('SleepWakeList: ', sleepWakeList)
         print('Start: ', datetimes[0])
         print('End', datetimes[-1])
-        #answer = input("Click Enter to continue, 'N' to skip and continue")
-        #if(answer == 'N'):
-         #   errors += 1
-         #   return -1
+        answer = input("Click Enter to continue, 'N' to skip and continue")
+        if(answer == 'N'):
+            errors += 1
+            return -1
     if meanActivityPerNonZeroEpoch == 'N/A':
         print("Warning: No Nonzero Epoches")
-        #answer = input("Click Enter to continue, 'N' to skip and continue")
-        #if(answer == 'N'):
-        #    errors += 1
-        #    return -1    
+        answer = input("Click Enter to continue, 'N' to skip and continue")
+        if(answer == 'N'):
+            errors += 1
+            return -1    
     if meanSleepBoutSeconds == 0:
         print("ERROR: THERE IS NO SLEEP BOUTS, THIS SHOULD NEVER HAPPEN")
         print("")
@@ -357,41 +357,41 @@ def findSleepAnalysisData(activity, datetimes):
         print('Acitivty List Length: ', len(activity))
         print('Start: ', datetimes[0])
         print('End', datetimes[-1])
-        #input("To Skip and Continue, Press Enter")
+        input("To Skip and Continue, Press Enter")
         return -1
     if sleepEfficiency > 100 or percentSleep > 100 or percentAwake > 100 or mobilePercent > 100 or immobilePercent > 100:
         print("ERROR: PERCENTAGE OVER 100, SHOULD NEVER HAPPEN")
         errors += 1
-        #input("To Skip and Continue, Press Enter")
+        input("To Skip and Continue, Press Enter")
         return -1
     
     #Output
-    print("Lights Out: ",  datetimes[0])
-    print("Fell Asleep: ", fellAsleepTime)
-    print("Woke Up: ", wokeUpTime)
-    print("Got out of bed: ", datetimes[-1])
-    print("Time in bed: ", timeInBed)
-    print("Assumed sleep: ", sleepTime)
-    print("Actual sleep time: " , actualSleepTime)
-    print("Actual sleep %: " , round(percentSleep, 1))
-    print("Actual wake time: " , awakeTime)
-    print("Actual wake %: " , round(percentAwake,1))
-    print("Sleep efficiency %: " , round(sleepEfficiency,1))
-    print("Sleep latency: " , sleepLatencyTime)
-    print("Sleep bouts", sleepBout)
-    print("Wake bouts", wakeBout)
-    print("Ave sleep bouts", meanSleepBoutTime)
-    print("Ave wake bouts", meanWakeBoutTime)
-    print("immobile mins: ", immobileMinutes)
-    print("immobile %: ", round(immobilePercent,1))
-    print("mobile mins:", mobileMinutes )
-    print("mobile %: ", round(mobilePercent,1))
-    print("Immobile bouts: ", immobileBout)
-    print("mean immobile bout: ", meanImmobileBoutTime)
-    print("Immobile bouts <= 1 ", boutsLessThanOne)
-    print("Immobile bouts <= 1% ", round(boutsLessThanOnePercent,1))
-    print("Total Activity: ", totalActivity )
-    print("Mean Activity per epoch: ", round(meanActivityPerEpoch,2))
+    #print("Lights Out: ",  datetimes[0])
+    #print("Fell Asleep: ", fellAsleepTime)
+    #print("Woke Up: ", wokeUpTime)
+    #print("Got out of bed: ", datetimes[-1])
+    #print("Time in bed: ", timeInBed)
+    #print("Assumed sleep: ", sleepTime)
+    #print("Actual sleep time: " , actualSleepTime)
+    #print("Actual sleep %: " , round(percentSleep, 1))
+    #print("Actual wake time: " , awakeTime)
+    #print("Actual wake %: " , round(percentAwake,1))
+    #print("Sleep efficiency %: " , round(sleepEfficiency,1))
+    #print("Sleep latency: " , sleepLatencyTime)
+    #print("Sleep bouts", sleepBout)
+    #print("Wake bouts", wakeBout)
+    #print("Ave sleep bouts", meanSleepBoutTime)
+    #print("Ave wake bouts", meanWakeBoutTime)
+    #print("immobile mins: ", immobileMinutes)
+    #print("immobile %: ", round(immobilePercent,1))
+    #print("mobile mins:", mobileMinutes )
+    #print("mobile %: ", round(mobilePercent,1))
+    #print("Immobile bouts: ", immobileBout)
+    #print("mean immobile bout: ", meanImmobileBoutTime)
+    #print("Immobile bouts <= 1 ", boutsLessThanOne)
+    #print("Immobile bouts <= 1% ", round(boutsLessThanOnePercent,1))
+    #print("Total Activity: ", totalActivity )
+    #print("Mean Activity per epoch: ", round(meanActivityPerEpoch,2))
     if meanActivityPerNonZeroEpoch == 'N/A':
         print("Mean Nonzero activity per epoch: ", meanActivityPerNonZeroEpoch)
     else:
