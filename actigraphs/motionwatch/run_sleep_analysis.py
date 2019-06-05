@@ -61,6 +61,19 @@ err.plot_study_error(error_study_LO, RP)
 plt.figure('Got Up Error')
 err.plot_study_error(error_study_GU, RP)
 
+total_list = []
+plt.figure('Plot of all Points for each day')
+for participant in list(error_per_participant_GU.values()):
+    plt.plot(participant, 'bo')
+    total_list += participant
+ 
+plt.figure('Plot of all points GU')
+plt.plot(total_list, 'bo')
+plt.plot(markersize = 1)
+plt.xlabel('Time point')
+plt.ylabel('Absolute error in minutes')
+plt.title('Absolute error vs Time Points')
+
 # compare to event markers
 marker_dir = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline Markers"
 marker_data = os.listdir(marker_dir)
@@ -77,11 +90,12 @@ for file in marker_data:
 fig, ax = plt.subplots(figsize = (10,10))
 
 # add the x-axis and the y-axis to the plot
-BT23 = markers['025']
-BT23ProgramLO = LO['025']
-BT23ProgramGU = GU['025']
-BT23ProtocolLO = LOprotocol['025']
-BT23ProtocolGU = GUprotocol['025']
+pid = '092'
+BT23 = markers[pid]
+BT23ProgramLO = LO[pid]
+BT23ProgramGU = GU[pid]
+BT23ProtocolLO = LOprotocol[pid]
+BT23ProtocolGU = GUprotocol[pid]
 
 LOdates = []
 LOtimes = []
@@ -115,9 +129,10 @@ ax.plot(GUdates, GUtimes, 'bo')
 ax.plot(LOdatespro, LOtimespro, 'g^')
 ax.plot(GUdatespro, GUtimespro, 'g^')
 # rotate tick labels
-plt.xlim([LOdatespro[0], GUdatespro[-1]])
+plt.xlim([BT23[0], BT23[-1]])
 #plt.setp(rotation=45)
-plt.rc('xtick', labelsize = 6)
+plt.xticks(fontsize=10, rotation=45)
+plt.yticks(fontsize=10)
 # set title and labels for axes
 ax.set(xlabel="Date",
        ylabel="Time",

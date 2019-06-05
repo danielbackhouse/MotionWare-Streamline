@@ -95,7 +95,7 @@ def __sum_errors(program_part, protocol_part):
         participant_error = participant_error/index
     return participant_error, 
 
-def get_std_per_participant(LOdates, LOprotocol, participant_list ):
+def get_std_per_participant(LOdatesDic, LOprotocolDic, participant_list ):
     """ Gets the standard deviation in the error between the program and prtocol
     determined lights out or got up times
     
@@ -106,6 +106,8 @@ def get_std_per_participant(LOdates, LOprotocol, participant_list ):
     are arrays containing the std deviation of the errors for each participant
     :rtype: (dic)
     """
+    LOdates = list(LOdatesDic.values())
+    LOprotocol = list(LOprotocolDic.values())
     std_per_participant = {}
     for i in range(0, len(LOdates)):
         program_part = LOdates[i]
@@ -127,8 +129,9 @@ def plot_study_error(error_dic, participant_list):
     plt.ylabel('Absolute Error per Day')
     plt.xlabel('Participant ID')
     plt.title('Average Absolute Error Per Participant')
-    plt.rc('xtick', labelsize = 2)
-    plt.ylim([0, 160])
+    #plt.rc('xtick', labelsize = 4)
+    plt.xticks(fontsize=8, rotation=90)
+    plt.ylim([0, 150])
 
 def plot_participant_error(error_arr, participant_id):
     """ Plots the error of a single participant given an array and the participant ID 
