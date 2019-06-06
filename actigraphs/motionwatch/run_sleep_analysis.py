@@ -38,10 +38,10 @@ LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
 
 protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)
-LOprotocol, GUprotocol = protocol.get_study_analysis_sleep_times()
+LOprotocol, GUprotocol, sleep_eff, frag_index = protocol.get_study_analysis_sleep_times()
 
 
-#get the error vaues
+# Get the absolute errors between the two
 error_study_GU, RP = err.get_error_study(GU,GUprotocol,PL)
 error_per_participant_GU = err.get_error_per_participant(GU, GUprotocol, PL)
 count_GU = err.entries_over_fifteen(error_per_participant_GU)
@@ -52,6 +52,7 @@ error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
 count_LO = err.entries_over_fifteen(error_per_participant_LO)
 error_LO = err.total_error(error_study_LO)
 
+# Plot the relative errors of GU and LO
 plt.figure('Lights Out Error')
 err.plot_study_error(error_study_LO, RP)
 plt.figure('Got Up Error')
@@ -70,22 +71,21 @@ plt.xlabel('Time point')
 plt.ylabel('Absolute error in minutes')
 plt.title('Absolute error vs Time Points')
 
-# compare to event markers
+
+# Find the Event marker times
 marker_dir = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline Markers"
 marker_data = os.listdir(marker_dir)
 markers = {}
-
 for file in marker_data:
     if(file.endswith('.xlsx')):
         sheet = pd.read_excel(marker_dir + '\\' + file, skiprows = 16)
         dates = list(sheet.iloc[:,1])
         times = list(sheet.iloc[:,2])
         markers[file[3:6]] = [dates, times]
-        
-# create the plot space upon which to plot the data
-fig, ax = plt.subplots(figsize = (10,10))
 
-# add the x-axis and the y-axis to the plot
+        
+# Event Marker Plot
+fig, ax = plt.subplots(figsize = (10,10))
 pid = '092'
 BT23 = markers[pid]
 BT23ProgramLO = LO[pid]
@@ -117,20 +117,74 @@ for dateTime in BT23ProtocolGU:
     GUdatespro.append(dateTime.date())
     GUtimespro.append(dateTime.time())
 
-
-
 ax.plot(BT23[0], BT23[1], 'rs')
 ax.plot(LOdates, LOtimes, 'bo')
 ax.plot(GUdates, GUtimes, 'bo')
 ax.plot(LOdatespro, LOtimespro, 'g^')
 ax.plot(GUdatespro, GUtimespro, 'g^')
-# rotate tick labels
-plt.xlim([BT23[0], BT23[-1]])
-#plt.setp(rotation=45)
 plt.xticks(fontsize=10, rotation=45)
 plt.yticks(fontsize=10)
-# set title and labels for axes
-ax.set(xlabel="Date",
-       ylabel="Time",
-       title="Times vs Date");
+ax.set(xlabel="Date",ylabel="Time", title="Times vs Date");
 
+       
+# Fragmentation Index Error
+frag_error = {}
+frag_error_total = []
+frag_error_per_total = []
+frag_average_error = {}
+for part in RP:
+    days = SI[part]
+    error = []
+    percent_error = []
+    sum_frag_com = 0
+    sum_frag_hum = 0
+    for i in range(0, len(frag_index[part])):
+        sleep_parameters = days[i]
+        frag_part = sleep_parameters['Fragmentation Index']
+        frag_index_day = frag_index[part]
+        error.append(frag_part - frag_index_day[i]) 
+        percent_error.append(((frag_part-frag_index_day[i])/frag_index_day[i])*100)
+        sum_frag_com += frag_part
+        sum_frag_hum += frag_index_day[i]
+        
+    frag_average_error[part] = sum(error)/len(error)
+    frag_error[part] = error
+    frag_error_total += error
+    frag_error_per_total += percent_error
+    
+# Sleep Effeciency Error    
+eff_error = {}
+eff_error_total = []
+for part in RP:
+    days = SI[part]
+    error = []
+    for i in range(0, len(frag_index[part])):
+        sleep_parameters = days[i]
+        eff_part = sleep_parameters['Sleep efficiency %']
+        eff_index_day = sleep_eff[part]
+        error.append(eff_part - eff_index_day[i]) 
+        
+    eff_error[part] = error
+    eff_error_total += error
+
+plt.figure('Fragmentation Index Error')
+plt.plot(frag_error_total, 'bo')     
+
+plt.figure('Sleep Efficiency % Error')
+plt.plot(eff_error_total, 'bo')     
+
+plt.figure('Fragmentation Index Percent Error')
+plt.plot(frag_error_per_total, 'bo')
+
+plt.figure('Average Fragmentation error per participant')
+plt.plot(list(frag_average_error.keys()),list(frag_average_error.values()), 'g^')
+plt.xticks(rotation=90)
+
+#Sleep Diary Review
+diary_quality = [ 0, 0, 8, 10, 1, 2, 1, 2, 1, 0, 4, 3, 5, 8, 4, 5, 1, 2, 3, 0, 10, 3,
+                 1, 1, 5, 8, 1, 9, 1, 8, 0, 0, 2, 2, 0, 0, 0, 0, 2, 3, 1, 0, 1, 9, 6,
+                 1, 3, 0, 4, 1, 1, 2, 1, 0, 0, 1, 4, 0, 2, 6, 1, 0, 3, 0, 1, 0, 1, 0,
+                 1, 0, 0, 2]
+
+plt.figure('sleep diary quality')
+plt.plot(list(frag_average_error.values()), diary_quality, 'ro')

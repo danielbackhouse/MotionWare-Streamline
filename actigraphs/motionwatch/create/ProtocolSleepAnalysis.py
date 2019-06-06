@@ -31,17 +31,20 @@ class ProtocolSleepAnalysis:
         print('\n Getting study analysis sleep times...')
         lights_out_analysis = {}
         got_up_analysis = {}
+        sleep_eff = {}
+        frag_index = {}
         LOdic = {}
         for participant_id in self.participant_list:
-            lightsOutTimes, gotUpTimes = self.get_participant_sleep_analysis_times(
+            lightsOutTimes, gotUpTimes, se, fi = self.get_participant_sleep_analysis_times(
                     self.sleep_analysis_directory, participant_id)
             
             lights_out_analysis[participant_id] = lightsOutTimes
             got_up_analysis[participant_id] = (gotUpTimes)
             LOdic[participant_id] = lightsOutTimes
+            sleep_eff[participant_id] = se
+            frag_index[participant_id] = fi
             
-            
-        return lights_out_analysis, got_up_analysis
+        return lights_out_analysis, got_up_analysis, sleep_eff, frag_index
 
     
     def get_participant_sleep_analysis_times(self, sleepAnalysisDirectory, participant_id):
@@ -56,19 +59,22 @@ class ProtocolSleepAnalysis:
         """
         LOdatetime = []
         GUdatetime = []
+        
         sheetName = self.study_name + '-' + participant_id + ' ' + self.assesment
         print(sheetName)
         try:
             sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, sheet_name = sheetName)
         except:
             print('No such sheet in sleep analysis excel sheet')
-            return LOdatetime, GUdatetime
+            return LOdatetime, GUdatetime, list(), list()
         
         lightsOutDates = sleepAnalysis.iloc[15,1:15].tolist()
         lightsOutTimes = sleepAnalysis.iloc[18,1:15].tolist()
         gotUpDates = sleepAnalysis.iloc[17,1:15].tolist()
         gotUpTimes = sleepAnalysis.iloc[21, 1:15].tolist()
         
+        fragmentation = sleepAnalysis.iloc[45, 1:15].tolist()
+        sleep_effeciency = sleepAnalysis.iloc[28, 1:15].tolist()
 
         
         for i in range(0, len(lightsOutDates)):
@@ -78,5 +84,5 @@ class ProtocolSleepAnalysis:
             except:
                 break
         
-        return LOdatetime, GUdatetime
+        return LOdatetime, GUdatetime, sleep_effeciency, fragmentation
             

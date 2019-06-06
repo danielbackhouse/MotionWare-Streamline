@@ -105,8 +105,8 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
         got_up_indices.append(got_up_index)
         
         #TODO: Do something with the returned dictionary
-        sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(activity[lights_out_index-10: got_up_index+11], 
-                           dateTimes[lights_out_index: got_up_index+1])
+        sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(activity[lights_out_index: got_up_index], 
+                           dateTimes[lights_out_index: got_up_index])
         
         sleep_analysis_list.append(sleepAnalysisInfo)
         lights_out_dateTimes.append(dateTimes[lights_out_index])
