@@ -181,10 +181,33 @@ plt.plot(list(frag_average_error.keys()),list(frag_average_error.values()), 'g^'
 plt.xticks(rotation=90)
 
 #Sleep Diary Review
-diary_quality = [ 0, 0, 8, 10, 1, 2, 1, 2, 1, 0, 4, 3, 5, 8, 4, 5, 1, 2, 3, 0, 10, 3,
+diary_quality = [ 0, 0, 10, 1, 2, 1, 2, 1, 0, 4, 3, 5, 4, 5, 1, 2, 3, 0, 10, 3,
                  1, 1, 5, 8, 1, 9, 1, 8, 0, 0, 2, 2, 0, 0, 0, 0, 2, 3, 1, 0, 1, 9, 6,
                  1, 3, 0, 4, 1, 1, 2, 1, 0, 0, 1, 4, 0, 2, 6, 1, 0, 3, 0, 1, 0, 1, 0,
                  1, 0, 0, 2]
-
+diary_qual = {}
+for i in range(0,len(RP)):
+    diary_qual[RP[i]] = diary_quality[i]
+    
+    
 plt.figure('sleep diary quality')
-plt.plot(list(frag_average_error.values()), diary_quality, 'ro')
+plt.plot(list(error_study_LO.values()), diary_quality, 'ro')
+
+large_error_LO = {}
+large_error_GU = {}
+large_diary_GU = {}
+large_diary_LO = {}
+for part in RP:
+    if(error_study_LO[part] > 20):
+        large_error_LO[part] = error_study_LO[part]
+        large_diary_LO[part] = diary_qual[part]
+    
+    if(error_study_GU[part] > 20):
+        large_error_GU[part] = error_study_GU[part]
+        large_diary_GU[part] = diary_qual[part]
+    
+plt.figure('sleep diary quality for large error')
+plt.title('Sleep Diary Quality vs Absolute LO time error > 20min/day')
+plt.plot(list(large_error_LO.values()), list(large_diary_LO.values()), 'ro')   
+plt.xlabel('Absolute Error in min/day')
+plt.ylabel('Sleep Diary Quality Score')
