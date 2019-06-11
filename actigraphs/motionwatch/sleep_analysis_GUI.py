@@ -10,7 +10,7 @@ import run_sleep_analysis as run
 
 window = Tk()
 window.title("MotionWare Data Analysis")
-window.geometry("1000x550")
+window.geometry("650x550")
 
 #INPUT
 
@@ -76,7 +76,7 @@ name_study_entry.insert(0, 'BT')
 name_study_label.grid(row = 9, column = 0, columnspan = 3)
 name_study_entry.grid(row = 10, column = 0, columnspan = 3)
 
-#Assessment 
+#Assessment
 assess_label = Label(window, text = 'Enter the assessment of the study:')
 assess_entry = Entry(window, width = 50, justify = 'center')
 assess_entry.insert(0, 'Baseline')
@@ -109,11 +109,11 @@ def startGoing():
     window.destroy()
     run.run_program(raw_data_path, skipped_rows_num, study_name, assess, trim_num, sleep_diary_path)
 goButton = Button(window, text = 'Start', command = startGoing, width = 20, bg = 'green')
-goButton.grid(row = 15, column = 4)
+goButton.grid(row = 15, column = 2)
 
 #Quit Button
 quitButton = Button(window, text = 'QUIT', command = window.destroy, width = 20, bg = 'red')
-quitButton.grid(row = 15, column = 1)
+quitButton.grid(row = 15, column = 0)
 
 
 
