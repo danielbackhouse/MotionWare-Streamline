@@ -3,6 +3,7 @@
 
 import pandas as pd
 import datetime
+import numpy as np
 
 class ProtocolSleepAnalysis:
     
@@ -33,9 +34,11 @@ class ProtocolSleepAnalysis:
         got_up_analysis = {}
         sleep_eff = {}
         frag_index = {}
+        act_index = {}
+        latency_index = {}
         LOdic = {}
         for participant_id in self.participant_list:
-            lightsOutTimes, gotUpTimes, se, fi = self.get_participant_sleep_analysis_times(
+            lightsOutTimes, gotUpTimes, se, fi, act, latency = self.get_participant_sleep_analysis_times(
                     self.sleep_analysis_directory, participant_id)
             
             lights_out_analysis[participant_id] = lightsOutTimes
@@ -43,8 +46,10 @@ class ProtocolSleepAnalysis:
             LOdic[participant_id] = lightsOutTimes
             sleep_eff[participant_id] = se
             frag_index[participant_id] = fi
+            act_index[participant_id] = act
+            latency_index[participant_id] = latency
             
-        return lights_out_analysis, got_up_analysis, sleep_eff, frag_index
+        return lights_out_analysis, got_up_analysis, sleep_eff, frag_index, act_index, latency_index
 
     
     def get_participant_sleep_analysis_times(self, sleepAnalysisDirectory, participant_id):
@@ -75,14 +80,19 @@ class ProtocolSleepAnalysis:
         
         fragmentation = sleepAnalysis.iloc[45, 1:15].tolist()
         sleep_effeciency = sleepAnalysis.iloc[28, 1:15].tolist()
-
+        act = sleepAnalysis.iloc[24, 1:15].tolist()
+        latency = sleepAnalysis.iloc[29, 1:15].tolist()
         
+        fragmentation = list(filter(lambda a: not np.isnan(a), fragmentation))
+        sleep_effeciency = list(filter(lambda a: not np.isnan(a), sleep_effeciency))            
+        
+
         for i in range(0, len(lightsOutDates)):
             try:
                 LOdatetime.append(datetime.datetime.combine(lightsOutDates[i], lightsOutTimes[i]))
                 GUdatetime.append(datetime.datetime.combine(gotUpDates[i], gotUpTimes[i]))
             except:
-                print('date formatted incorectly, compensating...')
+                print('Unchecked')
                 
             try:
                 LOdate = datetime.datetime.strptime(lightsOutDates[i], '%m/%d/%Y')
@@ -90,7 +100,7 @@ class ProtocolSleepAnalysis:
                 LOdatetime.append(datetime.datetime.combine(LOdate, lightsOutTimes[i]))
                 GUdatetime.append(datetime.datetime.combine(GUdate, gotUpTimes[i]))
             except:
-                print('could not format date properly...')
+                print('Checked')
              
-        return LOdatetime, GUdatetime, sleep_effeciency, fragmentation
+        return LOdatetime, GUdatetime, sleep_effeciency, fragmentation, act, latency
             
