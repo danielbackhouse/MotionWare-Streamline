@@ -82,7 +82,15 @@ class ProtocolSleepAnalysis:
                 LOdatetime.append(datetime.datetime.combine(lightsOutDates[i], lightsOutTimes[i]))
                 GUdatetime.append(datetime.datetime.combine(gotUpDates[i], gotUpTimes[i]))
             except:
-                break
-        
+                print('date formatted incorectly, compensating...')
+                
+            try:
+                LOdate = datetime.datetime.strptime(lightsOutDates[i], '%m/%d/%Y')
+                GUdate = datetime.datetime.strptime(gotUpDates[i], '%m/%d/%Y')
+                LOdatetime.append(datetime.datetime.combine(LOdate, lightsOutTimes[i]))
+                GUdatetime.append(datetime.datetime.combine(GUdate, gotUpTimes[i]))
+            except:
+                print('could not format date properly...')
+             
         return LOdatetime, GUdatetime, sleep_effeciency, fragmentation
             

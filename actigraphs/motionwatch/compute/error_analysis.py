@@ -21,6 +21,7 @@ def get_error_per_day(program_part, protocol_part):
         error_min = abs(error.total_seconds()/60)
         participant_error.append(error_min)
         if(error_min >= 720):   # ignore all differences greater than 12 hours as 
+            print('error greater than 720')
             return list()       # this indicates different poins where chosen
         index = index + 1        
     return participant_error
@@ -40,6 +41,7 @@ def get_error_per_participant(LOdatesDic, LOprotocolDic, participant_list):
     LOprotocol = list(LOprotocolDic.values())
     error_per_participant = {}
     for i in range(0, len(LOdates)):
+        print(participant_list[i])
         program_part = LOdates[i]
         protocol_part = LOprotocol[i]
         participant_error = get_error_per_day(program_part, protocol_part)
