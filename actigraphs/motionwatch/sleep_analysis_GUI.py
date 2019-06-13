@@ -10,11 +10,11 @@ import run_sleep_analysis as run
 
 window = Tk()
 window.title("MotionWare Data Analysis")
-window.geometry("650x550")
+window.geometry("775x650")
 
 #INPUT
 
-spacing = Canvas(height = 10, width = 1000)
+spacing = Canvas(height = 10, width = 650)
 spacing.grid(row = 0, column = 0, columnspan = 6)
 #Input Title
 input_label = Label(window, text = 'Input')
@@ -33,9 +33,9 @@ canvas.create_line(600, 2, 900, 2)
 canvas.grid(row=2, columnspan = 6, column = 0, rowspan = 1)
 #Open Raw Data Directory
 def openRawDataFile():
-    filename = filedialog.askdirectory(initialdir = "/", title = 'Select folder')
+    foldername = filedialog.askdirectory(initialdir = "/", title = 'Select folder')
     raw_data_entry.delete(0, END)
-    raw_data_entry.insert(0, filename)
+    raw_data_entry.insert(0, foldername)
 raw_data_label = Label(window, text = 'Enter the Raw Data Folder Path:')
 raw_data_entry = Entry(window, width = 50)
 raw_data_entry.insert(0, r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline")
@@ -46,7 +46,7 @@ openFileButton.grid(row = 4, column = 2)
 
 #Open Sleep Diary File
 def openSleepDiaryFile():
-    filename = filedialog.askopenfilename(initialdir = "/", title = 'Select folder')
+    filename = filedialog.askopenfilename(initialdir = "/", title = 'Select file')
     sleep_diary_entry.delete(0, END)
     sleep_diary_entry.insert(0, filename)
 sleep_diary_label = Label(window, text = 'Enter the Sleep Diary File Path:')
@@ -57,6 +57,17 @@ sleep_diary_label.grid(row = 5, column = 0, columnspan = 3)
 sleep_diary_entry.grid(row = 6, column = 0, columnspan = 2)
 openNewFileButton.grid(row = 6, column = 2)
 
+def openSleepAnalysisDirectory():
+    filenametwo = filedialog.askopenfilename(initialdir = "/", title = 'Select file')
+    sleep_analysis_entry.delete(0, END)
+    sleep_analysis_entry.insert(0, filenametwo)
+sleep_analysis_label = Label(window, text = 'Enter the Sleep Analysis File Path:')
+sleep_analysis_entry = Entry(window, width = 50)
+sleep_analysis_entry.insert(0, r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx")
+openNewFileButton = Button(window, text = 'Open File', command = openSleepDiaryFile)
+sleep_analysis_label.grid(row = 7, column = 0, columnspan = 3)
+sleep_analysis_entry.grid(row = 8, column = 0, columnspan = 2)
+openNewFileButton.grid(row = 8, column = 2)
 #Skipped Rows
 skipped_rows = StringVar(window)
 skipped_rows.set(20) # default value
@@ -64,32 +75,32 @@ numbers = []
 for x in range(100):
     numbers.append(x)
 skipped_rows_list = OptionMenu(window, skipped_rows, *numbers)
-skipped_rows_list.grid(row = 8, column = 0, columnspan = 3)
+skipped_rows_list.grid(row = 10, column = 0, columnspan = 3)
 skipped_rows_label = Label(window, text = 'Enter the Number of Rows To Skip in the Raw Data:')
-skipped_rows_label.grid(row = 7, column = 0, columnspan = 3)
+skipped_rows_label.grid(row = 9, column = 0, columnspan = 3)
 
 
 #Name of Study
 name_study_label = Label(window, text = 'Enter the name of the study:')
 name_study_entry = Entry(window, width = 50, justify = 'center')
 name_study_entry.insert(0, 'BT')
-name_study_label.grid(row = 9, column = 0, columnspan = 3)
-name_study_entry.grid(row = 10, column = 0, columnspan = 3)
+name_study_label.grid(row = 11, column = 0, columnspan = 3)
+name_study_entry.grid(row = 12, column = 0, columnspan = 3)
 
 #Assessment
 assess_label = Label(window, text = 'Enter the assessment of the study:')
 assess_entry = Entry(window, width = 50, justify = 'center')
 assess_entry.insert(0, 'Baseline')
-assess_label.grid(row = 11, column = 0, columnspan = 3)
-assess_entry.grid(row = 12, column = 0, columnspan = 3)
+assess_label.grid(row = 13, column = 0, columnspan = 3)
+assess_entry.grid(row = 14, column = 0, columnspan = 3)
 
 #Trim Type
 trim = StringVar(window)
 trim.set(2) # default value
 trim_list = OptionMenu(window, trim, 0, 1, 2)
-trim_list.grid(row=14, column = 0, columnspan = 3)
+trim_list.grid(row=16, column = 0, columnspan = 3)
 trim_label = Label(window, text = 'Enter trim type:')
-trim_label.grid(row = 13, column = 0, columnspan = 3)
+trim_label.grid(row = 15, column = 0, columnspan = 3)
 
 
 #Start Button
@@ -100,26 +111,28 @@ def startGoing():
     assess = assess_entry.get()
     trim_num = int(trim.get())
     sleep_diary_path = sleep_diary_entry.get()
+    sleep_analysis_path = sleep_analysis_entry.get()
     print(raw_data_path)
     print(skipped_rows_num)
     print(study_name)
     print(assess)
     print(trim_num)
     print(sleep_diary_path)
+    print(sleep_analysis_path)
     window.destroy()
-    run.run_program(raw_data_path, skipped_rows_num, study_name, assess, trim_num, sleep_diary_path)
+    run.run_program(raw_data_path, skipped_rows_num, study_name, assess, trim_num, sleep_diary_path, sleep_analysis_path)
 goButton = Button(window, text = 'Start', command = startGoing, width = 20, bg = 'green')
-goButton.grid(row = 15, column = 2)
+goButton.grid(row = 17, column = 2)
 
 #Quit Button
 quitButton = Button(window, text = 'QUIT', command = window.destroy, width = 20, bg = 'red')
-quitButton.grid(row = 15, column = 0)
+quitButton.grid(row = 17, column = 0)
 
 
 
-for x in range(6):
+for x in range(3):
     window.columnconfigure(x, minsize = 500/3)
 for y in range(18):
     window.rowconfigure(y ,pad = 10)
-window.rowconfigure(15, pad = 40)
+window.rowconfigure(17, pad = 40)
 window.mainloop()
