@@ -12,15 +12,18 @@
 import create.Study as study
 import create.ProtocolSleepAnalysis as ps
 import compute.error_analysis as err
-#import os
-#import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
-sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
-sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
+from scipy.stats import pearsonr
+from scipy.stats import spearmanr
+import seaborn as sns
+
+raw_data_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\Baseline"
+sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Diary.xlsx"
+sa_directory =  r'C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Analysis.xlsx'
 skiprows_rawdata = 20
-study_name = "BT"
+study_name = "SC"
 assesment = "Baseline"
 trim_type = 2
 ws = 6
@@ -112,16 +115,16 @@ plt.plot(frag_error_mean, frag_error_total, 'ro')
 plt.axhline(md,           color='gray', linestyle='--')
 plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
-plt.title('Bland Altman Plot Fragmentation Index (BT Baseline)')
+plt.title('Bland Altman Plot Fragmentation Index (SC)')
 plt.xlabel('Mean Fragmentation Index')
 plt.ylabel('Difference between Protocol and Program FI' )
 
 plt.figure(2)
-plt.text(55, 15, 'Pearson Correalation = 0.92', style = 'italic')
-plt.text(55, 10, 'Spearman Correalation = 0.90', style = 'italic')
-plt.text(20, 90, 'N = 980', weight = 'bold', size = 'large')
+plt.text(70, 15, 'Pearson Correalation = 0.86', style = 'italic')
+plt.text(70, 10, 'Spearman Correalation = 0.87', style = 'italic')
+plt.text(20, 90, 'N = 2076', weight = 'bold', size = 'large')
 plt.plot(frag_program, frag_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Fragmentation Index (BT Baseline)')
+plt.title('Plot of Protocol vs Program Fragmentation Index (SC)')
 plt.xlabel('Program Fragnmentation Index')
 plt.ylabel('Protocol Fragmentation Index')
 
@@ -135,7 +138,8 @@ for part in RP:
     days = SI[part]
     error = []
     mean = []
-    for i in range(0, len(sleep_eff[part])):
+    i = 0
+    while i < len(sleep_eff[part]) and i < len(days):
         sleep_parameters = days[i]
         eff_part = sleep_parameters['Sleep efficiency %']
         eff_index_day = sleep_eff[part]
@@ -143,6 +147,7 @@ for part in RP:
         mean.append((eff_part + eff_index_day[i])/2)
         eff_program.append(eff_part)
         eff_protocol.append(eff_index_day[i])
+        i += 1
         
     eff_error[part] = error
     eff_error_total += error
@@ -158,16 +163,16 @@ plt.plot(eff_error_mean, eff_error_total, 'ro')
 plt.axhline(md,           color='gray', linestyle='--')
 plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
-plt.title('Bland Altman Plot Sleep Effeciency (BT Baseline)')
+plt.title('Bland Altman Plot Sleep Effeciency (SC)')
 plt.xlabel('Mean Sleep Effeciency')
 plt.ylabel('Difference between Protocol and Program SE' )
 
 plt.figure(4)
-plt.text(60, 40, 'Pearson Correalation = 0.86', style = 'italic')
-plt.text(60, 36, 'Spearman Correalation = 0.82', style = 'italic')
-plt.text(40, 90, 'N = 980', weight = 'bold', size = 'large')
+plt.text(60, 40, 'Pearson Correalation = 0.76', style = 'italic')
+plt.text(60, 36, 'Spearman Correalation = 0.75', style = 'italic')
+plt.text(40, 90, 'N = 2076', weight = 'bold', size = 'large')
 plt.plot(eff_program, eff_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Sleep Effeciency (BT Baseline)')
+plt.title('Plot of Protocol vs Program Sleep Effeciency (SC)')
 plt.xlabel('Program Sleep Effeciency (%)')
 plt.ylabel('Protocol Sleep Effeciency (%)')
 
@@ -182,7 +187,8 @@ for part in RP:
     days = SI[part]
     error = []
     mean = []
-    for i in range(0, len(act_index[part])):
+    i = 0
+    while i < len(act_index[part]) and i < len(days):
         sleep_parameters = days[i]
         act_part = sleep_parameters['Actual sleep time']
         act_program_point = act_part.total_seconds()/60
@@ -192,6 +198,7 @@ for part in RP:
         mean.append((act_program_point + act_protocol_point/60)/2)
         act_program.append(act_program_point)
         act_protocol.append(act_protocol_point/60)
+        i += 1
         
     act_error[part] = error
     act_error_total += error
@@ -207,16 +214,16 @@ plt.plot(act_error_mean, act_error_total, 'ro')
 plt.axhline(md,           color='gray', linestyle='--')
 plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
-plt.title('Bland Altman Plot Actual Sleep Time (BT Baseline)')
+plt.title('Bland Altman Plot Actual Sleep Time (SC)')
 plt.xlabel('Mean Actual Sleep Time')
 plt.ylabel('Difference between Protocol and Program AST' )
 
 plt.figure(6)
-plt.text(400, 140, 'Pearson Correalation = 0.82', style = 'italic')
+plt.text(400, 140, 'Pearson Correalation = 0.85', style = 'italic')
 plt.text(400, 120, 'Spearman Correalation = 0.86', style = 'italic')
-plt.text(150, 550, 'N = 980', weight = 'bold', size = 'large')
+plt.text(150, 550, 'N = 2076', weight = 'bold', size = 'large')
 plt.plot(act_program, act_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Actual Sleep Time (BT Baseline)')
+plt.title('Plot of Protocol vs Program Actual Sleep Time (SC)')
 plt.xlabel('Program AST (min)')
 plt.ylabel('Protocol AST (min)')
 
@@ -230,7 +237,8 @@ for part in RP:
     days = SI[part]
     error = []
     mean = []
-    for i in range(0, len(latency_index[part])):
+    i = 0
+    while i < len(latency_index[part]) and i < len(days):
         sleep_parameters = days[i]
         ly_part = sleep_parameters['Sleep latency']
         ly_program_point = ly_part.total_seconds()/60
@@ -240,6 +248,7 @@ for part in RP:
         mean.append((ly_program_point + ly_protocol_point/60)/2)
         ly_program.append(ly_program_point)
         ly_protocol.append(ly_protocol_point/60)
+        i += 1
         
     ly_error[part] = error
     ly_error_total += error
@@ -255,17 +264,35 @@ plt.plot(ly_error_mean, ly_error_total, 'ro')
 plt.axhline(md,           color='gray', linestyle='--')
 plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
-plt.title('Bland Altman Plot Sleep Latency (BT Baseline)')
+plt.title('Bland Altman Plot Sleep Latency (SC)')
 plt.xlabel('Mean Sleep Latency (min)')
 plt.ylabel('Difference between Protocol and Program Sleep Latency (min)' )
 
 plt.figure(8)
-plt.text(90, 140, 'Pearson Correalation = 0.17', style = 'italic')
-plt.text(90, 130, 'Spearman Correalation = 0.13', style = 'italic')
-plt.text(90, 120, 'P value (Spearman) = 0.00001')
-plt.text(0, 140, 'N = 980', weight = 'bold', size = 'large')
+plt.text(150, 140, 'Pearson Correalation = 0.26', style = 'italic')
+plt.text(150, 130, 'Spearman Correalation = 0.14', style = 'italic')
+plt.text(150, 120, 'P value (Spearman) = 1^-10')
+plt.text(0, 140, 'N = 2076', weight = 'bold', size = 'large')
 plt.plot(ly_program, ly_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Sleep latency (BT Baseline)')
+plt.title('Plot of Protocol vs Program Sleep latency (SC)')
 plt.xlabel('Program Sleep Latency (min)')
 plt.ylabel('Protocol Sleep Latency (min)')
+
+
+
+data = np.array([eff_program, eff_protocol]).transpose()
+df = pd.DataFrame(data, columns = ['SE program', 'SE protocol'])
+eff_program_arr = np.array(eff_program)/sum(eff_program)
+eff_protocol_arr = np.array(eff_protocol)/sum(eff_protocol)
+
+
+ax = sns.distplot(eff_program, color  = 'red', kde = False)
+sns.distplot(eff_protocol, color = 'blue', kde = False)
+ax.set_title('Sleep Effeciency Distribution Program vs Protocol Values')
+ax.set_xlabel('Sleep Effeciency Values')
+ax.set_ylabel('Counts of Value')
+ax.set_xlim(50, 100)
+
+sns.jointplot(x = 'SE program', y = 'SE protocol', data = df)
+
 

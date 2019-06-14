@@ -37,9 +37,15 @@ class ProtocolSleepAnalysis:
         act_index = {}
         latency_index = {}
         LOdic = {}
+        offset = 3 # added for SC where the sleep analysis changed rows midway through
         for participant_id in self.participant_list:
+            # Offset added for Sleep and Cognition (SC)
+            if (participant_id == '130'):
+                offset = 0
+            
+            print(offset)
             lightsOutTimes, gotUpTimes, se, fi, act, latency = self.get_participant_sleep_analysis_times(
-                    self.sleep_analysis_directory, participant_id)
+                    self.sleep_analysis_directory, participant_id, offset)
             
             lights_out_analysis[participant_id] = lightsOutTimes
             got_up_analysis[participant_id] = (gotUpTimes)
@@ -52,7 +58,7 @@ class ProtocolSleepAnalysis:
         return lights_out_analysis, got_up_analysis, sleep_eff, frag_index, act_index, latency_index
 
     
-    def get_participant_sleep_analysis_times(self, sleepAnalysisDirectory, participant_id):
+    def get_participant_sleep_analysis_times(self, sleepAnalysisDirectory, participant_id, offset):
         """Gets the lights out and got up times of the participant as determined in
         in the sleep analysis
         
@@ -64,8 +70,9 @@ class ProtocolSleepAnalysis:
         """
         LOdatetime = []
         GUdatetime = []
-        
-        sheetName = self.study_name + '-' + participant_id + ' ' + self.assesment
+        #TODO
+        #*********************** Modified for sleep and cognition to not include assesment 
+        sheetName = self.study_name + '-' + participant_id # + ' ' + self.assesment
         print(sheetName)
         try:
             sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, sheet_name = sheetName)
@@ -73,19 +80,21 @@ class ProtocolSleepAnalysis:
             print('No such sheet in sleep analysis excel sheet')
             return LOdatetime, GUdatetime, list(), list()
         
-        lightsOutDates = sleepAnalysis.iloc[15,1:15].tolist()
-        lightsOutTimes = sleepAnalysis.iloc[18,1:15].tolist()
-        gotUpDates = sleepAnalysis.iloc[17,1:15].tolist()
-        gotUpTimes = sleepAnalysis.iloc[21, 1:15].tolist()
+        lightsOutDates = sleepAnalysis.iloc[15 - offset,1:15].tolist()
+        lightsOutTimes = sleepAnalysis.iloc[18 - offset,1:15].tolist()
+        gotUpDates = sleepAnalysis.iloc[17 - offset,1:15].tolist()
+        gotUpTimes = sleepAnalysis.iloc[21 - offset, 1:15].tolist()
         
-        fragmentation = sleepAnalysis.iloc[45, 1:15].tolist()
-        sleep_effeciency = sleepAnalysis.iloc[28, 1:15].tolist()
-        act = sleepAnalysis.iloc[24, 1:15].tolist()
-        latency = sleepAnalysis.iloc[29, 1:15].tolist()
+        fragmentation = sleepAnalysis.iloc[45 - offset, 1:15].tolist()
+        sleep_effeciency = sleepAnalysis.iloc[28 - offset, 1:15].tolist()
+        act = sleepAnalysis.iloc[24 - offset, 1:15].tolist()
+        latency = sleepAnalysis.iloc[29 - offset, 1:15].tolist()
         
         fragmentation = list(filter(lambda a: not np.isnan(a), fragmentation))
         sleep_effeciency = list(filter(lambda a: not np.isnan(a), sleep_effeciency))            
         
+        act = list(filter(lambda a: not isinstance(a, float), act))   
+        latency = list(filter(lambda a: not isinstance(a, float), latency))   
 
         for i in range(0, len(lightsOutDates)):
             try:
