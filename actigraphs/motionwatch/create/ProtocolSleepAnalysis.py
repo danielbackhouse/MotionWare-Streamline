@@ -37,13 +37,13 @@ class ProtocolSleepAnalysis:
         act_index = {}
         latency_index = {}
         LOdic = {}
-        offset = 3 # added for SC where the sleep analysis changed rows midway through
+        offset = 0
+        # added for SC where the sleep analysis changed rows midway through
         for participant_id in self.participant_list:
             # Offset added for Sleep and Cognition (SC)
             if (participant_id == '130'):
                 offset = 0
-            
-            print(offset)
+            print('Offset set to:  ' + str(offset))
             lightsOutTimes, gotUpTimes, se, fi, act, latency = self.get_participant_sleep_analysis_times(
                     self.sleep_analysis_directory, participant_id, offset)
             
@@ -72,13 +72,13 @@ class ProtocolSleepAnalysis:
         GUdatetime = []
         #TODO
         #*********************** Modified for sleep and cognition to not include assesment 
-        sheetName = self.study_name + '-' + participant_id # + ' ' + self.assesment
+        sheetName = self.study_name + '-' + participant_id  + ' ' + self.assesment
         print(sheetName)
         try:
             sleepAnalysis = pd.read_excel(sleepAnalysisDirectory, sheet_name = sheetName)
         except:
             print('No such sheet in sleep analysis excel sheet')
-            return LOdatetime, GUdatetime, list(), list()
+            return LOdatetime, GUdatetime, list(), list(), list(), list()
         
         lightsOutDates = sleepAnalysis.iloc[15 - offset,1:15].tolist()
         lightsOutTimes = sleepAnalysis.iloc[18 - offset,1:15].tolist()

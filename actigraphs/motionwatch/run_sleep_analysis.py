@@ -18,17 +18,18 @@ import numpy as np
 from scipy.stats import pearsonr
 from scipy.stats import spearmanr
 import seaborn as sns
+import matplotlib.patches as mpatches
 
-raw_data_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\Baseline"
-sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Diary.xlsx"
-sa_directory =  r'C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Analysis.xlsx'
+raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
+sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
+sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
 skiprows_rawdata = 20
-study_name = "SC"
+study_name = "BT"
 assesment = "Baseline"
 trim_type = 2
 ws = 6
-dm = 12 
-zac = 25
+dm = 20 
+zac = 10
 zmc = 180
 zlc = 180
 ta = 20 
@@ -117,16 +118,22 @@ plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
 plt.title('Bland Altman Plot Fragmentation Index (SC)')
 plt.xlabel('Mean Fragmentation Index')
-plt.ylabel('Difference between Protocol and Program FI' )
+plt.ylabel('Difference between Protocol and ULA FI' )
+
+
+
+pears = pearsonr(frag_program, frag_protocol)
+spear = spearmanr(frag_program, frag_protocol)
+
 
 plt.figure(2)
-plt.text(70, 15, 'Pearson Correalation = 0.86', style = 'italic')
-plt.text(70, 10, 'Spearman Correalation = 0.87', style = 'italic')
-plt.text(20, 90, 'N = 2076', weight = 'bold', size = 'large')
+plt.text(60, 15, 'Pearson Correalation = ' + str(round(pears[0],2)), style = 'italic')
+plt.text(60, 10, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
+plt.text(20, 90, 'N = ' + str(len(frag_program)), weight = 'bold', size = 'large')
 plt.plot(frag_program, frag_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Fragmentation Index (SC)')
+plt.title('Plot of ULA vs Program Fragmentation Index (SC)')
 plt.xlabel('Program Fragnmentation Index')
-plt.ylabel('Protocol Fragmentation Index')
+plt.ylabel('ULA Fragmentation Index')
 
 # Sleep Effeciency Error    
 eff_error = {}
@@ -158,6 +165,8 @@ sd = np.std(eff_error_total)
 md = np.mean(eff_error_total)
 vr = np.var(eff_error_total)
 
+pears = pearsonr(eff_program, eff_protocol)
+
 plt.figure(3)
 plt.plot(eff_error_mean, eff_error_total, 'ro')
 plt.axhline(md,           color='gray', linestyle='--')
@@ -168,12 +177,12 @@ plt.xlabel('Mean Sleep Effeciency')
 plt.ylabel('Difference between Protocol and Program SE' )
 
 plt.figure(4)
-plt.text(60, 40, 'Pearson Correalation = 0.76', style = 'italic')
-plt.text(60, 36, 'Spearman Correalation = 0.75', style = 'italic')
-plt.text(40, 90, 'N = 2076', weight = 'bold', size = 'large')
+plt.text(60, 40, 'Pearson Correalation = ' + str(round(pears[0],2)), style = 'italic')
+plt.text(60, 36, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
+plt.text(40, 90, 'N = ' + str(len(eff_program)), weight = 'bold', size = 'large')
 plt.plot(eff_program, eff_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Sleep Effeciency (SC)')
-plt.xlabel('Program Sleep Effeciency (%)')
+plt.title('Plot of Protocol vs ULA Sleep Effeciency (SC)')
+plt.xlabel('ULA Sleep Effeciency (%)')
 plt.ylabel('Protocol Sleep Effeciency (%)')
 
 
@@ -209,6 +218,9 @@ sd = np.std(act_error_total)
 md = np.mean(act_error_total)
 vr = np.var(act_error_total)
 
+pears = pearsonr(act_program, act_protocol)
+spear = spearmanr(act_program, act_protocol)
+
 plt.figure(5)
 plt.plot(act_error_mean, act_error_total, 'ro')
 plt.axhline(md,           color='gray', linestyle='--')
@@ -216,15 +228,15 @@ plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
 plt.title('Bland Altman Plot Actual Sleep Time (SC)')
 plt.xlabel('Mean Actual Sleep Time')
-plt.ylabel('Difference between Protocol and Program AST' )
+plt.ylabel('Difference between Protocol and ULA AST' )
 
 plt.figure(6)
-plt.text(400, 140, 'Pearson Correalation = 0.85', style = 'italic')
-plt.text(400, 120, 'Spearman Correalation = 0.86', style = 'italic')
-plt.text(150, 550, 'N = 2076', weight = 'bold', size = 'large')
+plt.text(300, 140, 'Pearson Correalation = '  + str(round(pears[0],2)), style = 'italic')
+plt.text(300, 120, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
+plt.text(150, 550, 'N = ' + str(len(act_program)), weight = 'bold', size = 'large')
 plt.plot(act_program, act_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Actual Sleep Time (SC)')
-plt.xlabel('Program AST (min)')
+plt.title('Plot of Protocol vs ULA Actual Sleep Time (SC)')
+plt.xlabel('ULA AST (min)')
 plt.ylabel('Protocol AST (min)')
 
 # Latency Error    
@@ -266,33 +278,39 @@ plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
 plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
 plt.title('Bland Altman Plot Sleep Latency (SC)')
 plt.xlabel('Mean Sleep Latency (min)')
-plt.ylabel('Difference between Protocol and Program Sleep Latency (min)' )
+plt.ylabel('Difference between Protocol and ULA Sleep Latency (min)' )
 
 plt.figure(8)
 plt.text(150, 140, 'Pearson Correalation = 0.26', style = 'italic')
 plt.text(150, 130, 'Spearman Correalation = 0.14', style = 'italic')
-plt.text(150, 120, 'P value (Spearman) = 1^-10')
 plt.text(0, 140, 'N = 2076', weight = 'bold', size = 'large')
 plt.plot(ly_program, ly_protocol, 'bo')
-plt.title('Plot of Protocol vs Program Sleep latency (SC)')
-plt.xlabel('Program Sleep Latency (min)')
+plt.title('Plot of Protocol vs ULA Sleep latency (SC)')
+plt.xlabel('ULA Sleep Latency (min)')
 plt.ylabel('Protocol Sleep Latency (min)')
 
 
 
 data = np.array([eff_program, eff_protocol]).transpose()
-df = pd.DataFrame(data, columns = ['SE program', 'SE protocol'])
+df = pd.DataFrame(data, columns = ['Eff ULA', 'Eff Protocol'])
 eff_program_arr = np.array(eff_program)/sum(eff_program)
 eff_protocol_arr = np.array(eff_protocol)/sum(eff_protocol)
 
 
-ax = sns.distplot(eff_program, color  = 'red', kde = False)
-sns.distplot(eff_protocol, color = 'blue', kde = False)
-ax.set_title('Sleep Effeciency Distribution Program vs Protocol Values')
-ax.set_xlabel('Sleep Effeciency Values')
-ax.set_ylabel('Counts of Value')
-ax.set_xlim(50, 100)
+ax = sns.distplot(eff_protocol, color  = 'red', kde = True, hist = False)
+sns.distplot(eff_program, color = 'blue', kde = True, hist = False)
+ax.set_title('Sleep Effeciency Program and ULA Values')
+ax.set_xlabel('Sleep Effeciency (%)')
+ax.set_ylabel('Density')
+ax.set_xlim(40, 100)
+red_patch = mpatches.Patch(color='red', label='Protocol')
+blue_patch = mpatches.Patch(color='blue', label='ULA')
+ax.legend(handles=[red_patch, blue_patch])
 
-sns.jointplot(x = 'SE program', y = 'SE protocol', data = df)
 
+#sns.jointplot(x = 'FI ULA', y = 'FI Protocol', data = df, kind = 'kde')
+
+#p1=sns.kdeplot(df['FI ULA'], shade=False, color="r")
+#p1=sns.kdeplot(df['FI Protocol'], shade=False, color="b")
+#sns.plt.show()
 
