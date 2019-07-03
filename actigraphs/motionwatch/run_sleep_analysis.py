@@ -20,11 +20,11 @@ from scipy.stats import spearmanr
 import seaborn as sns
 import matplotlib.patches as mpatches
 
-raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
-sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
-sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
+raw_data_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\Baseline"
+sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Diary.xlsx"
+sa_directory =  r'C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Analysis.xlsx'
 skiprows_rawdata = 20
-study_name = "BT"
+study_name = "SC"
 assesment = "Baseline"
 trim_type = 2
 ws = 6
@@ -33,6 +33,69 @@ zac = 10
 zmc = 180
 zlc = 180
 ta = 20 
+
+    
+
+def plot_correlation_graph(x, y, xtitle, ytitle, title, xpos, ypos):
+    """ Plots the correlation plots between two quantities and gives the spearman
+    and pearson correlation between the two
+    """
+    pears = pearsonr(x, y)
+
+    plt.figure()
+    plt.text(xpos, ypos, 'Pearson Correalation = ' + str(round(pears[0],2)), style = 'italic')
+    #plt.text(xpos, ypos-5, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
+    #plt.text(20, 90, 'N = ' + str(len(x)), weight = 'bold', size = 'large')
+    plt.plot(x, y, 'bo')
+    plt.title(title)
+    plt.xlabel(xtitle)
+    plt.ylabel(ytitle)
+    
+def get_parameter_info(program_SI, protocol_PI, RP, parameter):
+    """" Gets info on important paramters, passed program sleep info
+    and protocol parameter info and the relevant participants
+    """
+    error_total = []
+    error_mean = []
+    program = []
+    protocol = []
+    part_program = []
+    part_protocol = []
+    
+    for participant in RP:
+        param_program = program_SI[participant]
+        param_protocol = protocol_PI[participant]
+        program_sum = 0
+        protocol_sum = 0
+        i = 0
+        while i < len(param_protocol) and i < len(param_program):
+            day_sleep_info = param_program[i]
+            param_ULA = day_sleep_info[parameter]
+            param_human = param_protocol[i]
+            error_total.append(param_ULA - param_human) 
+            error_mean.append((param_ULA + param_human)/2)
+            program.append(param_ULA)
+            protocol.append(param_human)
+            program_sum += param_ULA
+            protocol_sum += param_human
+            i = i + 1
+        part_program.append(program_sum/(i))
+        part_protocol.append(protocol_sum/(i))
+    return program, part_program, protocol, part_protocol, error_mean, error_total
+
+def plot_bland_altman(error_total, mean_error, xtitle, ytitle, title):
+    sd = np.std(error_total)
+    md = np.mean(error_total)
+    
+    plt.figure()
+    plt.plot(mean_error, error_total, 'ro')
+    plt.axhline(md,           color='gray', linestyle='--')
+    plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
+    plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
+    plt.title(title)
+    plt.xlabel(xtitle)
+    plt.ylabel(ytitle)
+
 
 # Get the times for the protocol and program
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
@@ -43,8 +106,6 @@ protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)
 LOprotocol, GUprotocol, sleep_eff, frag_index, act_index, latency_index = protocol.get_study_analysis_sleep_times()
 
-
-# Get the absolute errors between the two
 error_study_GU, RP = err.get_error_study(GU,GUprotocol,PL)
 error_per_participant_GU = err.get_error_per_participant(GU, GUprotocol, PL)
 count_GU = err.entries_over_fifteen(error_per_participant_GU)
@@ -55,135 +116,46 @@ error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
 count_LO = err.entries_over_fifteen(error_per_participant_LO)
 error_LO = err.total_error(error_study_LO)
 
-# Plot the relative errors of GU and LO
-plt.figure('Lights Out Error')
-err.plot_study_error(error_study_LO, RP)
-plt.figure('Got Up Error')
-err.plot_study_error(error_study_GU, RP)
-
 total_list = []
 for participant in list(error_per_participant_GU.values()):
     total_list += participant
  
-plt.figure('Plot of all points GU')
-plt.plot(total_list, 'bo')
-plt.plot(markersize = 1)
-plt.xlabel('Time point')
-plt.ylabel('Absolute error in minutes')
-plt.title('Absolute error vs Time Points')
+
        
-# Fragmentation Index Error
-frag_error = {}
-frag_error_total = []
-frag_error_per_total = []
-frag_average_error = {}
-frag_error_mean = []
-frag_program = []
-frag_protocol = []
-for part in RP:
-    days = SI[part]
-    error = []
-    percent_error = []
-    mean = []
-    sum_frag_com = 0
-    sum_frag_hum = 0
-    i = 0
-    while i < len(frag_index[part]) and i < len(days):
-        sleep_parameters = days[i]
-        frag_part = sleep_parameters['Fragmentation Index']
-        frag_index_day = frag_index[part]
-        error.append(frag_part - frag_index_day[i]) 
-        percent_error.append(((frag_part-frag_index_day[i])/frag_index_day[i])*100)
-        sum_frag_com += frag_part
-        sum_frag_hum += frag_index_day[i]
-        mean.append((frag_part + frag_index_day[i])/2)
-        frag_program.append(frag_part)
-        frag_protocol.append(frag_index_day[i])       
-        i = i + 1
 
-    frag_average_error[part] = sum(error)/len(error)
-    frag_error[part] = error
-    frag_error_total += error
-    frag_error_mean  += mean
-    frag_error_per_total += percent_error
+frag_info = get_parameter_info(SI, frag_index, RP, 'Fragmentation Index') 
+
+plot_bland_altman(frag_info[5], frag_info[4], 'Mean Fragmentation Index',
+                  'Difference between Protocol and ULA FI', 
+                  'Bland Altman Plot Fragmentation Index (SC)' )
     
-sd = np.std(frag_error_total)
-md = np.mean(frag_error_total)
-vr = np.var(frag_error_total)
 
-plt.figure(1)
-plt.plot(frag_error_mean, frag_error_total, 'ro')
-plt.axhline(md,           color='gray', linestyle='--')
-plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
-plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
-plt.title('Bland Altman Plot Fragmentation Index (SC)')
-plt.xlabel('Mean Fragmentation Index')
-plt.ylabel('Difference between Protocol and ULA FI' )
+plot_correlation_graph(frag_info[0], frag_info[2],
+                       'Program Fragnmentation Index','ULA Fragmentation Index',
+                       'Plot of ULA vs Program Fragmentation Index (SC)', 50, 15 )
+
+plot_correlation_graph(frag_info[1], frag_info[3],
+                       'Program Fragnmentation Index','ULA Fragmentation Index',
+                       'Plot of ULA vs Program Fragmentation Index (SC)', 50, 15 )
 
 
 
-pears = pearsonr(frag_program, frag_protocol)
-spear = spearmanr(frag_program, frag_protocol)
+eff_info = get_parameter_info(SI, sleep_eff, RP, 'Sleep efficiency %') 
 
-
-plt.figure(2)
-plt.text(60, 15, 'Pearson Correalation = ' + str(round(pears[0],2)), style = 'italic')
-plt.text(60, 10, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
-plt.text(20, 90, 'N = ' + str(len(frag_program)), weight = 'bold', size = 'large')
-plt.plot(frag_program, frag_protocol, 'bo')
-plt.title('Plot of ULA vs Program Fragmentation Index (SC)')
-plt.xlabel('Program Fragnmentation Index')
-plt.ylabel('ULA Fragmentation Index')
-
-# Sleep Effeciency Error    
-eff_error = {}
-eff_error_total = []
-eff_error_mean = []
-eff_program = []
-eff_protocol = []
-for part in RP:
-    days = SI[part]
-    error = []
-    mean = []
-    i = 0
-    while i < len(sleep_eff[part]) and i < len(days):
-        sleep_parameters = days[i]
-        eff_part = sleep_parameters['Sleep efficiency %']
-        eff_index_day = sleep_eff[part]
-        error.append(eff_part - eff_index_day[i]) 
-        mean.append((eff_part + eff_index_day[i])/2)
-        eff_program.append(eff_part)
-        eff_protocol.append(eff_index_day[i])
-        i += 1
-        
-    eff_error[part] = error
-    eff_error_total += error
-    eff_error_mean += mean
-
+plot_bland_altman(eff_info[5], eff_info[4], 'Mean Sleep Effeciency',
+                  'Difference between Protocol and ULA SE', 
+                  'Bland Altman Plot Sleep Effeciency (SC)' )
     
-sd = np.std(eff_error_total)
-md = np.mean(eff_error_total)
-vr = np.var(eff_error_total)
 
-pears = pearsonr(eff_program, eff_protocol)
+plot_correlation_graph(eff_info[0], eff_info[2],
+                       'Program Fragnmentation Index','ULA Fragmentation Index',
+                       'Plot of ULA vs Program Fragmentation Index (SC)', 60, 40 )
 
-plt.figure(3)
-plt.plot(eff_error_mean, eff_error_total, 'ro')
-plt.axhline(md,           color='gray', linestyle='--')
-plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
-plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
-plt.title('Bland Altman Plot Sleep Effeciency (SC)')
-plt.xlabel('Mean Sleep Effeciency')
-plt.ylabel('Difference between Protocol and Program SE' )
+plot_correlation_graph(eff_info[1], eff_info[3],
+                       'Program Fragnmentation Index','ULA Fragmentation Index',
+                       'Plot of ULA vs Program Fragmentation Index (SC)', 70, 60 )
 
-plt.figure(4)
-plt.text(60, 40, 'Pearson Correalation = ' + str(round(pears[0],2)), style = 'italic')
-plt.text(60, 36, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
-plt.text(40, 90, 'N = ' + str(len(eff_program)), weight = 'bold', size = 'large')
-plt.plot(eff_program, eff_protocol, 'bo')
-plt.title('Plot of Protocol vs ULA Sleep Effeciency (SC)')
-plt.xlabel('ULA Sleep Effeciency (%)')
-plt.ylabel('Protocol Sleep Effeciency (%)')
+
 
 
 # ACT Error    
