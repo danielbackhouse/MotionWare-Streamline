@@ -294,15 +294,44 @@ for participants in RP:
             if isinstance(time, datetime.datetime):
                 time = time.time()
             
-            GUdatetime = datetime.datetime.combine(dates[i], time)
+            GUdatetime = datetime.datetime.combine(
+                    dates[i] + datetime.timedelta(days = 1), time)
             GU_times_fixed.append(GUdatetime)   
         GU_diary[participants] = GU_times_fixed
         
         
-    
-#TODO: Do something with the returned dictionary
-sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(
-        activity[lights_out_index: got_up_index], 
-                   dateTimes[lights_out_index: got_up_index])
+participant_list = sleep_study.participant_list
+activity = sleep_study.activity
+datetime_arr = sleep_study.datetime_arr
+part_data = {}
+SI = {}
+for i in range(0, len(participant_list)):
+    part_data[participant_list[i]]= [datetime_arr[i], activity[i]]
+                    
+                    
+for participant in participant_list:
+    if(participant in diary_participants):
+        data = part_data[participant]
+        participant_activity = data[1]
+        participant_datetime_arr = data[0]
+        LOdatetimes = LO_diary[participant]
+        GUdatetimes = GU_diary[participant]
+        participant_SI = []
+        for i in range(0, len(LOdatetimes)):
+            LOdatetime = LOdatetimes[i]
+            GUdatetime  = GUdatetimes[i]
+            for index in range(0, len(participant_datetime_arr)):
+                if LOdatetime == participant_datetime_arr[index]:
+                    lights_out_index = index
+                if GUdatetime == participant_datetime_arr[index]:
+                    got_up_index = index 
+ 
+                
+            sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(
+                   participant_activity[lights_out_index: got_up_index], 
+                   participant_datetime_arr[lights_out_index: got_up_index]) 
+            participant_SI.append(sleepAnalysisInfo)
+            
+        SI[participant] = participant_SI
 
 
