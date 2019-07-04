@@ -43,7 +43,6 @@ class Study:
             print('Getting study dates...')
             study_dates, participant_num = self.__get_study_dates(sd_directory)
             print('\n Getting trimmed data based on study dates')
-            self.sleep_diary_dates = study_dates
             dates, times, activity, lux, participants = self.__get_study_trimmed_data(
                     study_dates, participant_num)
         else:

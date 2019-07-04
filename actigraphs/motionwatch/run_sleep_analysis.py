@@ -10,6 +10,7 @@
     Author: Alan Yan and Daniel Backhouse
 """
 import create.Study as study
+import compute.sleep_analysis as sleep_analysis
 import create.ProtocolSleepAnalysis as ps
 import compute.error_analysis as err
 import pandas as pd
@@ -19,6 +20,7 @@ from scipy.stats import pearsonr
 from scipy.stats import spearmanr
 import seaborn as sns
 import matplotlib.patches as mpatches
+import datetime
 
 raw_data_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\Baseline"
 sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Diary.xlsx"
@@ -107,22 +109,9 @@ protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
 LOprotocol, GUprotocol, sleep_eff, frag_index, act_index, latency_index = protocol.get_study_analysis_sleep_times()
 
 error_study_GU, RP = err.get_error_study(GU,GUprotocol,PL)
-error_per_participant_GU = err.get_error_per_participant(GU, GUprotocol, PL)
-count_GU = err.entries_over_fifteen(error_per_participant_GU)
-error_GU = err.total_error(error_study_GU)
-
 error_study_LO, RP = err.get_error_study(LO,LOprotocol,PL)
-error_per_participant_LO = err.get_error_per_participant(LO, LOprotocol, PL)
-count_LO = err.entries_over_fifteen(error_per_participant_LO)
-error_LO = err.total_error(error_study_LO)
-
-total_list = []
-for participant in list(error_per_participant_GU.values()):
-    total_list += participant
- 
 
        
-
 frag_info = get_parameter_info(SI, frag_index, RP, 'Fragmentation Index') 
 
 plot_bland_altman(frag_info[5], frag_info[4], 'Mean Fragmentation Index',
@@ -154,8 +143,6 @@ plot_correlation_graph(eff_info[0], eff_info[2],
 plot_correlation_graph(eff_info[1], eff_info[3],
                        'Program Fragnmentation Index','ULA Fragmentation Index',
                        'Plot of ULA vs Program Fragmentation Index (SC)', 70, 60 )
-
-
 
 
 # ACT Error    
@@ -263,26 +250,59 @@ plt.ylabel('Protocol Sleep Latency (min)')
 
 
 
-data = np.array([eff_program, eff_protocol]).transpose()
-df = pd.DataFrame(data, columns = ['Eff ULA', 'Eff Protocol'])
-eff_program_arr = np.array(eff_program)/sum(eff_program)
-eff_protocol_arr = np.array(eff_protocol)/sum(eff_protocol)
+file = pd.read_excel(r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Complete Diary.xlsx", 
+                     sheet_name = None)
 
+LO_diary = {}
+GU_diary = {}
+midnight = datetime.time(0, 0)
+midday  = datetime.time(16, 0)
+diary_participants = []
+for participants in RP:
+    if ('SC-'+ participants) in file.keys():
+        diary_participants.append(participants)
+        sheet = file['SC-' + participants]
+        dates = list(sheet)
+        dates.pop()
+        dates.reverse()
+        dates.pop()
+        dates.reverse()
+        
+        LO_times =  sheet.iloc[1, 1:15].tolist()
+        LO_times_fixed = []  
+        for i in range(0,len(LO_times)):
+            time = LO_times[i]
+            if isinstance(time, datetime.datetime):
+                time = time.time()
+                
+            if(time > midnight and time < midday):
+                LOdatetime = datetime.datetime.combine(
+                        dates[i] + datetime.timedelta(days = 1), time)
+                LO_times_fixed.append(LOdatetime)
+            else:
+                LOdatetime = datetime.datetime.combine(
+                        dates[i], time)
+                LO_times_fixed.append(LOdatetime)
+            
+        LO_diary[participants] = LO_times_fixed
+        
+    
+        GU_times = sheet.iloc[6, 1:15].tolist()
+        GU_times_fixed = []   
+        for i in range(0, len(GU_times)):
+            time = GU_times[i]
+            if isinstance(time, datetime.datetime):
+                time = time.time()
+            
+            GUdatetime = datetime.datetime.combine(dates[i], time)
+            GU_times_fixed.append(GUdatetime)   
+        GU_diary[participants] = GU_times_fixed
+        
+        
+    
+#TODO: Do something with the returned dictionary
+sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(
+        activity[lights_out_index: got_up_index], 
+                   dateTimes[lights_out_index: got_up_index])
 
-ax = sns.distplot(eff_protocol, color  = 'red', kde = True, hist = False)
-sns.distplot(eff_program, color = 'blue', kde = True, hist = False)
-ax.set_title('Sleep Effeciency Program and ULA Values')
-ax.set_xlabel('Sleep Effeciency (%)')
-ax.set_ylabel('Density')
-ax.set_xlim(40, 100)
-red_patch = mpatches.Patch(color='red', label='Protocol')
-blue_patch = mpatches.Patch(color='blue', label='ULA')
-ax.legend(handles=[red_patch, blue_patch])
-
-
-#sns.jointplot(x = 'FI ULA', y = 'FI Protocol', data = df, kind = 'kde')
-
-#p1=sns.kdeplot(df['FI ULA'], shade=False, color="r")
-#p1=sns.kdeplot(df['FI Protocol'], shade=False, color="b")
-#sns.plt.show()
 
