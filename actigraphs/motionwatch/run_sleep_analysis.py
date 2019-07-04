@@ -65,6 +65,7 @@ def get_parameter_info(program_SI, protocol_PI, RP, parameter):
     part_protocol = []
     
     for participant in RP:
+        print(participant)
         param_program = program_SI[participant]
         param_protocol = protocol_PI[participant]
         program_sum = 0
@@ -255,19 +256,15 @@ file = pd.read_excel(r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Complete Diary
 
 LO_diary = {}
 GU_diary = {}
-midnight = datetime.time(0, 0)
+midnight = datetime.time(23, 59)
 midday  = datetime.time(16, 0)
 diary_participants = []
 for participants in RP:
     if ('SC-'+ participants) in file.keys():
         diary_participants.append(participants)
         sheet = file['SC-' + participants]
-        dates = list(sheet)
-        dates.pop()
-        dates.reverse()
-        dates.pop()
-        dates.reverse()
-        
+        GUdates =  GUprotocol[participants]
+        LOdates = LOprotocol[participants] 
         LO_times =  sheet.iloc[1, 1:15].tolist()
         LO_times_fixed = []  
         for i in range(0,len(LO_times)):
@@ -275,13 +272,17 @@ for participants in RP:
             if isinstance(time, datetime.datetime):
                 time = time.time()
                 
-            if(time > midnight and time < midday):
+            if( midday < LOdates[i].time() <= midnight and time < midday):
                 LOdatetime = datetime.datetime.combine(
-                        dates[i] + datetime.timedelta(days = 1), time)
+                        LOdates[i] + datetime.timedelta(days = 1), time)
                 LO_times_fixed.append(LOdatetime)
+            elif( midday < time <= midnight and LOdates[i].time() < midday ):
+                LOdatetime = datetime.datetime.combine(
+                        LOdates[i] - datetime.timedelta(days = 1), time)
+                LO_times_fixed.append(LOdatetime) 
             else:
                 LOdatetime = datetime.datetime.combine(
-                        dates[i], time)
+                        LOdates[i], time)
                 LO_times_fixed.append(LOdatetime)
             
         LO_diary[participants] = LO_times_fixed
@@ -295,7 +296,7 @@ for participants in RP:
                 time = time.time()
             
             GUdatetime = datetime.datetime.combine(
-                    dates[i] + datetime.timedelta(days = 1), time)
+                    GUdates[i], time)
             GU_times_fixed.append(GUdatetime)   
         GU_diary[participants] = GU_times_fixed
         
@@ -304,7 +305,7 @@ participant_list = sleep_study.participant_list
 activity = sleep_study.activity
 datetime_arr = sleep_study.datetime_arr
 part_data = {}
-SI = {}
+SIdiary = {}
 for i in range(0, len(participant_list)):
     part_data[participant_list[i]]= [datetime_arr[i], activity[i]]
                     
@@ -332,6 +333,14 @@ for participant in participant_list:
                    participant_datetime_arr[lights_out_index: got_up_index]) 
             participant_SI.append(sleepAnalysisInfo)
             
-        SI[participant] = participant_SI
+        SIdiary[participant] = participant_SI
 
+frag_info_diary = get_parameter_info(SIdiary, frag_index, diary_participants,
+                               'Fragmentation Index') 
 
+frag_info_program = get_parameter_info(SI, frag_index, diary_participants,
+                               'Fragmentation Index') 
+
+plot_correlation_graph(frag_info_diary[0], frag_info_program[0],
+                       'Program Fragnmentation Index','ULA Fragmentation Index',
+                       'Plot of ULA vs Program Fragmentation Index (SC)', 50, 15 )
