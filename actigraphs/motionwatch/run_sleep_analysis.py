@@ -341,6 +341,34 @@ frag_info_diary = get_parameter_info(SIdiary, frag_index, diary_participants,
 frag_info_program = get_parameter_info(SI, frag_index, diary_participants,
                                'Fragmentation Index') 
 
-plot_correlation_graph(frag_info_diary[0], frag_info_program[0],
+eff_info_diary = get_parameter_info(SIdiary, sleep_eff, diary_participants, 'Sleep efficiency %') 
+
+eff_info_program = get_parameter_info(SI, sleep_eff, diary_participants, 'Sleep efficiency %')
+
+plot_correlation_graph(frag_info_diary[1], frag_info_program[1],
                        'Program Fragnmentation Index','ULA Fragmentation Index',
                        'Plot of ULA vs Program Fragmentation Index (SC)', 50, 15 )
+
+ax = sns.distplot(frag_info_diary[0], color  = 'red', kde = True, hist = False)
+sns.distplot(frag_info_program[0], color = 'blue', kde = True, hist = False)
+sns.distplot(frag_info_program[2], color = 'green', kde = True, hist = False)
+ax.set_title('Fragmentation Index Program and ULA Values')
+ax.set_xlabel('Fragmentation Index')
+ax.set_ylabel('Density')
+ax.set_xlim(0, 100)
+red_patch = mpatches.Patch(color='red', label='Diary')
+blue_patch = mpatches.Patch(color='blue', label='ULA')
+green_patch = mpatches.Patch(color='green', label='Protocol')
+ax.legend(handles=[red_patch, blue_patch, green_patch])
+
+ax = sns.distplot(eff_info_diary[0], color  = 'red', kde = True, hist = False)
+sns.distplot(eff_info_program[0], color = 'blue', kde = True, hist = False)
+sns.distplot(eff_info_program[2], color = 'green', kde = True, hist = False)
+ax.set_title('Sleep Effeciency Program and ULA Values')
+ax.set_xlabel('Sleep Effeciency (%)')
+ax.set_ylabel('Density')
+ax.set_xlim(40, 100)
+red_patch = mpatches.Patch(color='red', label='Diary')
+blue_patch = mpatches.Patch(color='blue', label='ULA')
+green_patch = mpatches.Patch(color='green', label='Protocol')
+ax.legend(handles=[red_patch, blue_patch, green_patch])
