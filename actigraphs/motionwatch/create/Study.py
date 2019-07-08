@@ -1,3 +1,4 @@
+
 """ Title: Study
     Purpose: The study class 
     Author: Daniel Backhouse and Alan Yan

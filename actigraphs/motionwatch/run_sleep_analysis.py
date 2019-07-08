@@ -47,7 +47,7 @@ def plot_correlation_graph(x, y, xtitle, ytitle, title, xpos, ypos):
     plt.figure()
     plt.text(xpos, ypos, 'Pearson Correalation = ' + str(round(pears[0],2)), style = 'italic')
     #plt.text(xpos, ypos-5, 'Spearman Correalation = ' + str(round(spear[0],2)), style = 'italic')
-    #plt.text(20, 90, 'N = ' + str(len(x)), weight = 'bold', size = 'large')
+    plt.text(300, 500, 'N = ' + str(len(x)), weight = 'bold', size = 'large')
     plt.plot(x, y, 'bo')
     plt.title(title)
     plt.xlabel(xtitle)
@@ -115,8 +115,8 @@ error_study_LO, RP = err.get_error_study(LO,LOprotocol,PL)
        
 frag_info = get_parameter_info(SI, frag_index, RP, 'Fragmentation Index') 
 
-plot_bland_altman(frag_info[5], frag_info[4], 'Mean Fragmentation Index',
-                  'Difference between Protocol and ULA FI', 
+plot_bland_altman(frag_info_diary[5], frag_info_diary[4], 'Mean Fragmentation Index',
+                  'Difference between Protocol and CSD FI', 
                   'Bland Altman Plot Fragmentation Index (SC)' )
     
 
@@ -132,8 +132,8 @@ plot_correlation_graph(frag_info[1], frag_info[3],
 
 eff_info = get_parameter_info(SI, sleep_eff, RP, 'Sleep efficiency %') 
 
-plot_bland_altman(eff_info[5], eff_info[4], 'Mean Sleep Effeciency',
-                  'Difference between Protocol and ULA SE', 
+plot_bland_altman(eff_info_program[5], eff_info_program[4], 'Mean Sleep Effeciency',
+                  'Difference between Protocol and CSD SE', 
                   'Bland Altman Plot Sleep Effeciency (SC)' )
     
 
@@ -350,10 +350,14 @@ act_error_total = []
 act_error_mean = []
 act_diary = []
 act_protocol = []
+act_diary_part = []
+act_protocol_part = []
 for part in diary_participants:
     days = SIdiary[part]
     error = []
     mean = []
+    diary_sum = 0 
+    protocol_sum = 0
     i = 0
     while i < len(act_index[part]) and i < len(days):
         sleep_parameters = days[i]
@@ -365,22 +369,29 @@ for part in diary_participants:
         mean.append((act_program_point + act_protocol_point/60)/2)
         act_diary.append(act_program_point)
         act_protocol.append(act_protocol_point/60)
+        diary_sum += act_program_point
+        protocol_sum += act_protocol_point/60
         i += 1
         
     act_error[part] = error
     act_error_total += error
     act_error_mean += mean
+    act_diary_part.append(diary_sum/i)
+    act_protocol_part.append(protocol_sum/i)
+    
 
 act_error = {}
 act_error_total = []
 act_error_mean = []
 act_program = []
 act_protocol = []
+act_program_part = []
 for part in diary_participants:
     days = SI[part]
     error = []
     mean = []
     i = 0
+    program_sum = 0
     while i < len(act_index[part]) and i < len(days):
         sleep_parameters = days[i]
         act_part = sleep_parameters['Actual sleep time']
@@ -391,28 +402,30 @@ for part in diary_participants:
         mean.append((act_program_point + act_protocol_point/60)/2)
         act_program.append(act_program_point)
         act_protocol.append(act_protocol_point/60)
+        program_sum += act_program_point
         i += 1
         
     act_error[part] = error
     act_error_total += error
     act_error_mean += mean
+    act_program_part.append(program_sum/i)
 
 
 
 
-plot_correlation_graph(act_diary, act_program,
-                       'Program Sleep Duration','ULA Sleep Duration',
-                       'Plot of ULA vs Program Sleep Duration (SC)', 100, 600 )
+plot_correlation_graph(act_diary_part, act_protocol_part,
+                       'CSD Sleep Duration (min)','Protocol Sleep Duration (min)',
+                       'Plot of Protocol vs CSD Sleep Duration (SC)', 400, 300 )
 
 
 
-plot_correlation_graph(frag_info_diary[1], frag_info_program[1],
-                       'Program Fragnmentation Index','ULA Fragmentation Index',
-                       'Plot of ULA vs Program Fragmentation Index (SC)', 50, 15 )
+plot_correlation_graph(eff_info_program[1], eff_info_diary[1],
+                       'ULA Sleep Effeciency (%)','CSD Sleep Effeciency (%)',
+                       'Plot of CSD vs ULA Sleep Effeciency (SC)', 75, 60 )
 
-ax = sns.distplot(frag_info_diary[0], color  = 'red', kde = True, hist = False)
-sns.distplot(frag_info_program[0], color = 'blue', kde = True, hist = False)
-sns.distplot(frag_info_program[2], color = 'green', kde = True, hist = False)
+ax = sns.distplot(frag_info_diary[1], color  = 'red', kde = True, hist = False)
+sns.distplot(frag_info_program[1], color = 'blue', kde = True, hist = False)
+sns.distplot(frag_info_program[3], color = 'green', kde = True, hist = False)
 ax.set_title('Fragmentation Index Program and ULA Values')
 ax.set_xlabel('Fragmentation Index')
 ax.set_ylabel('Density')
@@ -422,9 +435,9 @@ blue_patch = mpatches.Patch(color='blue', label='ULA')
 green_patch = mpatches.Patch(color='green', label='Protocol')
 ax.legend(handles=[red_patch, blue_patch, green_patch])
 
-ax = sns.distplot(eff_info_diary[0], color  = 'red', kde = True, hist = False)
-sns.distplot(eff_info_program[0], color = 'blue', kde = True, hist = False)
-sns.distplot(eff_info_program[2], color = 'green', kde = True, hist = False)
+ax = sns.distplot(eff_info_diary[1], color  = 'red', kde = True, hist = False)
+sns.distplot(eff_info_program[1], color = 'blue', kde = True, hist = False)
+sns.distplot(eff_info_program[3], color = 'green', kde = True, hist = False)
 ax.set_title('Sleep Effeciency Program and ULA Values')
 ax.set_xlabel('Sleep Effeciency (%)')
 ax.set_ylabel('Density')
@@ -435,9 +448,9 @@ green_patch = mpatches.Patch(color='green', label='Protocol')
 ax.legend(handles=[red_patch, blue_patch, green_patch])
 
 
-ax = sns.distplot(act_diary, color  = 'red', kde = True, hist = False)
-sns.distplot(act_program, color = 'blue', kde = True, hist = False)
-sns.distplot(act_protocol, color = 'green', kde = True, hist = False)
+ax = sns.distplot(act_diary_part, color  = 'red', kde = True, hist = False)
+sns.distplot(act_program_part, color = 'blue', kde = True, hist = False)
+sns.distplot(act_protocol_part, color = 'green', kde = True, hist = False)
 ax.set_title('Sleep Duration (min) Program and ULA Values')
 ax.set_xlabel('Sleep Duration (min)')
 ax.set_ylabel('Density')
@@ -446,3 +459,30 @@ red_patch = mpatches.Patch(color='red', label='Diary')
 blue_patch = mpatches.Patch(color='blue', label='ULA')
 green_patch = mpatches.Patch(color='green', label='Protocol')
 ax.legend(handles=[red_patch, blue_patch, green_patch])
+
+
+
+frag_diary_part = frag_info_diary[0]
+frag_program_part = frag_info_program[0]
+frag_protocol_part = frag_info_program[2]
+
+eff_diary_part = eff_info_diary[0]
+eff_program_part = eff_info_program[0]
+eff_protocol_part = eff_info_program[2]
+
+def sleepers(FI, SE, SD, diary_participants):
+    poor_sleepers = []
+    good_sleepers = []
+    average_sleepers = []
+    for i in range(0, len(diary_participants)):
+        if FI[i] <= 25 and SE[i] >= 85 and SD[i] >= 420:
+            good_sleepers.append(diary_participants[i])
+        elif (FI[i] >= 40 and SE[i] <= 75) or (SD[i] <= 360):
+            poor_sleepers.append(diary_participants[i])
+        else:
+            average_sleepers.append(diary_participants[i])
+        
+    return good_sleepers, average_sleepers, poor_sleepers
+    
+
+
