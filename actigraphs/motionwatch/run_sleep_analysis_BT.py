@@ -22,11 +22,11 @@ import seaborn as sns
 import matplotlib.patches as mpatches
 import datetime
 
-raw_data_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\Baseline"
-sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Diary.xlsx"
-sa_directory =  r'C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Analysis.xlsx'
+raw_data_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\Baseline"
+sleep_diary_directory = r"C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Diary.xlsx"
+sa_directory =  r'C:\Users\dbackhou\Desktop\BT Sleep Copy\BT Sleep Analysis.xlsx'
 skiprows_rawdata = 20
-study_name = "SC"
+study_name = "BT"
 assesment = "Baseline"
 trim_type = 2
 ws = 6
