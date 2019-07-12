@@ -60,8 +60,8 @@ LO_one, GU_one, SI_one, PL_one = sleep_study.get_in_bed_times(ws, dm, zmc, zac, 
 error, RP = err.get_error_study(LO_one,LOprotocol,PL_one)
 
 
-LO_two, GU_two, SI_two, PL_two = sleep_study.get_in_bed_times(ws, 600, zmc, 10, zlc, ta)
-LO_three, GU_three, SI_three, PL_three = sleep_study.get_in_bed_times(ws, 15, zmc, 10, zlc, ta)
+LO_two, GU_two, SI_two, PL_two = sleep_study.get_in_bed_times(ws, 10, zmc, 20, zlc, ta)
+LO_three, GU_three, SI_three, PL_three = sleep_study.get_in_bed_times(ws, 20, zmc, 20, zlc, ta)
 LO_four, GU_four, SI_four, PL_four = sleep_study.get_in_bed_times(ws, dm, zmc + 15, zac, zlc, ta)
 LO_five, GU_five, SI_five, PL_five = sleep_study.get_in_bed_times(ws, dm, zmc + 20, zac, zlc, ta)
 
@@ -88,9 +88,9 @@ ax.set_xlabel('Sleep Effeciency (%)')
 ax.set_ylabel('Density')
 ax.set_xlim(40, 100)
 
-red_patch = mpatches.Patch(color='red', label='DM = 15')
-blue_patch = mpatches.Patch(color='blue', label='ZAC = 10')
-purple_patch = mpatches.Patch(color='purple', label='ZAC = 10, DM = 15')
+red_patch = mpatches.Patch(color='red', label='DM = 20, ZAC = 10')
+blue_patch = mpatches.Patch(color='blue', label='DM = 10, DM = 20')
+purple_patch = mpatches.Patch(color='purple', label='ZAC = 20, DM = 20')
 #yellow_patch = mpatches.Patch(color='orange', label='DM = 20')
 #gray_patch = mpatches.Patch(color='gray', label='DM = 25')
 green_patch = mpatches.Patch(color='green', label='Sleep Protocol')

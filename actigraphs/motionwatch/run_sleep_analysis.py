@@ -386,12 +386,14 @@ act_error_mean = []
 act_program = []
 act_protocol = []
 act_program_part = []
+act_protocol_part = []
 for part in diary_participants:
     days = SI[part]
     error = []
     mean = []
     i = 0
     program_sum = 0
+    protocol_sum = 0
     while i < len(act_index[part]) and i < len(days):
         sleep_parameters = days[i]
         act_part = sleep_parameters['Actual sleep time']
@@ -403,13 +405,15 @@ for part in diary_participants:
         act_program.append(act_program_point)
         act_protocol.append(act_protocol_point/60)
         program_sum += act_program_point
+        protocol_sum += act_protocol_point/60
         i += 1
+     
         
     act_error[part] = error
     act_error_total += error
     act_error_mean += mean
     act_program_part.append(program_sum/i)
-
+    act_protocol_part.append(protocol_sum/i)
 
 
 
@@ -485,4 +489,27 @@ def sleepers(FI, SE, SD, diary_participants):
     return good_sleepers, average_sleepers, poor_sleepers
     
 
-
+def over_under_estimate(estimate, exact):
+    
+    over = 0
+    under = 0
+    same = 0
+    for i in range(0, len(estimate)):
+        
+        if estimate[i] > exact[i]:
+            over += 1
+        elif estimate[i] < exact[i]:
+            under += 1
+        else:
+            same += 1
+            
+    return over, same, under
+            
+    
+    
+    
+    
+    
+    
+    
+        
