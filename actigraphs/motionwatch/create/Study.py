@@ -76,6 +76,10 @@ class Study:
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
                     dm, zmc, zac, zlc, ta)
+            
+            LOdatetime.pop()
+            GUdatetime.pop()
+            SleepInfo.pop()
             LOdatetimeDic[self.participant_list[i]] = LOdatetime
             GUdatetimeDic[self.participant_list[i]] = GUdatetime
             SleepInfoDic[self.participant_list[i]] = SleepInfo
