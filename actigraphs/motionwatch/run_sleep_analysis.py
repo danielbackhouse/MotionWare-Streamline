@@ -35,6 +35,8 @@ zac = 10
 zmc = 180
 zlc = 180
 ta = 20 
+zsc = 10
+lc = 10000
 
     
 
@@ -103,7 +105,7 @@ def plot_bland_altman(error_total, mean_error, xtitle, ytitle, title):
 # Get the times for the protocol and program
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
                           assesment, trim_type, sleep_diary_directory)
-LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta)
+LO, GU, SI, PL = sleep_study.get_in_bed_times(ws, dm, zmc, zac, zlc, ta, zsc, lc)
 
 protocol = ps.ProtocolSleepAnalysis(sa_directory, sleep_study.participant_list,
                                     study_name, assesment)

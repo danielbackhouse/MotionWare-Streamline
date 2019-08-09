@@ -8,7 +8,8 @@ import datetime
 import compute.sleep_analysis as sleep_analysis
 
 #TODO: Modify docstring to once sleep analysis is completed
-def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, ta):
+def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, 
+                     ta, zsc, lc):
     """ Finds the got up and lights out times of a participant
     
     ****NOTE: This module and corresponding program has ONLY been validated
@@ -101,7 +102,8 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc, t
         awake_range_backward = index + 5*60
         awake_range_forward = index + 12*60
         got_up_index = __find_got_up_index(awake_range_backward, activity, lux, 
-                                         awake_range_forward, sleepRangeMean )
+                                         awake_range_forward, sleepRangeMean, 
+                                         zsc, lc )
         got_up_indices.append(got_up_index)
         
         #TODO: Do something with the returned dictionary
@@ -343,7 +345,7 @@ def __find_lights_out_index(index, activity, lux, sleepRange, dm, zmc, zac, zlc,
                       
     return lights_out_index
     
-def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
+def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean, zsc, lc):
     """ Finds the got up time of the participant
     
     :param (array) activity: the activity data of the participant
@@ -356,6 +358,7 @@ def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
     :rtype: (int)
     """
     zeroStirringCount = 0;
+    light_count = 0;
     got_up_index = index 
     while index < sleep_range and index < len(activity): # added less than end of len activity                                                      
         if lux[index] != 0 and activity[index] >= sleepRangeMean: # so that if the last indice
@@ -365,9 +368,20 @@ def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean):
         else:
             zeroStirringCount = 0
             
-        if zeroStirringCount >= 10:
+        if lux[index] != 0:
+            light_count +=1
+            if light_count == 1:
+                got_up_index = index
+        else:
+            light_count = 0
+            
+            
+        if zeroStirringCount >= zsc:
             return got_up_index
             
+        if light_count >= lc:
+            return got_up_index
+        
         index = index + 1
                        
     return got_up_index

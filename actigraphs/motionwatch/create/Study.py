@@ -59,7 +59,7 @@ class Study:
         print('\n Converting date and times...')
         self.datetime_arr = self.__convert_date_time()
     
-    def get_in_bed_times(self, window_size, dm, zmc, zac, zlc, ta):
+    def get_in_bed_times(self, window_size, dm, zmc, zac, zlc, ta, zsc, lc):
         """Gets the in bed times for when not using sleep diaries
         
         :param: None
@@ -75,7 +75,7 @@ class Study:
             print(self.participant_list[i])
             LOdatetime, GUdatetime, SleepInfo = find_in_bed_times.find_in_bed_time(
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
-                    dm, zmc, zac, zlc, ta)
+                    dm, zmc, zac, zlc, ta, zsc, lc)
             
             LOdatetime.pop()
             GUdatetime.pop()
