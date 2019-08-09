@@ -50,7 +50,7 @@ class Study:
             print('\n Error you entered an invalid trim_type (enter number between 0-2)')
             print('Terminating program...')
             sys.exit()
-            
+        
         self.dates = dates
         self.times = times
         self.activity = activity
@@ -245,6 +245,7 @@ class Study:
                     print(participant_num)
                     part_dates = study_dates[dates_counter]
                     start = part_dates[0]
+
                     end = part_dates[1]
                     #TODO add detection for unentered sleep diary
                     dates, times, lux, activity = raw_data_editor.study_trimmed_data(
