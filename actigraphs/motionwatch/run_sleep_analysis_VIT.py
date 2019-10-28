@@ -46,6 +46,22 @@ zsc = 10
 lc = 10000
 
 
+def get_parameter(sleep_info, RP):
+    parameter_info = {}
+    parameter_average = {}
+    for participant in RP:
+        week_info = sleep_info[participant]
+        sleep_parameter = []
+        print(participant)
+        for i in range(0, len(week_info)):
+            day_info = week_info[i]
+            sleep_parameter.append(day_info["Sleep efficiency %"])#.total_seconds()/60)
+         
+        parameter_info[participant] = sleep_parameter
+        parameter_average[participant] = np.mean(sleep_parameter)
+    
+    return parameter_info, parameter_average
+    
 # Get the times for the protocol and program
 sleep_study = study.Study(raw_data_directory, skiprows_rawdata, study_name,
                           assesment, trim_type, sleep_diary_directory)
@@ -60,4 +76,40 @@ assesment = "Final"
 sleep_study_midpoint = study.Study(raw_data_directory, skiprows_rawdata, study_name,
                           assesment, trim_type, sleep_diary_directory)
 LO_mid, GU_mid, SI_mid, PL_mid = sleep_study_midpoint.get_in_bed_times(ws, dm, zmc, zac, zlc, ta, zsc, lc)
+
+
+raw_data_directory = r"C:\Users\dbackhou\Desktop\VIT Grant\Midpoint"
+assesment = "Midpoint"
+
+
+sleep_study_3month = study.Study(raw_data_directory, skiprows_rawdata, study_name,
+                          assesment, trim_type, sleep_diary_directory)
+LO_3mo, GU_3mo, SI_3mo, PL_3mo = sleep_study_3month.get_in_bed_times(ws, dm, zmc, zac, zlc, ta, zsc, lc)
+
+RP =[]
+for participant in PL:
+    if participant in PL_3mo and participant in PL_mid:
+        RP.append(participant)
+
+
+
+
+_, frag_index_base = get_parameter(SI_bas, RP)
+_, frag_index_mid = get_parameter(SI_mid, RP)
+_, frag_index_3mo = get_parameter(SI_3mo, RP)
+
+df_base = pd.DataFrame.from_dict(data = frag_index_base, orient='index')
+df_3mo = pd.DataFrame.from_dict(data = frag_index_3mo, orient = 'index')
+df_mid = pd.DataFrame.from_dict(data = frag_index_mid, orient='index')
+
+df_base.to_excel('sleep_eff_base_VIT.xlsx')
+df_mid.to_excel("sleep_eff_mid_VIT.xlsx")
+df_3mo.to_excel("sleep_eff_3mo_VIT.xlsx")
+
+
+
+
+
+
+
 

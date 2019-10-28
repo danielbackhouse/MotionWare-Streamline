@@ -30,10 +30,10 @@ study_name = "SC"
 assesment = "Baseline"
 trim_type = 2
 ws = 6
-dm = 20 
-zac = 10
-zmc = 180
-zlc = 180
+dm = 10000
+zac = 10000
+zmc = 10000
+zlc = 15
 ta = 20 
 zsc = 10
 lc = 10000
@@ -346,6 +346,8 @@ frag_info_program = get_parameter_info(SI, frag_index, diary_participants,
 eff_info_diary = get_parameter_info(SIdiary, sleep_eff, diary_participants, 'Sleep efficiency %') 
 
 eff_info_program = get_parameter_info(SI, sleep_eff, diary_participants, 'Sleep efficiency %')
+
+
 
 act_error = {}
 act_error_total = []

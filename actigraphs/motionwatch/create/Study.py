@@ -77,9 +77,6 @@ class Study:
                     self.datetime_arr[i], self.activity[i], self.lux[i], window_size,
                     dm, zmc, zac, zlc, ta, zsc, lc)
             
-            LOdatetime.pop()
-            GUdatetime.pop()
-            SleepInfo.pop()
             LOdatetimeDic[self.participant_list[i]] = LOdatetime
             GUdatetimeDic[self.participant_list[i]] = GUdatetime
             SleepInfoDic[self.participant_list[i]] = SleepInfo
@@ -118,14 +115,9 @@ class Study:
         for sheets in file.values():
             raw_dates.append(list(sheets))
         
-        raw_dates.reverse() #Removing the template sheet
-        raw_dates.pop()
-        raw_dates.reverse()
-        
         real_dates = self.__get_study_days(raw_dates)
         
         participant_nums = self.__format_diary_participants(list(file.keys()))
-        
         return real_dates, participant_nums
     
     def __format_diary_participants(self, participants):
@@ -134,9 +126,6 @@ class Study:
         :param (list) participants: a list of the participant ID's taken from
         the sleep diaries
         """
-        participants.reverse()
-        participants.pop()
-        participants.reverse()
         ID_num = []
         for ID in participants:
             ID_num.append(ID[len(self.study_name)+1:len(ID)])
@@ -158,7 +147,7 @@ class Study:
             participant.reverse()
             for dates in participant:
                 if(isinstance(dates, datetime.datetime )):
-                    end_dates = dates
+                    end_dates = dates + datetime.timedelta(days=1)
                     break
                 
             real_dates.append([start_date, end_dates])

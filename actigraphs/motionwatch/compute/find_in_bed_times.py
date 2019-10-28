@@ -80,8 +80,8 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc,
     :rtype: (list) (list)
     :raises: Exception (no 12pm in array)
     """
-    #TODO: Bug in __get_sleep_window indicies (BT 002 Final)
     sleep_window_indices = __get_sleep_window_indices(activity,lux,dateTimes,window_size)
+    print(len(sleep_window_indices))
     lights_out_indices = list()
     got_up_indices = list()
     lights_out_dateTimes = list()
@@ -89,6 +89,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc,
     sleep_analysis_list = list()
     
     for index in sleep_window_indices:
+        
         sleep_range_backward = index - 3*60
         sleep_range_forward = index + 3*60 
         lights_out_index = __find_lights_out_index(sleep_range_backward, activity,
@@ -109,7 +110,7 @@ def find_in_bed_time(dateTimes, activity, lux, window_size, dm, zmc, zac, zlc,
         #TODO: Do something with the returned dictionary
         sleepAnalysisInfo = sleep_analysis.findSleepAnalysisData(activity[lights_out_index: got_up_index], 
                            dateTimes[lights_out_index: got_up_index])
-        
+        print(str(dateTimes[index]) +  " LO:  " + str(dateTimes[lights_out_index]) + " GU:  " + str(dateTimes[got_up_index]) )
         sleep_analysis_list.append(sleepAnalysisInfo)
         lights_out_dateTimes.append(dateTimes[lights_out_index])
         got_up_dateTimes.append(dateTimes[got_up_index])
@@ -360,9 +361,9 @@ def __find_got_up_index(index, activity, lux, sleep_range, sleepRangeMean, zsc, 
     zeroStirringCount = 0;
     light_count = 0;
     got_up_index = index 
-    while index < sleep_range and index < len(activity): # added less than end of len activity                                                      
-        if lux[index] != 0 and activity[index] >= sleepRangeMean: # so that if the last indice
-            zeroStirringCount = zeroStirringCount + 1   # happens to be late we account for that
+    while index < sleep_range and index < len(activity):                                                       
+        if lux[index] != 0 and activity[index] >= sleepRangeMean: 
+            zeroStirringCount = zeroStirringCount + 1   
             if zeroStirringCount == 1:
                 got_up_index = index               
         else:
