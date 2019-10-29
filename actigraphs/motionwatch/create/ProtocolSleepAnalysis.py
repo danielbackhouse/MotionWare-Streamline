@@ -41,7 +41,7 @@ class ProtocolSleepAnalysis:
         # added for SC where the sleep analysis changed rows midway through
         for participant_id in self.participant_list:
             # Offset added for Sleep and Cognition (SC)
-            if (participant_id == '130'):
+            if (participant_id == '131'):
                 offset = 0
             print('Offset set to:  ' + str(offset))
             lightsOutTimes, gotUpTimes, se, fi, act, latency = self.get_participant_sleep_analysis_times(

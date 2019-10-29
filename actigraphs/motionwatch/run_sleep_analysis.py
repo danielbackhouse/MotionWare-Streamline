@@ -23,7 +23,7 @@ import matplotlib.patches as mpatches
 import datetime
 
 raw_data_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\Baseline"
-sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Diary.xlsx"
+sleep_diary_directory = r"C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Complete Diary.xlsx"
 sa_directory =  r'C:\Users\dbackhou\Desktop\SC Sleep Copy\SC Sleep Analysis.xlsx'
 skiprows_rawdata = 20
 study_name = "SC"
@@ -419,7 +419,75 @@ for part in diary_participants:
     act_program_part.append(program_sum/i)
     act_protocol_part.append(protocol_sum/i)
 
+lat_error = {}
+lat_error_total = []
+lat_error_mean = []
+lat_diary = []
+lat_protocol = []
+lat_diary_part = []
+lat_protocol_part = []
+for part in diary_participants:
+    days = SIdiary[part]
+    error = []
+    mean = []
+    diary_sum = 0 
+    protocol_sum = 0
+    i = 0
+    while i < len(latency_index[part]) and i < len(days):
+        sleep_parameters = days[i]
+        lat_part = sleep_parameters['Actual sleep time']
+        lat_program_point = lat_part.total_seconds()/60
+        lat_index_day = latency_index[part]
+        lat_protocol_point = (lat_index_day[i].hour*60 + lat_index_day[i].minute)*60 + lat_index_day[i].second
+        error.append(lat_program_point - lat_protocol_point/60) 
+        mean.append((lat_program_point + lat_protocol_point/60)/2)
+        lat_diary.append(lat_program_point)
+        lat_protocol.append(lat_protocol_point/60)
+        diary_sum += lat_program_point
+        protocol_sum += lat_protocol_point/60
+        i += 1
+        
+    lat_error[part] = error
+    lat_error_total += error
+    lat_error_mean += mean
+    lat_diary_part.append(diary_sum/i)
+    lat_protocol_part.append(protocol_sum/i)
+    
 
+lat_error = {}
+lat_error_total = []
+lat_error_mean = []
+lat_program = []
+lat_protocol = []
+lat_program_part = []
+lat_protocol_part = []
+for part in diary_participants:
+    days = SI[part]
+    error = []
+    mean = []
+    i = 0
+    program_sum = 0
+    protocol_sum = 0
+    while i < len(latency_index[part]) and i < len(days):
+        sleep_parameters = days[i]
+        lat_part = sleep_parameters['Actual sleep time']
+        lat_program_point = lat_part.total_seconds()/60
+        lat_index_day = latency_index[part]
+        lat_protocol_point = (lat_index_day[i].hour*60 + lat_index_day[i].minute)*60 + lat_index_day[i].second
+        error.append(lat_program_point - lat_protocol_point/60) 
+        mean.append((lat_program_point + lat_protocol_point/60)/2)
+        lat_program.append(lat_program_point)
+        lat_protocol.append(lat_protocol_point/60)
+        program_sum += lat_program_point
+        protocol_sum += lat_protocol_point/60
+        i += 1
+     
+        
+    lat_error[part] = error
+    lat_error_total += error
+    lat_error_mean += mean
+    lat_program_part.append(program_sum/i)
+    lat_protocol_part.append(protocol_sum/i)
 
 plot_correlation_graph(act_diary_part, act_protocol_part,
                        'CSD Sleep Duration (min)','Protocol Sleep Duration (min)',
