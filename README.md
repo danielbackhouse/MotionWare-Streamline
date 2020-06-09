@@ -121,7 +121,6 @@ Concerning the Sleep Point Determination Method:
 		time range.
 	
 			
-TODO
 
 
 
